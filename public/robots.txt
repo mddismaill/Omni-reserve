@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://book-dine-find.lovable.app/sitemap.xml

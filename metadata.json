@@ -1,0 +1,6 @@
+{
+  "name": "Bookly & Tabletop Unified Booking Platform",
+  "description": "Единый суперсервис для бронирования ресторанных столиков (Tabletop) и спа/фитнес-услуг (Bookly) с общей клиентской базой, интерактивной 3D-схемой залов и персонализированными AI-рекомендациями.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

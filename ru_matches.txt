@@ -1,0 +1,737 @@
+src/lib/i18n.ts:27:    lang: { en: "English", ru: "Русский", hy: "Հայերեն" },
+src/lib/i18n.ts:121:      dashboard: "Дашборд",
+src/lib/i18n.ts:122:      tabletop: "Схема столов (Tabletop)",
+src/lib/i18n.ts:123:      bookly: "Заказ услуг (Bookly)",
+src/lib/i18n.ts:124:      rbac: "🛡️ Управление (RBAC)",
+src/lib/i18n.ts:127:      depositBalance: "ДЕПОЗИТНЫЙ БАЛАНС",
+src/lib/i18n.ts:128:      topUp: "Пополнить баланс",
+src/lib/i18n.ts:129:      logout: "Выйти",
+src/lib/i18n.ts:130:      login: "Войти",
+src/lib/i18n.ts:131:      signup: "Регистрация",
+src/lib/i18n.ts:132:      language: "Язык",
+src/lib/i18n.ts:133:      loading: "Загрузка…",
+src/lib/i18n.ts:134:      cancel: "Отмена",
+src/lib/i18n.ts:135:      save: "Сохранить",
+src/lib/i18n.ts:136:      confirm: "Подтвердить",
+src/lib/i18n.ts:137:      retry: "Попробовать снова",
+src/lib/i18n.ts:138:      close: "Закрыть",
+src/lib/i18n.ts:140:    lang: { en: "English", ru: "Русский", hy: "Հայերեն" },
+src/lib/i18n.ts:142:      title: "Что-то пошло не так",
+src/lib/i18n.ts:143:      description: "Ошибка была зафиксирована. Попробуйте перезагрузить страницу.",
+src/lib/i18n.ts:144:      reload: "Перезагрузить",
+src/lib/i18n.ts:147:      title: "Сканирование QR-кода",
+src/lib/i18n.ts:148:      subtitle: "Регистрация прибытия гостей",
+src/lib/i18n.ts:149:      cameraError: "Не удалось получить доступ к камере. Пожалуйста, убедитесь, что вы разрешили доступ к камере в настройках браузера.",
+src/lib/i18n.ts:150:      initializing: "Инициализация камеры…",
+src/lib/i18n.ts:151:      hint: "Поместите QR-код бронирования или универсальный QR-пропуск клиента в рамку сканера для мгновенного чекина.",
+src/lib/i18n.ts:152:      stop: "Стоп",
+src/lib/i18n.ts:153:      start: "Запуск",
+src/lib/i18n.ts:156:      sectionLabel: "метеорологический контроль",
+src/lib/i18n.ts:157:      title: "Прогноз погоды и терраса",
+src/lib/i18n.ts:158:      wind: "Ветер",
+src/lib/i18n.ts:159:      windUnit: "м/с",
+src/lib/i18n.ts:160:      humidity: "Влажность",
+src/lib/i18n.ts:162:        sunny: "Солнечно, без осадков",
+src/lib/i18n.ts:163:        cloudy: "Переменная облачность",
+src/lib/i18n.ts:164:        rainy: "Ливень и грозовые тучи",
+src/lib/i18n.ts:165:        stormy: "Штормовое предупреждение, гроза",
+src/lib/i18n.ts:167:      shortName: { sunny: "Ясно", cloudy: "Облачно", rainy: "Дождь", stormy: "Шторм" },
+src/lib/i18n.ts:169:        success: "Идеальные условия",
+src/lib/i18n.ts:170:        info: "Комфортно",
+src/lib/i18n.ts:171:        warning: "Ограниченный доступ",
+src/lib/i18n.ts:172:        error: "Внимание: веранда закрыта",
+src/lib/i18n.ts:175:        sunny: "☀️ Великолепная погода! Идеальное время для бронирования столиков на открытой летней веранде. Рекомендуем бронировать заранее.",
+src/lib/i18n.ts:176:        cloudy: "☁️ Облачно и свежо. Отличная погода для обеда на свежем воздухе. Для вашего удобства на веранде доступны теплые пледы и инфракрасные обогреватели.",
+src/lib/i18n.ts:177:        rainy: "🌧️ Внимание: ожидается дождь. Летняя терраса частично закрыта. Столики под навесом доступны, но мы рекомендуем бронировать места в основном зале.",
+src/lib/i18n.ts:178:        stormy: "⛈️ Внимание! Действует штормовое предупреждение. Открытая летняя терраса полностью закрыта в целях безопасности. Пожалуйста, выбирайте места в теплом основном зале или VIP-зоне.",
+src/lib/i18n.ts:182:      title: "Отзывы и оценки гостей",
+src/lib/i18n.ts:183:      description: "Мнения посетителей о кухне, сервисе и общей атмосфере ресторана {{name}}.",
+src/lib/i18n.ts:184:      ratingLabel: "рейтинг",
+src/lib/i18n.ts:185:      countReviews_one: "{{count}} отзыв",
+src/lib/i18n.ts:186:      countReviews_few: "{{count}} отзыва",
+src/lib/i18n.ts:187:      countReviews_many: "{{count}} отзывов",
+src/lib/i18n.ts:188:      countReviews_other: "{{count}} отзыва",
+src/lib/i18n.ts:189:      distribution: "Распределение оценок",
+src/lib/i18n.ts:190:      leaveReview: "Оставить отзыв",
+src/lib/i18n.ts:191:      yourRating: "Ваша оценка",
+src/lib/i18n.ts:192:      reviewText: "Текст отзыва",
+src/lib/i18n.ts:193:      textPlaceholder: "Поделитесь вашими впечатлениями о заведении…",
+src/lib/i18n.ts:194:      submitting: "Публикация…",
+src/lib/i18n.ts:195:      submit: "Отправить отзыв",
+src/lib/i18n.ts:196:      loginPrompt: "Пожалуйста, авторизуйтесь на платформе, чтобы иметь возможность делиться своим мнением.",
+src/lib/i18n.ts:197:      latest: "Последние отзывы",
+src/lib/i18n.ts:198:      loadingReviews: "Загрузка отзывов…",
+src/lib/i18n.ts:199:      empty: "Будьте первым, кто оставит отзыв об этом заведении!",
+src/lib/i18n.ts:200:      verifiedClient: "Подтвержденный клиент",
+src/lib/i18n.ts:201:      errorLoad: "Не удалось загрузить отзывы",
+src/lib/i18n.ts:202:      loginRequired: "Войдите в аккаунт, чтобы оставить отзыв.",
+src/lib/i18n.ts:203:      writeText: "Пожалуйста, напишите текст отзыва.",
+src/lib/i18n.ts:204:      errorSend: "Не удалось отправить отзыв. Попробуйте позже.",
+src/lib/i18n.ts:205:      errorSendGeneric: "Ошибка при отправке отзыва",
+src/lib/i18n.ts:206:      success: "Спасибо! Ваш отзыв успешно опубликован.",
+src/lib/i18n.ts:209:      day: "День",
+src/lib/i18n.ts:210:      sunset: "Закат",
+src/lib/i18n.ts:211:      neon: "Неон",
+src/lib/i18n.ts:212:      nav3d: "3D Навигация",
+src/lib/i18n.ts:213:      navHint: "Зажмите ЛКМ для вращения, ПКМ / Shift+ЛКМ для перемещения. Прокручивайте колесико мыши для масштабирования.",
+src/lib/i18n.ts:214:      statusLegend: "СТАТУС СТОЛОВ",
+src/lib/i18n.ts:215:      available: "Доступен",
+src/lib/i18n.ts:216:      booked: "Забронирован",
+src/lib/i18n.ts:217:      foundInSearch: "Найден в поиске",
+src/lib/i18n.ts:218:      yourChoice: "Ваш выбор",
+src/lib/i18n.ts:219:      loadingSpace: "Загрузка пространства…",
+src/lib/i18n.ts:220:      tableNumber: "Стол #{{n}}",
+src/lib/i18n.ts:221:      type: { vip: "💎 VIP", window: "🌅 У окна", terrace: "🍃 Веранда", standard: "🛋️ Стандарт" },
+src/lib/i18n.ts:222:      capacity: "Вместимость:",
+src/lib/i18n.ts:223:      capacityValue_one: "{{count}} человек",
+src/lib/i18n.ts:224:      capacityValue_few: "{{count}} человека",
+src/lib/i18n.ts:225:      capacityValue_many: "{{count}} человек",
+src/lib/i18n.ts:226:      capacityValue_other: "{{count}} человек",
+src/lib/i18n.ts:227:      deposit: "Депозит брони:",
+src/lib/i18n.ts:228:      statusLabel: "Статус:",
+src/lib/i18n.ts:229:      occupied: "Занят",
+src/lib/i18n.ts:230:      free: "Свободен",
+src/lib/i18n.ts:257:    lang: { en: "English", ru: "Русский", hy: "Հայերեն" },
+src/lib/googleCalendar.ts:51:      throw new Error("Не удалось получить access token из Firebase Auth");
+src/lib/googleCalendar.ts:96:  if (!token) throw new Error("Пользователь не авторизован в Google Calendar");
+src/lib/googleCalendar.ts:111:    throw new Error(errorData.error?.message || "Не удалось загрузить события календаря");
+src/lib/googleCalendar.ts:157:  if (!token) throw new Error("Пользователь не авторизован в Google Calendar");
+src/lib/googleCalendar.ts:162:    ? `🍽️ Ресторан: Бронь Столика #${booking.tableNumber} — ${booking.restaurantName || "OmniReserve"}`
+src/lib/googleCalendar.ts:163:    : `🌸 Спа & Велнес: ${booking.serviceName} (${booking.staffName})`;
+src/lib/googleCalendar.ts:166:    ? `Детали бронирования стола в OmniReserve:\n• Ресторан: ${booking.restaurantName || "OmniReserve"}\n• Столик: #${booking.tableNumber} (${booking.room === "vip" ? "VIP зал" : booking.room === "terrace" ? "Терраса" : "Главный зал"})\n• Гостей: ${booking.guests}\n• Пожелания: ${booking.notes || "нет"}\n• Сумма депозита: ${booking.price} ₽`
+src/lib/googleCalendar.ts:167:    : `Детали записи на услугу в OmniReserve:\n• Услуга: ${booking.serviceName}\n• Категория: ${booking.category}\n• Мастер: ${booking.staffName}\n• Салон: ${booking.salonName || "Lotus Spa"}\n• Стоимость: ${booking.price} ₽`;
+src/lib/googleCalendar.ts:170:    ? `${booking.restaurantName || "OmniReserve"}, ул. Лесная, д. 5, стр. 2`
+src/lib/googleCalendar.ts:171:    : `${booking.salonName || "Lotus Spa & Wellness"}, ул. Лесная, д. 5, стр. 2`;
+src/lib/googleCalendar.ts:205:    throw new Error(errorData.error?.message || "Не удалось сохранить событие в Google Calendar");
+src/lib/googleCalendar.ts:214:  if (!token) throw new Error("Пользователь не авторизован в Google Calendar");
+src/lib/googleCalendar.ts:226:    throw new Error(errorData.error?.message || "Не удалось удалить событие из Google Calendar");
+src/lib/api.ts:50:  return invokeOrThrow<Restaurant[]>("restaurants", { method: "GET" }, "Не удалось загрузить рестораны.")
+src/lib/api.ts:66:    "Ошибка при регистрации ресторана."
+src/lib/api.ts:73:  return invokeOrThrow<Salon[]>("salons", { method: "GET" }, "Не удалось загрузить салоны.")
+src/lib/api.ts:92:    "Ошибка при регистрации салона."
+src/lib/api.ts:99:  return invokeOrThrow<Service[]>("services", { method: "GET" }, "Не удалось загрузить услуги.")
+src/lib/api.ts:112:  return invokeOrThrow<Table[]>(path, { method: "GET" }, "Не удалось загрузить столы.")
+src/lib/api.ts:142:    "Ошибка при бронировании столика."
+src/lib/api.ts:170:    "Ошибка при бронировании услуги."
+src/components/RbacPanel.tsx:74:    { id: "biz-1", name: "Lotus Spa Salon", owner: "Виктор Владелец", subscription: "professional", status: "active", revenue: 145000, logo: "🌸" },
+src/components/RbacPanel.tsx:75:    { id: "biz-2", name: "Gold Gym Active", owner: "Игорь Тренер", subscription: "starter", status: "active", revenue: 82000, logo: "⚡" },
+src/components/RbacPanel.tsx:76:    { id: "biz-3", name: "Prime Barber", owner: "Сергей Стиль", subscription: "enterprise", status: "active", revenue: 310000, logo: "💈" },
+src/components/RbacPanel.tsx:77:    { id: "biz-4", name: "Dent Clinic Pro", owner: "Анна Мед", subscription: "professional", status: "suspended", revenue: 0, logo: "🦷" }
+src/components/RbacPanel.tsx:125:    role: "Терапевт",
+src/components/RbacPanel.tsx:146:    gender: "Женский",
+src/components/RbacPanel.tsx:168:        "user-1,Мария Смирнова,maria@example.com,client,15000",
+src/components/RbacPanel.tsx:169:        "user-2,Алексей Иванов,alex@example.com,client,8500",
+src/components/RbacPanel.tsx:170:        "user-admin,Александр Админ,admin@example.com,platform_admin,999999",
+src/components/RbacPanel.tsx:171:        "user-owner,Виктор Владелец,owner@example.com,business_owner,50000"
+src/components/RbacPanel.tsx:177:          ? `Столик #${b.tableNumber} (${b.room})` 
+src/components/RbacPanel.tsx:196:      "Экспорт CSV завершен",
+src/components/RbacPanel.tsx:197:      `Файл bookly_${type}_export.csv успешно сгенерирован и скачан в систему.`,
+src/components/RbacPanel.tsx:205:      setCsvMessage("Пожалуйста, вставьте валидный CSV-текст для импорта.");
+src/components/RbacPanel.tsx:212:        setCsvMessage("Ошибка: в CSV должны быть заголовки и как минимум одна строка с данными.");
+src/components/RbacPanel.tsx:231:            const name = cols[nameIdx]?.replace(/['"]/g, "").trim() || `Импортированная услуга ${i}`;
+src/components/RbacPanel.tsx:234:            const description = cols[descIdx]?.replace(/['"]/g, "").trim() || "Быстрый импорт через CSV";
+src/components/RbacPanel.tsx:246:                { id: "staff-1", name: "Елена Соколова", role: "Терапевт", rating: 4.9, avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120" }
+src/components/RbacPanel.tsx:255:        setCsvMessage(`Успешно импортировано услуг: ${count}! Новые услуги добавлены в Bookly.`);
+src/components/RbacPanel.tsx:257:        onAddNotification("CSV Импорт услуг", `Успешно добавлено ${count} новых услуг в каталог.`, "status");
+src/components/RbacPanel.tsx:259:        setCsvMessage("Ошибка: Неизвестный формат CSV. Убедитесь, что заголовки содержат 'name', 'price', 'category'.");
+src/components/RbacPanel.tsx:262:      setCsvMessage(`Ошибка разбора CSV: ${e.message}`);
+src/components/RbacPanel.tsx:282:      "Права изменены",
+src/components/RbacPanel.tsx:283:      `Права "${permission}" для роли "${role}" были изменены. Настройки применены ко всем пользователям.`,
+src/components/RbacPanel.tsx:303:    onAddNotification("Вебхук добавлен", `Новый URL-адрес для события ${newWebhookEvent} успешно сохранен.`, "status");
+src/components/RbacPanel.tsx:322:      "Симуляция вебхука",
+src/components/RbacPanel.tsx:323:      `Событие "${webhook.event}" отправлено на ${webhook.url}. Ответ: 200 OK.`,
+src/components/RbacPanel.tsx:340:      description: newService.description || "Новая премиальная услуга",
+src/components/RbacPanel.tsx:343:        { id: "staff-3", name: "Анна Кузнецова", role: "Топ-стилист", rating: 4.8, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" }
+src/components/RbacPanel.tsx:359:      "Услуга добавлена",
+src/components/RbacPanel.tsx:360:      `Услуга "${svc.name}" успешно внесена в каталог вашего филиала.`,
+src/components/RbacPanel.tsx:372:      "Специалист нанят",
+src/components/RbacPanel.tsx:373:      `Новый специалист "${newStaff.name}" (${newStaff.role}) успешно привязан к расписанию.`,
+src/components/RbacPanel.tsx:379:      role: "Терапевт",
+src/components/RbacPanel.tsx:395:        "Статус бронирования изменен",
+src/components/RbacPanel.tsx:396:        `Бронирование ${target.id} переведено менеджером в статус "${status}". Клиент уведомлен.`,
+src/components/RbacPanel.tsx:479:        setScanResultError(`Бронирование с ID "${bookingId}" не найдено в базе данных.`);
+src/components/RbacPanel.tsx:492:        setScanResultError(`У пользователя "${email}" нет активных бронирований.`);
+src/components/RbacPanel.tsx:499:      setScanResultError("Неподдерживаемый формат QR-кода. Пожалуйста, отсканируйте корректный QR-код чекина гостя.");
+src/components/RbacPanel.tsx:513:        "Процедура обновлена",
+src/components/RbacPanel.tsx:514:        `Мастер перевел процедуру "${target.type === "service" ? target.serviceName : "Стол #" + target.tableNumber}" в статус "${newState}".`,
+src/components/RbacPanel.tsx:544:              <span className="text-[10px] text-teal-400 font-mono tracking-widest uppercase font-bold block">АКТИВНАЯ РОЛЬ</span>
+src/components/RbacPanel.tsx:546:                {currentRole === 'platform_admin' && "👑 Платформа-Админ"}
+src/components/RbacPanel.tsx:547:                {currentRole === 'business_owner' && "👔 Владелец Бизнеса"}
+src/components/RbacPanel.tsx:548:                {currentRole === 'business_admin' && "👔 Админ Бизнеса (SaaS)"}
+src/components/RbacPanel.tsx:549:                {currentRole === 'manager' && "💼 Менеджер / Reception"}
+src/components/RbacPanel.tsx:550:                {currentRole === 'staff' && "👩‍⚕️ Мастер / Специалист"}
+src/components/RbacPanel.tsx:551:                {currentRole === 'client' && "👤 Клиент Платформы"}
+src/components/RbacPanel.tsx:557:            Платформа OmniReserve динамически перестраивает интерфейсы, меню и права доступа на основе роли в вашей сессии.
+src/components/RbacPanel.tsx:561:            <span className="text-[10px] text-white/30 font-mono block mb-2 uppercase font-bold">Смена роли (Демо-сессия):</span>
+src/components/RbacPanel.tsx:564:                { role: 'platform_admin', label: "Админ Платформы", email: "admin@example.com", icon: "👑" },
+src/components/RbacPanel.tsx:565:                { role: 'business_owner', label: "Владелец Бизнеса", email: "owner@example.com", icon: "👔" },
+src/components/RbacPanel.tsx:566:                { role: 'manager', label: "Менеджер / Ресепшн", email: "manager@example.com", icon: "💼" },
+src/components/RbacPanel.tsx:567:                { role: 'staff', label: "Мастер / Специалист", email: "staff@example.com", icon: "👩‍⚕️" },
+src/components/RbacPanel.tsx:568:                { role: 'client', label: "Клиент (Мария С.)", email: "maria@example.com", icon: "👤" }
+src/components/RbacPanel.tsx:584:                            "Роль изменена",
+src/components/RbacPanel.tsx:585:                            `Вы вошли под ролью: ${r.label}. Интерфейс перестроен.`,
+src/components/RbacPanel.tsx:605:            <span>Логи безопасности RBAC</span>
+src/components/RbacPanel.tsx:627:                <span className="text-[10px] text-white/40 block font-mono">ГЛОБАЛЬНАЯ ВЫРУЧКА</span>
+src/components/RbacPanel.tsx:629:                <span className="text-[9px] text-emerald-400 block mt-1">+12.4% с этой недели</span>
+src/components/RbacPanel.tsx:632:                <span className="text-[10px] text-white/40 block font-mono">АКТИВНЫХ ФИЛИАЛОВ</span>
+src/components/RbacPanel.tsx:633:                <span className="text-lg font-bold text-white font-mono">4 бизнеса</span>
+src/components/RbacPanel.tsx:634:                <span className="text-[9px] text-teal-400 block mt-1">SaaS Multi-tenant модель</span>
+src/components/RbacPanel.tsx:637:                <span className="text-[10px] text-white/40 block font-mono">НАЛОГОВАЯ СТАВКА (VAT)</span>
+src/components/RbacPanel.tsx:639:                <span className="text-[9px] text-white/30 block mt-1">Регулируется в реальном времени</span>
+src/components/RbacPanel.tsx:642:                <span className="text-[10px] text-white/40 block font-mono">КОМИССИЯ РЫНКА</span>
+src/components/RbacPanel.tsx:643:                <span className="text-lg font-bold text-teal-400 font-mono">10% с транзакции</span>
+src/components/RbacPanel.tsx:644:                <span className="text-[9px] text-emerald-400 block mt-1">Прямой сплит через Connect</span>
+src/components/RbacPanel.tsx:653:                  Управление SaaS-подписками филиалов
+src/components/RbacPanel.tsx:655:                <span className="text-[10px] bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded-full font-mono font-bold">БИЛЛИНГ СИСТЕМА</span>
+src/components/RbacPanel.tsx:662:                      <th className="py-2.5 font-medium">Филиал / Бизнес</th>
+src/components/RbacPanel.tsx:663:                      <th className="py-2.5 font-medium">Владелец</th>
+src/components/RbacPanel.tsx:664:                      <th className="py-2.5 font-medium">Тариф подписки</th>
+src/components/RbacPanel.tsx:665:                      <th className="py-2.5 font-medium">Статус</th>
+src/components/RbacPanel.tsx:666:                      <th className="py-2.5 font-medium text-right">Накоплено</th>
+src/components/RbacPanel.tsx:667:                      <th className="py-2.5 font-medium text-right">Действия</th>
+src/components/RbacPanel.tsx:693:                              onAddNotification("Бизнес изменен", `Статус филиала ${b.name} успешно обновлен.`, "status");
+src/components/RbacPanel.tsx:697:                            {b.status === 'active' ? "Приостановить" : "Активировать"}
+src/components/RbacPanel.tsx:711:                Интерактивная матрица ролей и полномочий (RBAC Grid)
+src/components/RbacPanel.tsx:714:                Администратор платформы имеет право в реальном времени перестраивать цепочку авторизации (RBAC). Кликните по чекбоксу для применения.
+src/components/RbacPanel.tsx:721:                      <th className="py-2 font-medium">Полномочие (Permission)</th>
+src/components/RbacPanel.tsx:722:                      <th className="py-2 text-center font-medium">Платформа-Админ</th>
+src/components/RbacPanel.tsx:723:                      <th className="py-2 text-center font-medium">Владелец Бизнеса</th>
+src/components/RbacPanel.tsx:724:                      <th className="py-2 text-center font-medium">Админ Бизнеса</th>
+src/components/RbacPanel.tsx:725:                      <th className="py-2 text-center font-medium">Менеджер</th>
+src/components/RbacPanel.tsx:726:                      <th className="py-2 text-center font-medium">Мастер / Staff</th>
+src/components/RbacPanel.tsx:727:                      <th className="py-2 text-center font-medium">Клиент</th>
+src/components/RbacPanel.tsx:732:                      { key: "manage_subscriptions", label: "Управление подписками & биллингом" },
+src/components/RbacPanel.tsx:733:                      { key: "view_analytics", label: "Просмотр глобальной аналитики финансов" },
+src/components/RbacPanel.tsx:734:                      { key: "edit_services", label: "Редактирование услуг и тарифов" },
+src/components/RbacPanel.tsx:735:                      { key: "manage_calendar", label: "Администрирование всего календаря записей" },
+src/components/RbacPanel.tsx:736:                      { key: "view_schedule", label: "Просмотр назначенного личного расписания" },
+src/components/RbacPanel.tsx:737:                      { key: "book_appointments", label: "Создание и оплата бронирований" }
+src/components/RbacPanel.tsx:768:                  Экспорт системных данных (CSV)
+src/components/RbacPanel.tsx:771:                  Выгрузите актуальные срезы таблиц базы данных в формате CSV для внешнего аудита или бухгалтерии.
+src/components/RbacPanel.tsx:779:                    <span>Выгрузить пользователей (Users)</span>
+src/components/RbacPanel.tsx:786:                    <span>Выгрузить бронирования (Bookings)</span>
+src/components/RbacPanel.tsx:793:                    <span>Выгрузить биллинг SaaS (Subscribers)</span>
+src/components/RbacPanel.tsx:802:                  Пакетный импорт услуг (CSV Parser)
+src/components/RbacPanel.tsx:805:                  Быстро импортируйте прайс-лист новых услуг. Вставьте CSV строку с колонками `name,price,category,desc` и нажмите импорт.
+src/components/RbacPanel.tsx:813:                    placeholder="name,price,category,desc&#10;Медицинский Пилинг,3800,Beauty & Style,Очищение кожи&#10;Кардио Интенсив,2500,Fitness & Active,Кардиотренировка"
+src/components/RbacPanel.tsx:827:                    Запустить импорт CSV
+src/components/RbacPanel.tsx:837:                Интеграции & Webhooks система
+src/components/RbacPanel.tsx:840:                Настройте отправку мгновенных уведомлений (Webhooks) на внешние CRM/ERP системы при изменении статусов бронирования.
+src/components/RbacPanel.tsx:869:                  Добавить вебхук
+src/components/RbacPanel.tsx:874:                <div className="font-mono text-[10px] text-white/40 mb-2 uppercase font-bold">Список зарегистрированных вебхуков:</div>
+src/components/RbacPanel.tsx:885:                        <div className="text-[10px] text-white/40 mt-1">Доставлено событий: {w.deliveries}</div>
+src/components/RbacPanel.tsx:893:                          Симулировать вызов
+src/components/RbacPanel.tsx:907:                  <div className="font-mono text-[10px] text-white/40 mb-2 uppercase font-bold">Лог последних HTTP вызовов вебхуков:</div>
+src/components/RbacPanel.tsx:938:                  Экспресс QR-регистрация гостей
+src/components/RbacPanel.tsx:941:                  Мгновенно отмечайте визиты клиентов, сканируя QR-коды бронирований или универсальные пропуска со смартфона гостя.
+src/components/RbacPanel.tsx:950:                Запустить QR-сканер
+src/components/RbacPanel.tsx:960:                  Управление брендингом филиала
+src/components/RbacPanel.tsx:963:                  Настройте локальное позиционирование вашего бизнеса. Изменения коснутся отображения ваших услуг в глобальном каталоге OmniReserve.
+src/components/RbacPanel.tsx:968:                    <label className="block text-[10px] font-mono text-white/40 mb-1">НАЗВАНИЕ БИЗНЕСА</label>
+src/components/RbacPanel.tsx:977:                    <label className="block text-[10px] font-mono text-white/40 mb-1">ФИРМЕННЫЙ ЦВЕТ</label>
+src/components/RbacPanel.tsx:998:                  <span className="text-[10px] text-white/30 font-mono uppercase font-bold block mb-2">Превью Карточки</span>
+src/components/RbacPanel.tsx:1008:                  onClick={() => onAddNotification("Настройки сохранены", "Брендинг успешно обновлен и синхронизирован.", "status")}
+src/components/RbacPanel.tsx:1011:                  Сохранить брендинг
+src/components/RbacPanel.tsx:1022:                  Управление каталогом услуг и прайс-листами
+src/components/RbacPanel.tsx:1030:                  Добавить услугу
+src/components/RbacPanel.tsx:1046:                        <label className="block text-[10px] font-mono text-white/40 mb-1">НАЗВАНИЕ УСЛУГИ</label>
+src/components/RbacPanel.tsx:1051:                          placeholder="Тайский массаж стоп"
+src/components/RbacPanel.tsx:1057:                        <label className="block text-[10px] font-mono text-white/40 mb-1">КАТЕГОРИЯ</label>
+src/components/RbacPanel.tsx:1069:                        <label className="block text-[10px] font-mono text-white/40 mb-1">ЦЕНА УСЛУГИ (₽)</label>
+src/components/RbacPanel.tsx:1081:                      <label className="block text-[10px] font-mono text-white/40 mb-1">ОПИСАНИЕ УСЛУГИ</label>
+src/components/RbacPanel.tsx:1086:                        placeholder="Краткое описание процедуры для карточки в каталоге..."
+src/components/RbacPanel.tsx:1097:                        Отмена
+src/components/RbacPanel.tsx:1103:                        Сохранить в каталог
+src/components/RbacPanel.tsx:1127:                        <span className="text-[9px] font-mono text-white/30">Мастеров: {s.staff?.length || 1}</span>
+src/components/RbacPanel.tsx:1131:                            onAddNotification("Услуга удалена", `Процедура "${s.name}" удалена из прайс-листа.`, "status");
+src/components/RbacPanel.tsx:1134:                          title="Удалить услугу"
+src/components/RbacPanel.tsx:1152:                    Выплаты & Рассчет комиссий (Stripe Payouts)
+src/components/RbacPanel.tsx:1158:                  Выплаты осуществляются напрямую на ваш Express Connect аккаунт. Выручка перечисляется за вычетом 10% комиссии маркетплейса OmniReserve.
+src/components/RbacPanel.tsx:1162:                  <div className="font-mono text-[10px] text-white/40 mb-2 uppercase font-bold">История выплат:</div>
+src/components/RbacPanel.tsx:1171:                          {p.status === 'completed' ? 'Зачислено' : 'В процессе'}
+src/components/RbacPanel.tsx:1180:                    onAddNotification("Запрос отправлен", "Перевод средств со счета Stripe Connect на банковский счет успешно инициирован.", "status");
+src/components/RbacPanel.tsx:1184:                  Вывести свободный баланс на реквизиты банка
+src/components/RbacPanel.tsx:1192:                    Финансовая Сводка
+src/components/RbacPanel.tsx:1195:                    Сводный финансовый отчет по операциям филиала за текущий отчетный период.
+src/components/RbacPanel.tsx:1200:                      <span className="text-white/40">Оборот по заказам:</span>
+src/components/RbacPanel.tsx:1204:                      <span className="text-white/40">Комиссия (10%):</span>
+src/components/RbacPanel.tsx:1208:                      <span className="text-white/40">К выводу (Net):</span>
+src/components/RbacPanel.tsx:1215:                  <span className="text-[10px] text-white/30 font-mono uppercase font-bold block">Счета-фактуры (Invoices):</span>
+src/components/RbacPanel.tsx:1217:                    onClick={() => onAddNotification("Счет сгенерирован", "Симуляция счета-фактуры: PDF-файл сформирован и готов к печати.", "status")}
+src/components/RbacPanel.tsx:1220:                    Экспортировать отчет за Июль 2026 (PDF)
+src/components/RbacPanel.tsx:1239:                  Панель диспетчера бронирований
+src/components/RbacPanel.tsx:1242:                  Менеджер имеет доступ к полному календарю встреч и может корректировать записи в реальном времени.
+src/components/RbacPanel.tsx:1250:                  title="Сканировать QR-код чекина гостя"
+src/components/RbacPanel.tsx:1253:                  <span>Сканировать QR</span>
+src/components/RbacPanel.tsx:1262:                    placeholder="Поиск по ID / имени..."
+src/components/RbacPanel.tsx:1269:                    { id: 'all', label: "Все" },
+src/components/RbacPanel.tsx:1270:                    { id: 'table', label: "Столы" },
+src/components/RbacPanel.tsx:1271:                    { id: 'service', label: "Услуги" }
+src/components/RbacPanel.tsx:1287:              <h4 className="font-mono text-[10px] text-white/40 mb-3 uppercase font-bold">Активные бронирования клиентов:</h4>
+src/components/RbacPanel.tsx:1292:                    В системе нет активных бронирований.
+src/components/RbacPanel.tsx:1319:                                  {b.type === 'table' ? `Бронь стола #${b.tableNumber}` : `${b.serviceName}`}
+src/components/RbacPanel.tsx:1324:                                {b.type === 'table' ? `Зал: ${b.room} • Гостей: ${b.guests} • Депозит: ${b.price} ₽` : `Специалист: ${b.staffName} • Категория: ${b.category} • Стоимость: ${b.price} ₽`}
+src/components/RbacPanel.tsx:1335:                            <span className="text-[10px] font-mono text-white/30 uppercase mr-1">Статус:</span>
+src/components/RbacPanel.tsx:1341:                              <option value="Confirmed">Подтвержден</option>
+src/components/RbacPanel.tsx:1342:                              <option value="In Progress">В процессе</option>
+src/components/RbacPanel.tsx:1343:                              <option value="Completed">Выполнен</option>
+src/components/RbacPanel.tsx:1344:                              <option value="Cancelled">Отменен</option>
+src/components/RbacPanel.tsx:1350:                                onAddNotification("Бронирование удалено", `Запись ${b.id} полностью удалена из базы менеджером.`, "status");
+src/components/RbacPanel.tsx:1353:                              title="Удалить запись"
+src/components/RbacPanel.tsx:1369:                База клиентов & CRM-профили
+src/components/RbacPanel.tsx:1374:                  { name: "Мария Смирнова", email: "maria@example.com", phone: "+7 (999) 043-12-11", notes: "Предпочитает лавандовое масло, столы у окна на летней веранде.", tier: "Gold VIP" },
+src/components/RbacPanel.tsx:1375:                  { name: "Алексей Иванов", email: "alex@example.com", phone: "+7 (911) 450-20-30", notes: "Тренировки высокой интенсивности, VIP комнаты в ресторане.", tier: "Platinum VIP" }
+src/components/RbacPanel.tsx:1390:                          onAddNotification("Профиль отправлен", `Напомнили клиенту ${c.name} о его персональных скидках.`, "status");
+src/components/RbacPanel.tsx:1394:                        Отправить промокод
+src/components/RbacPanel.tsx:1412:                Расписание назначенного специалиста: Елена Соколова
+src/components/RbacPanel.tsx:1415:                Вы вошли как специалист **Елена Соколова** (Ведущий спа-терапевт). Ниже отображаются только те бронирования, где вы назначены исполнителем.
+src/components/RbacPanel.tsx:1419:                {bookings.filter(b => b.type === 'service' && b.staffName.toLowerCase().includes("елена")).length === 0 ? (
+src/components/RbacPanel.tsx:1421:                    У вас пока нет назначенных записей на выбранную дату.
+src/components/RbacPanel.tsx:1425:                    .filter(b => b.type === 'service' && b.staffName.toLowerCase().includes("елена"))
+src/components/RbacPanel.tsx:1440:                                Категория: {b.type === 'service' ? b.category : ""} • Гость: Мария Смирнова • Длительность: 90 минут
+src/components/RbacPanel.tsx:1451:                            <span className="text-[10px] font-mono text-white/30 uppercase">Мой статус:</span>
+src/components/RbacPanel.tsx:1454:                                { id: "Confirmed", label: "Ожидаю", color: "bg-white/5 text-white border-white/10" },
+src/components/RbacPanel.tsx:1455:                                { id: "In Progress", label: "Прием", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+src/components/RbacPanel.tsx:1456:                                { id: "Completed", label: "Выполнен", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" }
+src/components/RbacPanel.tsx:1495:                    <span className="font-semibold text-xs text-teal-400 uppercase tracking-widest font-mono font-bold">ПРОГРАММА ЛОЯЛЬНОСТИ</span>
+src/components/RbacPanel.tsx:1498:                  <h3 className="font-display font-bold text-lg text-white mt-1">Золотой статус привилегий</h3>
+src/components/RbacPanel.tsx:1500:                    Вам начисляется 10% кэшбека бонусами с каждой оплаченной спа-процедуры и брони стола.
+src/components/RbacPanel.tsx:1506:                <span className="text-[10px] text-white/40 font-mono block uppercase">ДОСТУПНЫЕ БОНУСЫ</span>
+src/components/RbacPanel.tsx:1507:                <span className="text-xl font-bold text-teal-400 font-mono">{loyaltyPoints} БОН</span>
+src/components/RbacPanel.tsx:1508:                <span className="text-[9px] text-white/30 block mt-0.5">= {loyaltyPoints} руб на скидку</span>
+src/components/RbacPanel.tsx:1518:                  Персональный профиль
+src/components/RbacPanel.tsx:1523:                    <label className="block text-[10px] font-mono text-white/40 mb-1">ФИО КЛИЕНТА</label>
+src/components/RbacPanel.tsx:1532:                    <label className="block text-[10px] font-mono text-white/40 mb-1">ТЕЛЕФОН СВЯЗИ</label>
+src/components/RbacPanel.tsx:1541:                    <label className="block text-[10px] font-mono text-white/40 mb-1">МГНОВЕННЫЕ PUSH УВЕДОМЛЕНИЯ</label>
+src/components/RbacPanel.tsx:1547:                      <span>{clientProfile.notificationsEnabled ? "Включены (SMS / Telegram)" : "Отключены"}</span>
+src/components/RbacPanel.tsx:1557:                  Моё Избранное (Favorites)
+src/components/RbacPanel.tsx:1560:                  Быстрый доступ к вашим любимым услугам и процедурам в одно касание:
+src/components/RbacPanel.tsx:1631:                    <h4 className="font-display font-bold text-lg text-white">Визит подтвержден!</h4>
+src/components/RbacPanel.tsx:1632:                    <span className="text-[10px] font-mono text-teal-400 uppercase tracking-wider block font-bold">Бронирование успешно отмечено как выполнено</span>
+src/components/RbacPanel.tsx:1637:                      <span className="text-white/40">ID бронирования:</span>
+src/components/RbacPanel.tsx:1641:                      <span className="text-white/40">Категория:</span>
+src/components/RbacPanel.tsx:1643:                        {scannedBooking.type === "table" ? "Ресторан" : "Спа и Салон"}
+src/components/RbacPanel.tsx:1647:                      <span className="text-white/40">Позиция / Услуга:</span>
+src/components/RbacPanel.tsx:1649:                        {scannedBooking.type === "table" ? `Столик #${scannedBooking.tableNumber} (${scannedBooking.room === 'main' ? 'Главный зал' : scannedBooking.room === 'vip' ? 'VIP' : 'Терраса'})` : scannedBooking.serviceName}
+src/components/RbacPanel.tsx:1654:                        <span className="text-white/40">Мастер:</span>
+src/components/RbacPanel.tsx:1659:                      <span className="text-white/40">Запись на:</span>
+src/components/RbacPanel.tsx:1660:                      <span className="font-bold text-teal-400">{scannedBooking.date} в {scannedBooking.time}</span>
+src/components/RbacPanel.tsx:1663:                      <span className="text-white/40">Сумма депозита:</span>
+src/components/RbacPanel.tsx:1673:                      Отлично
+src/components/RbacPanel.tsx:1686:                    <h4 className="font-display font-bold text-lg text-white">Клиент зарегистрирован</h4>
+src/components/RbacPanel.tsx:1691:                    <h5 className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold">Активные записи гостя:</h5>
+src/components/RbacPanel.tsx:1695:                        Нет предстоящих визитов для этого клиента.
+src/components/RbacPanel.tsx:1705:                                  {b.type === 'table' ? `Ресторан • Стол #${b.tableNumber}` : b.serviceName}
+src/components/RbacPanel.tsx:1707:                                <span className="text-[10px] text-white/40 font-mono block mt-0.5">{b.date} в {b.time}</span>
+src/components/RbacPanel.tsx:1711:                                <span className="text-[10px] font-mono text-teal-400 font-bold bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded">Выполнен</span>
+src/components/RbacPanel.tsx:1724:                                  Чекин
+src/components/RbacPanel.tsx:1743:                      Закрыть
+src/components/RbacPanel.tsx:1756:                    <h4 className="font-display font-bold text-lg text-white">Ошибка сканирования</h4>
+src/components/RbacPanel.tsx:1757:                    <span className="text-[10px] font-mono text-red-400 uppercase tracking-wider block font-bold">Информация не распознана</span>
+src/components/RbacPanel.tsx:1773:                      Повторить
+src/components/RbacPanel.tsx:1780:                      Закрыть
+src/components/Tabletop3DViewer.tsx:649:      const cleanQuery = tableSearchQuery.trim().toLowerCase().replace(/(столик|стол|№|#)/g, "").trim();
+src/App.tsx:132:    cuisine: "Европейская",
+src/App.tsx:274:            setBookingSuccessMsg(`✅ Авто-синхронизация: Бронирование #${booking.id} добавлено в Google Календарь!`);
+src/App.tsx:302:      setCalendarError(err.message || "Ошибка при получении событий Google Календаря");
+src/App.tsx:328:        setBookingSuccessMsg("🎉 Google Календарь успешно подключен!");
+src/App.tsx:333:      setCalendarError(err.message || "Не удалось авторизоваться в Google Calendar");
+src/App.tsx:340:    if (confirm("Вы уверены, что хотите отключить Google Календарь? Это прекратит автоматическую синхронизацию.")) {
+src/App.tsx:347:        setBookingSuccessMsg("Google Календарь отключен.");
+src/App.tsx:371:      setBookingSuccessMsg(`✅ Событие успешно добавлено в Google Календарь!`);
+src/App.tsx:377:      alert(err.message || "Не удалось добавить событие в Google Календарь");
+src/App.tsx:388:    if (confirm("Вы уверены, что хотите удалить это событие из Google Календаря?")) {
+src/App.tsx:397:        setBookingSuccessMsg("Событие удалено из Google Календаря.");
+src/App.tsx:403:        alert(err.message || "Не удалось удалить событие из Google Календаря");
+src/App.tsx:553:        toast.error("Не удалось загрузить услуги", { description: err.message });
+src/App.tsx:562:        toast.error("Не удалось загрузить рестораны", { description: err.message });
+src/App.tsx:571:        toast.error("Не удалось загрузить салоны", { description: err.message });
+src/App.tsx:600:        toast.error("Не удалось загрузить столы", { description: err.message });
+src/App.tsx:624:      setBookingSuccessMsg(`⚠️ Время бронирования стола №${selectedTable.number} (90с) истекло. Бронь освобождена.`);
+src/App.tsx:691:          address: "ул. Лесная, д. 5, стр. 2 (А Квартал, Депо)",
+src/App.tsx:692:          directions: "Метро Белорусская (выход 3). Пешком 5 минут по улице Лесная. Ресторан находится с правой стороны, вход под вывеской со стилизованной кованой буквой A."
+src/App.tsx:694:      } else if (rName.toLowerCase().includes('sakura') || rName.toLowerCase().includes('дзен')) {
+src/App.tsx:696:          address: "пр-т Мира, д. 42 (БЦ «Олимпик»)",
+src/App.tsx:697:          directions: "Метро Проспект Мира (радиальная), выход 1. Перейдите через дорогу и пройдите 3 минуты в сторону СК «Олимпийский». Вход через главный холл БЦ, 1-й этаж."
+src/App.tsx:701:          address: "Большой Козихинский пер., д. 12 (Патриаршие пруды)",
+src/App.tsx:702:          directions: "Метро Пушкинская. Пройдите 8 минут пешком по Большой Бронной, затем поверните в Козихинский переулок. Вход в полукруглую арку с коваными воротами."
+src/App.tsx:707:      if (sName.toLowerCase().includes('lotus') || sName.toLowerCase().includes('спа')) {
+src/App.tsx:709:          address: "ул. Лесная, д. 5, стр. 2 (Lotus Spa)",
+src/App.tsx:710:          directions: "Метро Белорусская (выход 3). Пройдите 5 минут по ул. Лесная. Салон расположен на цокольном этаже левого крыла БЦ «Депо»."
+src/App.tsx:712:      } else if (sName.toLowerCase().includes('gold') || sName.toLowerCase().includes('gym') || sName.toLowerCase().includes('фитнес')) {
+src/App.tsx:714:          address: "пр-т Мира, д. 42 (Gold Gym)",
+src/App.tsx:715:          directions: "Метро Проспект Мира, выход 1. Клуб находится на 3 этаже торгового центра «Олимпик Плаза»."
+src/App.tsx:719:          address: "Большой Козихинский пер., д. 12 (Prime Barber)",
+src/App.tsx:720:          directions: "Метро Пушкинская, 8 минут пешком. Салон расположен на 1 этаже исторического здания, вход с левого крыла под вывеской Prime Barber."
+src/App.tsx:740:        setBookingSuccessMsg("Не удалось скопировать. Пожалуйста, скопируйте вручную.");
+src/App.tsx:743:      setBookingSuccessMsg("Ошибка копирования в буфер обмена.");
+src/App.tsx:753:      ? `🍽️ Бронирование стола #${booking.tableNumber} в ${(booking as any).restaurantName || 'Grand Atelier'}\n📅 Дата: ${booking.date}\n⏰ Время: ${booking.time}\n👥 Гостей: ${booking.guests} чел.\n📍 Адрес: ${dirInfo.address}\n💵 Стоимость: ${booking.price.toLocaleString('ru-RU')} ₽\n🆔 ID: ${booking.id}`
+src/App.tsx:754:      : `🌸 Запись на "${booking.serviceName}"\n📅 Дата: ${booking.date}\n⏰ Время: ${booking.time}\n👤 Специалист: ${booking.staffName}\n📍 Адрес: ${dirInfo.address}\n💵 Стоимость: ${booking.price.toLocaleString('ru-RU')} ₽\n🆔 ID: ${booking.id}`;
+src/App.tsx:759:      setBookingSuccessMsg("Информация о бронировании успешно скопирована!");
+src/App.tsx:785:      ? `Скоро бронирование стола #${booking.tableNumber}!`
+src/App.tsx:786:      : `Скоро ваша запись на "${booking.serviceName}"!`;
+src/App.tsx:789:      ? `Начало через 2 часа в ${(booking as any).restaurantName || 'Grand Atelier'} в ${booking.time}.`
+src/App.tsx:790:      : `Начало через 2 часа у специалиста ${booking.staffName} в ${booking.time}.`;
+src/App.tsx:814:        title: `⚠️ Напоминание за 2 часа (Бронь #${booking.id})`,
+src/App.tsx:815:        message: `${message} Адрес: ${dirInfo.address}. Маршрут: ${dirInfo.directions}`,
+src/App.tsx:897:        "Всего": tableCount + serviceCount
+src/App.tsx:905:  const cleanTableSearchQuery = tableSearchQuery.trim().toLowerCase().replace(/(столик|стол|№|#)/g, "").trim();
+src/App.tsx:973:      setAuthError("Заполните email и пароль.");
+src/App.tsx:985:        if (!res.ok) throw new Error("Неверный email или пароль.");
+src/App.tsx:996:        setAuthError(err.message || "Ошибка авторизации.");
+src/App.tsx:1014:        if (!res.ok) throw new Error("Ошибка входа.");
+src/App.tsx:1025:        setAuthError(err.message || "Ошибка быстрого входа.");
+src/App.tsx:1034:      setAuthError("Пожалуйста, заполните все обязательные поля.");
+src/App.tsx:1038:      setAuthError("Пожалуйста, укажите название бизнеса.");
+src/App.tsx:1076:        setAuthError(err.message || "Ошибка регистрации.");
+src/App.tsx:1140:        setBookingSuccessMsg(`Столик #${selectedTable.number} успешно забронирован на ${tabletopDate} в ${tabletopTime}!`);
+src/App.tsx:1161:      ? `Повышенный тариф (+25% за пиковые часы спроса)` 
+src/App.tsx:1162:      : "Стандартный тариф";
+src/App.tsx:1165:      `Ресторан: ${selectedRestaurant?.name || "Ресторан"}`,
+src/App.tsx:1166:      `Зал / Зона: ${selectedTable.room === 'main' ? selectedRestaurant?.rooms.main : selectedTable.room === 'vip' ? selectedRestaurant?.rooms.vip : selectedRestaurant?.rooms.terrace}`,
+src/App.tsx:1167:      `Номер стола: #${selectedTable.number}`,
+src/App.tsx:1168:      `Количество мест: до ${selectedTable.capacity} человек`,
+src/App.tsx:1169:      `Выбранное количество гостей: ${guestsCount}`,
+src/App.tsx:1170:      `Дата визита: ${tabletopDate}`,
+src/App.tsx:1171:      `Время визита: ${tabletopTime}`,
+src/App.tsx:1172:      `Тарифный план: ${billingText}`,
+src/App.tsx:1173:      `Примечания к брони: ${tableNotes || "нет"}`
+src/App.tsx:1178:        details.push(`⚠️ ПОГОДА: Штормовое предупреждение! Открытая веранда закрыта. Рекомендуется сменить зал.`);
+src/App.tsx:1180:        details.push(`⚠️ ПОГОДА: Ожидается ливневый дождь. Столы будут накрыты защитным навесом.`);
+src/App.tsx:1182:        details.push(`☁️ ПОГОДА: Облачно и свежо. Вам будут предоставлены теплые пледы.`);
+src/App.tsx:1184:        details.push(`☀️ ПОГОДА: Прекрасная солнечная погода на открытом воздухе!`);
+src/App.tsx:1190:      title: "Подтверждение бронирования столика",
+src/App.tsx:1222:        setBookingSuccessMsg(`Услуга "${selectedService.name}" успешно забронирована к специалисту ${selectedStaff.name} на ${booklyDate} в ${booklyTime}!`);
+src/App.tsx:1243:      title: "Подтверждение записи на услугу",
+src/App.tsx:1245:        `Салон: ${selectedService.salonName}`,
+src/App.tsx:1246:        `Категория: ${selectedService.category}`,
+src/App.tsx:1247:        `Услуга: ${selectedService.name}`,
+src/App.tsx:1248:        `Специалист: ${selectedStaff.name} (${selectedStaff.role})`,
+src/App.tsx:1249:        `Дата записи: ${booklyDate}`,
+src/App.tsx:1250:        `Время записи: ${booklyTime}`,
+src/App.tsx:1251:        `Длительность сеанса: ${selectedService.duration} мин.`
+src/App.tsx:1263:      toast.error("Название салона обязательно");
+src/App.tsx:1268:    const toastId = toast.loading("Регистрируем салон…");
+src/App.tsx:1291:        toast.success(`Салон "${newSalon.name}" зарегистрирован`, {
+src/App.tsx:1293:          description: "Салон успешно добавлен на платформу.",
+src/App.tsx:1297:        toast.error("Не удалось зарегистрировать салон", {
+src/App.tsx:1309:      toast.error("Название ресторана обязательно");
+src/App.tsx:1314:    const toastId = toast.loading("Регистрируем ресторан…");
+src/App.tsx:1322:          cuisine: "Европейская",
+src/App.tsx:1327:        toast.success(`Ресторан "${newRest.name}" зарегистрирован`, {
+src/App.tsx:1329:          description: "Столы сгенерированы автоматически.",
+src/App.tsx:1333:        toast.error("Не удалось зарегистрировать ресторан", {
+src/App.tsx:1350:  const availablePrefs = ["Спа и уход", "Массаж", "Йога", "Фитнес", "Стиль и Красота", "Столики у окна", "VIP-комнаты", "Летняя веранда"];
+src/App.tsx:1384:                    Две легендарные платформы. Один личный кабинет.
+src/App.tsx:1387:                    Единое пространство для ценителей безупречного сервиса. Выбирайте спа, тренировки, уход в <strong className="text-purple-400">Bookly</strong> и бронируйте точные места на 3D-схеме ресторана в <strong className="text-teal-400">Tabletop</strong>.
+src/App.tsx:1392:                  <span className="text-xs text-white/40 block mb-3 font-medium uppercase tracking-wider">Быстрый демо-вход:</span>
+src/App.tsx:1400:                        <span>Мария Смирнова <span className="text-white/40">(Спа & Террасы)</span></span>
+src/App.tsx:1410:                        <span>Алексей Иванов <span className="text-white/40">(Фитнес & VIP)</span></span>
+src/App.tsx:1420:                        <span className="text-amber-200 font-medium">Виктор Владелец <span className="text-amber-400/60 font-normal">(Владелец бизнеса - Спа & Ресторан)</span></span>
+src/App.tsx:1426:                    Пароль для демо-входа: <code className="text-white/60">password</code>
+src/App.tsx:1438:                    Вход в кабинет
+src/App.tsx:1447:                    Регистрация супер-аккаунта
+src/App.tsx:1464:                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Электронная почта</label>
+src/App.tsx:1475:                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Пароль</label>
+src/App.tsx:1490:                      {authLoading ? "Авторизация..." : "Войти в систему"}
+src/App.tsx:1497:                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">Тип аккаунта</label>
+src/App.tsx:1504:                          👤 Клиент платформы
+src/App.tsx:1511:                          👔 Владелец бизнеса
+src/App.tsx:1517:                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Ваше ФИО</label>
+src/App.tsx:1522:                        placeholder="Константин Константинопольский"
+src/App.tsx:1528:                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Электронная почта</label>
+src/App.tsx:1539:                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Пароль</label>
+src/App.tsx:1544:                        placeholder="Придумайте пароль"
+src/App.tsx:1552:                        <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Ваши предпочтения (для AI-ассистента)</label>
+src/App.tsx:1572:                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Название компании / бренда</label>
+src/App.tsx:1577:                            placeholder="Например, Lotus Spa Premium или Steak House 17"
+src/App.tsx:1583:                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Категория / Сфера бизнеса</label>
+src/App.tsx:1589:                            <option value="Spa & Wellness">💆 Spa & Wellness (Спа-салоны, сауны, оздоровление)</option>
+src/App.tsx:1590:                            <option value="Fitness & Active">💪 Fitness & Active (Спортзалы, кроссфит, йога)</option>
+src/App.tsx:1591:                            <option value="Beauty & Style">✂️ Beauty & Style (Салоны красоты, барбершопы)</option>
+src/App.tsx:1592:                            <option value="Restaurant">🍽️ Restaurant & Bistro (Рестораны, VIP-столики)</option>
+src/App.tsx:1593:                            <option value="Service Center">🚗 Auto & Tech Service (Сервисные центры, услуги)</option>
+src/App.tsx:1597:                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">Краткое описание бизнеса</label>
+src/App.tsx:1601:                            placeholder="Опишите ваши ключевые преимущества, атмосферу или особенности работы..."
+src/App.tsx:1615:                        ? (signupType === 'business' ? "Создание бизнес-кабинета..." : "Создание аккаунта...") 
+src/App.tsx:1616:                        : (signupType === 'business' ? "Зарегистрировать бизнес" : "Зарегистрироваться")}
+src/App.tsx:1705:                        title="Уведомления"
+src/App.tsx:1728:                                <span className="font-display font-bold text-xs text-white uppercase tracking-wider">Уведомления</span>
+src/App.tsx:1734:                                    Прочитать все
+src/App.tsx:1742:                                    Нет новых уведомлений
+src/App.tsx:1765:                                          Отметить как прочитанное
+src/App.tsx:1783:                        title="Настройки профиля"
+src/App.tsx:1799:                        title="Настройки профиля"
+src/App.tsx:1807:                        title="Выйти из аккаунта"
+src/App.tsx:1863:                        Пополнение демо-счета
+src/App.tsx:1866:                        Вы можете начислить себе виртуальные средства, чтобы полноценно протестировать процесс бронирования столов и услуг.
+src/App.tsx:1871:                          <label className="block text-xs font-semibold text-white/60 mb-1">Сумма начисления (₽)</label>
+src/App.tsx:1887:                            Отмена
+src/App.tsx:1893:                            Начислить на баланс
+src/App.tsx:1917:                          Единый кабинет OmniReserve
+src/App.tsx:1920:                          Добро пожаловать, {user.name}!
+src/App.tsx:1923:                          Ваш аккаунт объединяет профиль бронирования столов в ресторане Tabletop и спа-услуг в Bookly. На основе ваших предпочтений наш искусственный интеллект формирует эксклюзивные предложения.
+src/App.tsx:1933:                          Схема столов ресторана
+src/App.tsx:1940:                          Забронировать услугу
+src/App.tsx:1947:                          Быстрый Check-in QR
+src/App.tsx:1962:                            <span className="font-display font-bold text-sm text-white">Ваш AI-Консьерж</span>
+src/App.tsx:1970:                            <p className="text-xs text-white/40 font-medium">Анализируем ваши вкусы и подбираем лучшее...</p>
+src/App.tsx:1980:                              <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider block">Персональные советы:</span>
+src/App.tsx:1993:                                  <span className="text-white/40 block font-mono -mb-0.5 uppercase font-bold">СЕКРЕТНЫЙ ПРОМОКОД</span>
+src/App.tsx:2002:                            <p className="text-xs text-white/40">Рекомендации недоступны.</p>
+src/App.tsx:2007:                              Обновить
+src/App.tsx:2014:                        <span className="text-white/40 font-mono text-[10px]">Обновлено только что</span>
+src/App.tsx:2019:                          Перегенерировать AI <ChevronRight className="w-3 h-3" />
+src/App.tsx:2035:                        <h3 className="font-display font-bold text-lg text-white mb-1">Ресторан и Схема столов</h3>
+src/App.tsx:2037:                          Забронируйте столик в нашем панорамном ресторане. Выбирайте идеальное место с помощью детальной интерактивной схемы залов: терраса, VIP-кабинеты или столики у окна с видом на закат.
+src/App.tsx:2044:                        Открыть интерактивную схему Tabletop <ArrowRight className="w-3.5 h-3.5" />
+src/App.tsx:2054:                        <h3 className="font-display font-bold text-lg text-white mb-1">Спа, Тренировки & Красота</h3>
+src/App.tsx:2056:                          Подарите себе незабываемый уход. Выберите сеанс глубокого спа-массажа, индивидуальную тренировку с профессиональным тренером или визит к топ-стилисту в нашем салоне премиум-класса.
+src/App.tsx:2063:                        Записаться на услуги Bookly <ArrowRight className="w-3.5 h-3.5" />
+src/App.tsx:2081:                                  <h3 className="font-display font-bold text-sm text-white">Анализ расходов</h3>
+src/App.tsx:2091:                              Распределение ваших расходов в текущем месяце между ресторанами Tabletop и услугами Bookly.
+src/App.tsx:2128:                                    <span className="text-[9px] text-white/30 font-mono uppercase font-bold">Нет расходов в этом месяце</span>
+src/App.tsx:2152:                            Пополнить депозит
+src/App.tsx:2166:                          <h3 className="font-display font-bold text-base text-white">Обзор Бронирований (Последние 30 дней)</h3>
+src/App.tsx:2169:                          Распределение бронирований ресторанов (Tabletop) и сеансов услуг (Bookly)
+src/App.tsx:2259:                            Синхронизация с Google Календарем
+src/App.tsx:2273:                            <span>Активен</span>
+src/App.tsx:2283:                            Отключить
+src/App.tsx:2290:                          Не подключен
+src/App.tsx:2299:                            Подключите ваш Google Календарь, чтобы автоматически синхронизировать записи в спа-центры и забронированные столики. Получайте напоминания на любые устройства.
+src/App.tsx:2327:                                <span className={`text-[9px] block font-mono ${theme === 'light' ? 'text-gray-400' : 'text-white/40'}`}>АКТИВНЫЙ АККАУНТ</span>
+src/App.tsx:2337:                                  Автоматическая синхронизация
+src/App.tsx:2340:                                  Новые брони автоматически добавляются в календарь
+src/App.tsx:2366:                                <span>Статус синхронизации записей</span>
+src/App.tsx:2374:                                    У вас нет активных записей для синхронизации.
+src/App.tsx:2385:                                              {booking.type === 'table' ? `Столик #${booking.tableNumber}` : booking.serviceName}
+src/App.tsx:2396:                                            {booking.date} в {booking.time}
+src/App.tsx:2404:                                                <Check className="w-3.5 h-3.5" /> СИНХР.
+src/App.tsx:2413:                                                title="Удалить из Google Календаря"
+src/App.tsx:2433:                                                  <span>Синхронизировать</span>
+src/App.tsx:2452:                                  <span>Ваш Google Календарь (Ближайшие)</span>
+src/App.tsx:2462:                                  title="Обновить события календаря"
+src/App.tsx:2474:                                    <span>Загрузка событий из вашего Google аккаунта...</span>
+src/App.tsx:2482:                                    Нет предстоящих событий в вашем календаре.
+src/App.tsx:2493:                                      }) : "Без даты";
+src/App.tsx:2535:                        <h3 className="font-display font-bold text-base text-white">Ваши единые бронирования</h3>
+src/App.tsx:2537:                          Всего: {bookings.length}
+src/App.tsx:2547:                          <span>Список</span>
+src/App.tsx:2554:                          <span>Календарь</span>
+src/App.tsx:2563:                          <p className="text-sm text-white/60 font-medium">У вас пока нет активных бронирований.</p>
+src/App.tsx:2564:                          <p className="text-xs text-white/40 mt-1">Используйте разделы выше, чтобы сделать свой первый заказ.</p>
+src/App.tsx:2579:                                        {isTable ? `Столик #${booking.tableNumber} в ${(booking as any).restaurantName || 'Grand Atelier'}` : booking.serviceName}
+src/App.tsx:2588:                                          <span className="flex items-center gap-1"><Compass className="w-3.5 h-3.5 text-white/30" /> Зал: {booking.room === 'main' ? 'Главный' : booking.room === 'vip' ? 'VIP' : 'Терраса'}</span>
+src/App.tsx:2589:                                          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-white/30" /> Гостей: {booking.guests} чел</span>
+src/App.tsx:2593:                                          <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-white/30" /> Специалист: {booking.staffName}</span>
+src/App.tsx:2614:                                      <span className="text-xs text-white/40 block font-mono">СТОИМОСТЬ</span>
+src/App.tsx:2621:                                      title="Протестировать напоминание за 2 часа (Маршрут + ID)"
+src/App.tsx:2629:                                      title="Поделиться бронированием (копировать описание)"
+src/App.tsx:2637:                                      title="Показать QR-код чекина"
+src/App.tsx:2656:                                        title={syncedBookingIds[booking.id] ? "Синхронизировано с Google Календарем (Нажмите для удаления)" : "Синхронизировать с Google Календарем"}
+src/App.tsx:2664:                                        if (confirm("Вы уверены, что хотите отменить бронирование? Средства будут возвращены на ваш баланс.")) {
+src/App.tsx:2667:                                          setBookingSuccessMsg("Бронирование успешно отменено, средства возвращены на баланс.");
+src/App.tsx:2671:                                      title="Отменить бронирование"
+src/App.tsx:2695:                              title="Предыдущий месяц"
+src/App.tsx:2709:                              title="Следующий месяц"
+src/App.tsx:2715:                            * Выберите любой день с индикатором для просмотра деталей и управления
+src/App.tsx:2721:                          {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+src/App.tsx:2785:                                        title={bTable ? `Столик #${b.tableNumber}` : b.serviceName}
+src/App.tsx:2788:                                        {bTable ? `Стол #${b.tableNumber}` : b.serviceName}
+src/App.tsx:2794:                                      +еще {cellBookings.length - 2}
+src/App.tsx:2815:                                  <span>Детали за {new Date(selectedCalendarDay).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+src/App.tsx:2826:                                <p className="text-center py-6 text-xs text-white/40">На выбранный день бронирований не найдено.</p>
+src/App.tsx:2847:                                                {isTable ? `Столик #${booking.tableNumber} в ${(booking as any).restaurantName || 'Grand Atelier'}` : booking.serviceName}
+src/App.tsx:2861:                                                  <span>Зал: {booking.room === 'main' ? 'Главный' : booking.room === 'vip' ? 'VIP' : 'Терраса'}</span>
+src/App.tsx:2862:                                                  <span>Гостей: {booking.guests}</span>
+src/App.tsx:2866:                                                  <span>Специалист: {booking.staffName}</span>
+src/App.tsx:2876:                                            <span className="text-[9px] text-white/30 block">СТОИМОСТЬ</span>
+src/App.tsx:2882:                                              if (confirm("Вы уверены, что хотите отменить бронирование? Средства будут возвращены на ваш баланс.")) {
+src/App.tsx:2885:                                                setBookingSuccessMsg("Бронирование успешно отменено, средства возвращены на баланс.");
+src/App.tsx:2894:                                            title="Отменить бронирование"
+src/App.tsx:2921:                        Выберите гастрономическое пространство
+src/App.tsx:2924:                        Откройте для себя уникальные концептуальные заведения или зарегистрируйте собственное на платформе.
+src/App.tsx:2932:                      👔 Зарегистрировать бизнес
+src/App.tsx:2977:                                <span>Главный зал:</span>
+src/App.tsx:2981:                                <span>VIP Зона:</span>
+src/App.tsx:2985:                                <span>Терраса:</span>
+src/App.tsx:3001:                            Выбрать столик
+src/App.tsx:3024:                        <span>К ресторанам</span>
+src/App.tsx:3028:                        <span className="text-[10px] text-teal-400 font-bold uppercase tracking-wider block">РЕСТОРАН</span>
+src/App.tsx:3056:                              Интерактивная 2D/3D схема столов
+src/App.tsx:3059:                              Выберите нужную зону, рассмотрите расположение столов и кликните на свободный, чтобы забронировать его.
+src/App.tsx:3069:                                placeholder="Поиск стола по №..."
+src/App.tsx:3116:                              <Sliders className="w-3.5 h-3.5 text-teal-400" /> Фильтры:
+src/App.tsx:3125:                              <option value="0">Любая вместимость</option>
+src/App.tsx:3126:                              <option value="2">От 2 человек</option>
+src/App.tsx:3127:                              <option value="4">От 4 человек</option>
+src/App.tsx:3128:                              <option value="6">От 6 человек</option>
+src/App.tsx:3129:                              <option value="8">От 8 человек</option>
+src/App.tsx:3138:                              <option value="all">Все типы столов</option>
+src/App.tsx:3139:                              <option value="standard">🛋️ Стандарт</option>
+src/App.tsx:3140:                              <option value="window">🌅 У окна</option>
+src/App.tsx:3142:                              <option value="terrace">🍃 На веранде</option>
+src/App.tsx:3158:                              2D Схема
+src/App.tsx:3170:                              3D Зал
+src/App.tsx:3198:                                <span className="font-extrabold uppercase tracking-wider text-[9px] block mb-0.5">Влияние погоды на террасу ({weatherPresets[currentWeatherId].temp}°C)</span>
+src/App.tsx:3200:                                  {currentWeatherId === 'sunny' && "Летняя терраса полностью открыта! Превосходная погода для отдыха у реки."}
+src/App.tsx:3201:                                  {currentWeatherId === 'cloudy' && "Терраса открыта. Прохладно, гостям предоставляются уютные пледы и обогреватели."}
+src/App.tsx:3202:                                  {currentWeatherId === 'rainy' && "Внимание: Ожидается дождь. Столики под зонтами открыты, но лучше занять стол внутри!"}
+src/App.tsx:3203:                                  {currentWeatherId === 'stormy' && "Внимание! Из-за штормового предупреждения открытая веранда полностью ЗАКРЫТА."}
+src/App.tsx:3210:                              <span className="text-[9px] text-white/40 uppercase font-bold tracking-wide px-2 font-mono">симулятор:</span>
+src/App.tsx:3222:                                  {wId === 'sunny' ? 'Солнце' : wId === 'cloudy' ? 'Облачно' : wId === 'rainy' ? 'Дождь' : 'Шторм'}
+src/App.tsx:3235:                                Поиск <strong className="text-amber-400">"{tableSearchQuery}"</strong>:
+src/App.tsx:3237:                                  <> найдено <strong className="text-white">{matchedTables.length}</strong> {matchedTables.length === 1 ? "столик" : "столика(ов)"}</>
+src/App.tsx:3239:                                  <> совпадений в этом зале нет</>
+src/App.tsx:3245:                                <span className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">Быстрый выбор:</span>
+src/App.tsx:3264:                                    #{t.number} {t.status === 'booked' ? '🔒' : `(${t.capacity}м)`}
+src/App.tsx:3277:                              <p className="text-xs text-stone-400">Получаем статус столов...</p>
+src/App.tsx:3310:                                  <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/5 text-white/50 text-[10px] font-mono py-1 px-4 rounded-b-lg border-b border-x border-white/5 uppercase tracking-widest font-bold">ВХОД / РЕСЕПШН</div>
+src/App.tsx:3311:                                  <div className="absolute bottom-4 left-4 bg-white/5 text-white/50 text-[10px] font-mono py-2 px-3 rounded-xl border border-white/5 uppercase tracking-widest font-bold">БАРНАЯ ЗОНА</div>
+src/App.tsx:3313:                                    <span className="text-[9px] text-white/40 font-mono tracking-widest uppercase rotate-90 origin-center whitespace-nowrap block">ПАНОРАМНЫЕ ОКНА</span>
+src/App.tsx:3319:                                  <div className="absolute top-0 left-4 bg-white/5 text-white/50 text-[10px] font-mono py-1 px-4 rounded-b-lg border-b border-x border-white/5 uppercase tracking-widest font-bold">КАМИННАЯ ЗОНА</div>
+src/App.tsx:3325:                                  <div className="absolute inset-x-0 bottom-0 bg-teal-500/5 text-teal-400/80 text-[10px] font-mono py-1 text-center border-t border-teal-500/10 uppercase tracking-widest font-bold">ЖИВОПИСНАЯ РЕКА & НАБЕРЕЖНАЯ</div>
+src/App.tsx:3328:                                    ОТКРЫТЫЙ ВОЗДУХ
+src/App.tsx:3459:                                          {t.capacity} чел
+src/App.tsx:3492:                            <span>Свободен</span>
+src/App.tsx:3496:                            <span>Ваш выбор</span>
+src/App.tsx:3500:                            <span>Забронирован</span>
+src/App.tsx:3504:                          Кликните на стол для выбора
+src/App.tsx:3515:                          <h3 className="font-display font-bold text-base text-white mb-1">Параметры визита</h3>
+src/App.tsx:3516:                          <p className="text-xs text-white/40">Установите дату и время посещения для обновления доступности.</p>
+src/App.tsx:3522:                            <label className="block text-xs font-semibold text-white/60 mb-1.5">Дата визита</label>
+src/App.tsx:3535:                            <label className="block text-xs font-semibold text-white/60 mb-1.5">Время прибытия</label>
+src/App.tsx:3543:                                <option value="12:00">12:00 (Обед)</option>
+src/App.tsx:3544:                                <option value="13:30">13:30 (Обед)</option>
+src/App.tsx:3545:                                <option value="15:00">15:00 (День)</option>
+src/App.tsx:3546:                                <option value="17:00">17:00 (Ранний ужин)</option>
+src/App.tsx:3547:                                <option value="18:30">18:30 (🔥 Премиум / Высокий спрос)</option>
+src/App.tsx:3548:                                <option value="19:00">19:00 (🔥 Премиум / Высокий спрос)</option>
+src/App.tsx:3549:                                <option value="20:30">20:30 (🔥 Премиум / Высокий спрос)</option>
+src/App.tsx:3550:                                <option value="22:00">22:00 (Ночь)</option>
+src/App.tsx:3565:                                <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider block">ВЫБРАННЫЙ СТОЛИК</span>
+src/App.tsx:3566:                                <span className="font-display font-bold text-lg text-white block">Стол #{selectedTable.number}</span>
+src/App.tsx:3570:                                    Удержание: {holdTimer}с
+src/App.tsx:3575:                                {selectedTable.price} ₽ депо
+src/App.tsx:3581:                                <span className="text-white/40 block text-[10px]">ВМЕСТИМОСТЬ</span>
+src/App.tsx:3582:                                <span className="font-semibold text-white/80">до {selectedTable.capacity} человек</span>
+src/App.tsx:3585:                                <span className="text-white/40 block text-[10px]">ЗОНА ЗАЛА</span>
+src/App.tsx:3598:                              <label className="block text-[10px] font-semibold text-white/40 mb-1">КОЛИЧЕСТВО ГОСТЕЙ</label>
+src/App.tsx:3617:                              <label className="block text-[10px] font-semibold text-white/40 mb-1 uppercase">Пожелания к бронированию</label>
+src/App.tsx:3621:                                placeholder="Например: день рождения жены, нужен детский стул, тихая зона..."
+src/App.tsx:3632:                                  <div className="font-bold">Высокий спрос (Премиум-слот)</div>
+src/App.tsx:3633:                                  <div className="text-amber-300/80 leading-normal">В это время наблюдается максимальная нагрузка. К стандартному тарифу стола добавлена наценка +25%.</div>
+src/App.tsx:3640:                              <span className="text-white/40">Сумма депозита:</span>
+src/App.tsx:3646:                                Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).
+src/App.tsx:3653:                            Выберите любой свободный столик на схеме слева, чтобы начать оформление заказа.
+src/App.tsx:3666:                          {tableActionLoading ? "Обработка..." : "Забронировать этот столик"}
+src/App.tsx:3685:                          О заведении {selectedRestaurant.name}
+src/App.tsx:3721:                            Выберите велнес-салон или бьюти-центр
+src/App.tsx:3724:                            Подарите себе минуты безупречного ухода. Выберите подходящее заведение или зарегистрируйте собственное!
+src/App.tsx:3732:                          👔 Зарегистрировать бизнес
+src/App.tsx:3784:                                Открыть услуги
+src/App.tsx:3799:                            title="Назад к списку салонов"
+src/App.tsx:3808:                              Категория: {selectedSalon.category} • Адрес: {selectedSalon.address}
+src/App.tsx:3820:                              {cat === 'all' ? 'Все категории' : cat}
+src/App.tsx:3864:                                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {service.duration} мин</span>
+src/App.tsx:3865:                                          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {service.staff.length} специалиста</span>
+src/App.tsx:3872:                                        <span className="text-white/40 block text-[9px] font-sans font-semibold uppercase">Стоимость</span>
+src/App.tsx:3882:                                        Записаться
+src/App.tsx:3896:                              <h3 className="font-display font-bold text-base text-white mb-1">Детали сеанса</h3>
+src/App.tsx:3897:                              <p className="text-xs text-white/40">Выберите мастера, дату и желаемое время для сеанса.</p>
+src/App.tsx:3915:                                    <span className="text-[10px] font-mono text-white/40 block mt-0.5">{selectedService.duration} мин • {selectedService.price} ₽</span>
+src/App.tsx:3921:                                  <label className="block text-xs font-semibold text-white/60 mb-1.5">Выберите специалиста</label>
+src/App.tsx:3953:                                  <label className="block text-xs font-semibold text-white/60 mb-1.5">Дата сеанса</label>
+src/App.tsx:3967:                                  <label className="block text-xs font-semibold text-white/60 mb-1.5">Доступное время</label>
+src/App.tsx:3986:                                    Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).
+src/App.tsx:3993:                                Выберите любую услугу в списке слева, чтобы начать оформление визита.
+src/App.tsx:4006:                              {serviceActionLoading ? "Запись..." : "Подтвердить запись"}
+src/App.tsx:4075:                          <h4 className="font-display font-bold text-sm text-white">Универсальный QR-чекин</h4>
+src/App.tsx:4076:                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Карта гостя OmniReserve</span>
+src/App.tsx:4099:                        <span className="text-white/40">ИМЯ ГОСТЯ:</span>
+src/App.tsx:4107:                        <span className="text-white/40">РОЛЬ В СИСТЕМЕ:</span>
+src/App.tsx:4113:                      Предъявите этот QR-код при входе в ресторан или на ресепшн спа-центра для мгновенной регистрации вашего прибытия.
+src/App.tsx:4150:                          <h4 className="font-display font-bold text-sm text-white">QR-код Бронирования</h4>
+src/App.tsx:4174:                        <span className="text-white/40">НАЗВАНИЕ / ОБЪЕКТ:</span>
+src/App.tsx:4176:                          {selectedQrBooking.type === 'table' ? `Столик #${selectedQrBooking.tableNumber} (Ресторан)` : selectedQrBooking.serviceName}
+src/App.tsx:4180:                        <span className="text-white/40">ДАТА И ВРЕМЯ:</span>
+src/App.tsx:4181:                        <span className="text-teal-400 font-bold font-mono">{selectedQrBooking.date} в {selectedQrBooking.time}</span>
+src/App.tsx:4185:                          <span className="text-white/40">ЗАЛ И ГОСТИ:</span>
+src/App.tsx:4187:                            {selectedQrBooking.room === 'main' ? 'Главный' : selectedQrBooking.room === 'vip' ? 'VIP' : 'Терраса'}, {selectedQrBooking.guests} чел
+src/App.tsx:4192:                          <span className="text-white/40">СПЕЦИАЛИСТ:</span>
+src/App.tsx:4197:                        <span className="text-white/40">СТАТУС ЧЕКИНА:</span>
+src/App.tsx:4198:                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider animate-pulse">Ожидает прибытия</span>
+src/App.tsx:4203:                      Покажите данный код менеджеру или просканируйте его на терминале при входе для автоматической активации визита.
+src/App.tsx:4238:                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Проверка условий перед подтверждением</span>
+src/App.tsx:4252:                        <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider block mb-2">Детали заказа</span>
+src/App.tsx:4274:                          <span className="text-[10px] font-mono text-teal-400 font-bold uppercase tracking-wider block">Итого к списанию с баланса</span>
+src/App.tsx:4275:                          <span className="text-xs text-white/50">Депозит списывается моментально</span>
+src/App.tsx:4286:                          <span>Правила отмены бронирования</span>
+src/App.tsx:4290:                            ? "Полный возврат депозита возможен при отмене за 12+ часов до визита. При отмене менее чем за 12 часов удерживается 50% от суммы. При неявке депозит удерживается в 100% размере."
+src/App.tsx:4291:                            : "Бесплатная отмена или перенос записи возможны за 24 часа до назначенного времени. При отмене менее чем за 24 часа удерживается 30% стоимости зарезервированной услуги."}
+src/App.tsx:4297:                        Нажимая кнопку «Подтвердить», вы принимаете пользовательское соглашение, соглашаетесь с тарифами и политикой аннулирования.
+src/App.tsx:4307:                          Назад
+src/App.tsx:4314:                          <span>Подтвердить бронирование</span>
+src/App.tsx:4349:                          <h4 className="font-display font-bold text-base text-white">Настройки профиля</h4>
+src/App.tsx:4350:                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">управление аккаунтом и темой</span>
+src/App.tsx:4370:                          <span className="text-xs font-mono text-teal-400 font-bold uppercase tracking-wider">Ваш аккаунт</span>
+src/App.tsx:4378:                        <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">Имя пользователя</label>
+src/App.tsx:4388:                          placeholder="Ваше имя"
+src/App.tsx:4394:                        <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">Выберите аватар</label>
+src/App.tsx:4425:                          <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">Тема оформления</label>
+src/App.tsx:4426:                          <span className="text-[10px] text-white/30 block">Выберите визуальное оформление приложения</span>
+src/App.tsx:4442:                              <span className="text-xs block leading-none font-bold">Темная</span>
+src/App.tsx:4443:                              <span className="text-[8px] opacity-60 block mt-0.5">Энергосберегающая</span>
+src/App.tsx:4459:                              <span className="text-xs block leading-none font-bold">Светлая</span>
+src/App.tsx:4460:                              <span className="text-[8px] opacity-60 block mt-0.5">Высококонтрастная</span>
+src/App.tsx:4472:                          Сохранить настройки
+src/App.tsx:4509:                          <h4 className="font-display font-bold text-base text-white">Регистрация бьюти-бизнеса</h4>
+src/App.tsx:4510:                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Создание нового велнес/салонного центра</span>
+src/App.tsx:4523:                        <label className="block text-xs font-semibold text-white/60 mb-1">Название заведения *</label>
+src/App.tsx:4529:                          placeholder="Например: Aura Spa & Wellness"
+src/App.tsx:4536:                          <label className="block text-xs font-semibold text-white/60 mb-1">Категория *</label>
+src/App.tsx:4548:                          <label className="block text-xs font-semibold text-white/60 mb-1">Адрес *</label>
+src/App.tsx:4554:                            placeholder="ул. Ленина, д. 45"
+src/App.tsx:4561:                        <label className="block text-xs font-semibold text-white/60 mb-1">Краткое описание</label>
+src/App.tsx:4565:                          placeholder="Опишите концепцию, удобства и особенности вашего салона..."
+src/App.tsx:4572:                        <label className="block text-xs font-semibold text-white/60 mb-1">Ссылка на фото (URL)</label>
+src/App.tsx:4577:                          placeholder="https://images.unsplash.com/... (Оставьте пустым для автогенерации)"
+src/App.tsx:4583:                        <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider block">Первая услуга салона (для старта)</span>
+src/App.tsx:4586:                          <label className="block text-[11px] font-semibold text-white/50 mb-1">Название услуги *</label>
+src/App.tsx:4592:                            placeholder="Например: Классический шведский массаж"
+src/App.tsx:4599:                            <label className="block text-[11px] font-semibold text-white/50 mb-1">Стоимость (₽) *</label>
+src/App.tsx:4610:                            <label className="block text-[11px] font-semibold text-white/50 mb-1">Длительность (мин) *</label>
+src/App.tsx:4629:                          Отмена
+src/App.tsx:4636:                          {registeringSalon ? "Регистрируем…" : "Зарегистрировать салон"}
+src/App.tsx:4672:                          <h4 className="font-display font-bold text-base text-white">Регистрация ресторана / кафе</h4>
+src/App.tsx:4673:                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Создание нового гастрономического пространства</span>
+src/App.tsx:4686:                        <label className="block text-xs font-semibold text-white/60 mb-1">Название заведения *</label>
+src/App.tsx:4692:                          placeholder="Например: Bistro Gusto"
+src/App.tsx:4699:                          <label className="block text-xs font-semibold text-white/60 mb-1">Кухня *</label>
+src/App.tsx:4705:                            placeholder="Европейская, Азиатская, Итальянская"
+src/App.tsx:4710:                          <label className="block text-xs font-semibold text-white/60 mb-1">Количество столов для старта *</label>
+src/App.tsx:4724:                        <label className="block text-xs font-semibold text-white/60 mb-1">Описание концепции</label>
+src/App.tsx:4728:                          placeholder="Опишите атмосферу, фирменные блюда и особенности заведения..."
+src/App.tsx:4735:                        <label className="block text-xs font-semibold text-white/60 mb-1">Ссылка на фото (URL)</label>
+src/App.tsx:4740:                          placeholder="https://images.unsplash.com/... (Оставьте пустым для автогенерации)"
+src/App.tsx:4751:                          Отмена
+src/App.tsx:4758:                          {registeringRestaurant ? "Создаём…" : "Создать ресторан"}
+src/App.tsx:4796:                          <h4 className="font-display font-bold text-base text-white">Синхронизация события</h4>
+src/App.tsx:4813:                        Вы собираетесь добавить следующее событие в ваш основной Google Календарь:
+src/App.tsx:4818:                          <span className="text-white/50">Название:</span>
+src/App.tsx:4821:                              ? `🍽️ Бронь столика #${pendingSyncBooking.tableNumber} в ресторан`
+src/App.tsx:4826:                          <span className="text-white/50">Дата и время:</span>
+src/App.tsx:4827:                          <span className="font-semibold text-white">{pendingSyncBooking.date} в {pendingSyncBooking.time}</span>
+src/App.tsx:4830:                          <span className="text-white/50">Место:</span>
+src/App.tsx:4833:                              ? `Ресторан OmniReserve, ул. Лесная, д. 5, стр. 2`
+src/App.tsx:4834:                              : `Lotus Spa, ул. Лесная, д. 5, стр. 2`}
+src/App.tsx:4838:                          <span className="text-white/50">Напоминания:</span>
+src/App.tsx:4839:                          <span className="font-semibold text-teal-400">Всплывающее (30 мин) & Email (2 ч)</span>
+src/App.tsx:4851:                          Отмена
+src/App.tsx:4861:                            <span>Подтвердить запись</span>
+src/App.tsx:4888:                      <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider">Через 2 часа</span>
+src/App.tsx:4909:                        <span>Адрес назначения</span>
+src/App.tsx:4917:                          <strong>Как добраться:</strong> {alert.directions}
+src/App.tsx:4924:                      <span className="font-mono text-white/30 uppercase">ID брони: <strong className="text-white/60">{alert.bookingId}</strong></span>
+src/App.tsx:4931:                        Понятно
+src/App.tsx:4942:                <p>© 2026 OmniReserve Booking Superapp. Объединенная клиентская база Bookly & Tabletop.</p>
