@@ -40,6 +40,10 @@ CREATE TRIGGER update_business_financials_updated_at
   BEFORE UPDATE ON public.business_financials
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+-- Ensure legacy columns exist so the migration can run on fresh databases.
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS tax_id TEXT;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS payout_iban TEXT;
+
 -- Migrate existing data
 INSERT INTO public.business_financials (business_id, owner_id, tax_id, payout_iban)
 SELECT id, owner_id, tax_id, payout_iban

@@ -89,7 +89,7 @@ export default function App() {
 
   // Auth state
   const [user, setUser] = useState<UserType | null>(null);
-  const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
+  const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signup');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -1532,6 +1532,7 @@ export default function App() {
 
   const totalSelectedPrice = selectedTables.reduce((sum, t) => sum + t.price, 0);
   const totalSelectedCapacity = selectedTables.reduce((sum, t) => sum + t.capacity, 0);
+  const isSignupView = authTab === 'signup';
 
   return (
     <div className="min-h-screen bg-[#0F1115] text-[#E2E8F0] font-sans selection:bg-teal-500/20 selection:text-teal-400">
@@ -1547,261 +1548,197 @@ export default function App() {
             transition={{ duration: 0.4 }}
             className="flex min-h-screen items-center justify-center p-4 bg-[#0F1115]"
           >
-            <div className="w-full max-w-4xl bg-[#16191F] rounded-3xl shadow-2xl shadow-black/40 overflow-hidden border border-white/5 grid grid-cols-1 md:grid-cols-5" id="auth-container">
-              
-              {/* Brand Introduction Left Column */}
-              <div className="md:col-span-2 bg-[#090A0D] p-8 text-white flex flex-col justify-between relative overflow-hidden border-r border-white/5">
-                <div className="absolute inset-0 bg-radial-at-t from-teal-950/20 via-[#090A0D]/90 to-[#090A0D]" />
-                
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-8">
-                    <div className="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center text-black font-bold font-display text-xl shadow-lg shadow-teal-500/20">
-                      Ω
-                    </div>
-                    <div>
-                      <span className="font-display font-bold text-lg tracking-tight block">OmniReserve</span>
-                      <span className="text-[10px] text-teal-400 font-mono tracking-widest uppercase">Superapp Client Hub</span>
-                    </div>
-                  </div>
-                  
-                  <h2 className="font-display text-2xl font-bold tracking-tight leading-tight mb-4">
-                    {t('auth.slogan')}
-                  </h2>
-                  <p className="text-white/60 text-sm leading-relaxed mb-6">
-                    {t('auth.desc')}
-                  </p>
-                </div>
+            <div className="relative w-full max-w-6xl aspect-[16/9] min-h-[720px] overflow-hidden rounded-[32px] border border-white/5 bg-[#16191F] shadow-2xl shadow-black/40" id="auth-container">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(45,212,191,0.18),_transparent_40%),linear-gradient(135deg,_rgba(9,10,13,0.95),_rgba(17,21,28,0.95))]" />
 
-                <div className="relative z-10 pt-6 border-t border-white/5">
-                  <span className="text-xs text-white/40 block mb-3 font-medium uppercase tracking-wider">{t('auth.demoLoginTitle')}</span>
-                  <div className="space-y-2">
-                    <button 
-                      onClick={() => handleQuickLogin("maria@example.com")}
-                      className="w-full text-left py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition text-xs flex items-center justify-between"
-                    >
+              <motion.div
+                className="absolute inset-y-0 left-0 w-1/2"
+                initial={false}
+                animate={{ x: isSignupView ? 0 : '-100%' }}
+                transition={{ duration: 0.7, ease: [0.87, 0, 0.13, 1] }}
+              >
+                {isSignupView ? (
+                  <div className="flex h-full flex-col justify-between bg-[#090A0D]/90 p-8 text-white sm:p-10">
+                    <div className="space-y-6">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-teal-400"></span>
-                        <span>{t('auth.demoUserSpa')}</span>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500 text-xl font-bold text-black shadow-lg shadow-teal-500/20">Ω</div>
+                        <div>
+                          <span className="block font-display text-lg font-bold tracking-tight">OmniReserve</span>
+                          <span className="text-[10px] uppercase tracking-[0.3em] text-teal-400">Superapp Client Hub</span>
+                        </div>
                       </div>
-                      <ChevronRight className="w-3 h-3 text-teal-400" />
-                    </button>
-                    <button 
-                      onClick={() => handleQuickLogin("alex@example.com")}
-                      className="w-full text-left py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition text-xs flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-                        <span>{t('auth.demoUserFit')}</span>
+                      <div className="space-y-3">
+                        <h2 className="font-display text-3xl font-semibold leading-tight">{t('auth.slogan')}</h2>
+                        <p className="max-w-md text-sm leading-relaxed text-white/65">{t('auth.desc')}</p>
                       </div>
-                      <ChevronRight className="w-3 h-3 text-teal-400" />
-                    </button>
-                    <button 
-                      onClick={() => handleQuickLogin("owner@example.com")}
-                      className="w-full text-left py-2 px-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition text-xs flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                        <span className="text-amber-200 font-medium">{t('auth.demoUserOwner')}</span>
-                      </div>
-                      <ChevronRight className="w-3 h-3 text-amber-400" />
-                    </button>
-                  </div>
-                  <div className="mt-4 text-[11px] text-white/20 font-mono text-center">
-                    {t('auth.demoPass')}
-                  </div>
-                </div>
-              </div>
-
-              {/* Form Input Right Column */}
-              <div className="md:col-span-3 p-8 md:p-10 flex flex-col justify-center">
-                <div className="flex border-b border-white/5 mb-8 justify-start gap-6 text-sm font-medium">
-                  <button 
-                    onClick={() => { setAuthTab('signin'); setAuthError(""); }}
-                    className={`pb-3 transition relative ${authTab === 'signin' ? 'text-white font-semibold' : 'text-white/40 hover:text-white'}`}
-                  >
-                    {t('auth.loginBtn')}
-                    {authTab === 'signin' && (
-                      <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500" />
-                    )}
-                  </button>
-                  <button 
-                    onClick={() => { setAuthTab('signup'); setAuthError(""); }}
-                    className={`pb-3 transition relative ${authTab === 'signup' ? 'text-white font-semibold' : 'text-white/40 hover:text-white'}`}
-                  >
-                    {t('auth.signupTitle')}
-                    {authTab === 'signup' && (
-                      <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500" />
-                    )}
-                  </button>
-                </div>
-
-                {authError && (
-                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-xs flex items-center gap-2">
-                    <Info className="w-4 h-4 shrink-0" />
-                    <span>{authError}</span>
-                  </div>
-                )}
-
-                {authTab === 'signin' ? (
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.email')}</label>
-                      <input 
-                        type="email" 
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        placeholder="yourname@example.com"
-                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                        required
-                      />
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.password')}</label>
-                      <input 
-                        type="password" 
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                        required
-                      />
+
+                    <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">{t('auth.demoLoginTitle')}</span>
+                        <button
+                          onClick={() => { setAuthTab('signin'); setAuthError(''); }}
+                          className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-semibold text-teal-300 transition hover:bg-teal-500/20"
+                        >
+                          {t('auth.loginBtn')}
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <button onClick={() => handleQuickLogin('maria@example.com')} className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs transition hover:bg-white/10">
+                          <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-teal-400" />{t('auth.demoUserSpa')}</span>
+                          <ChevronRight className="h-3 w-3 text-teal-400" />
+                        </button>
+                        <button onClick={() => handleQuickLogin('alex@example.com')} className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs transition hover:bg-white/10">
+                          <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-purple-400" />{t('auth.demoUserFit')}</span>
+                          <ChevronRight className="h-3 w-3 text-teal-400" />
+                        </button>
+                        <button onClick={() => handleQuickLogin('owner@example.com')} className="flex w-full items-center justify-between rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-left text-xs transition hover:bg-amber-500/20">
+                          <span className="flex items-center gap-2"><span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />{t('auth.demoUserOwner')}</span>
+                          <ChevronRight className="h-3 w-3 text-amber-400" />
+                        </button>
+                      </div>
+                      <div className="text-center text-[11px] font-mono text-white/20">{t('auth.demoPass')}</div>
                     </div>
-                    <button 
-                      type="submit" 
-                      disabled={authLoading}
-                      className="w-full py-3 px-4 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-xl text-sm transition mt-6 flex items-center justify-center gap-2 shadow-lg shadow-teal-500/10 hover:shadow-teal-500/20 disabled:opacity-50"
-                    >
-                      {authLoading ? t('auth.authorizing') : t('auth.loginBtn')}
-                    </button>
-                  </form>
+                  </div>
                 ) : (
-                  <form onSubmit={handleRegister} className="space-y-4">
-                    {/* Signup Type Toggle */}
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">{t('auth.accountType')}</label>
-                      <div className="grid grid-cols-2 gap-2 p-1 bg-[#090A0D] rounded-xl border border-white/10">
-                        <button
-                          type="button"
-                          onClick={() => setSignupType('client')}
-                          className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${signupType === 'client' ? 'bg-teal-500 text-black shadow-lg' : 'text-white/60 hover:text-white'}`}
-                        >
-                          {t('auth.clientType')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSignupType('business')}
-                          className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${signupType === 'business' ? 'bg-teal-500 text-black shadow-lg' : 'text-white/60 hover:text-white'}`}
-                        >
-                          {t('auth.businessType')}
-                        </button>
+                  <div className="flex h-full flex-col justify-between bg-[#090A0D]/90 p-8 text-white sm:p-10">
+                    <div className="space-y-5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500 text-xl font-bold text-black shadow-lg shadow-teal-500/20">Ω</div>
+                        <div>
+                          <span className="block font-display text-lg font-bold tracking-tight">OmniReserve</span>
+                          <span className="text-[10px] uppercase tracking-[0.3em] text-teal-400">Welcome back</span>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <h2 className="font-display text-3xl font-semibold leading-tight">Sign in to continue your experience</h2>
+                        <p className="max-w-md text-sm leading-relaxed text-white/65">Access your bookings, preferences, and concierge tools in one place.</p>
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.fullName')}</label>
-                      <input 
-                        type="text" 
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        placeholder={t('auth.fullNamePlaceholder')}
-                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.email')}</label>
-                      <input 
-                        type="email" 
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        placeholder="username@example.com"
-                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.password')}</label>
-                      <input 
-                        type="password" 
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        placeholder={t('auth.passwordPlaceholder')}
-                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                        required
-                      />
-                    </div>
-
-                    {signupType === 'client' ? (
-                      <div>
-                        <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.preferences')}</label>
-                        <div className="flex flex-wrap gap-1.5 mt-1">
-                          {availablePrefs.map((pref) => {
-                            const isSelected = preferences.includes(pref.id);
-                            return (
-                              <button
-                                type="button"
-                                key={pref.id}
-                                onClick={() => togglePreference(pref.id)}
-                                className={`text-xs px-2.5 py-1 rounded-full border transition ${isSelected ? 'bg-teal-500/10 text-teal-400 border-teal-500/30 font-medium' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10'}`}
-                              >
-                                {pref.label}
-                              </button>
-                            );
-                          })}
-                        </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">{t('auth.loginBtn')}</span>
+                        <button
+                          onClick={() => { setAuthTab('signup'); setAuthError(''); }}
+                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/75 transition hover:bg-white/10"
+                        >
+                          {t('auth.signupTitle')}
+                        </button>
                       </div>
-                    ) : (
-                      <div className="space-y-4 pt-2 border-t border-white/5">
-                        <div>
-                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.companyName')}</label>
-                          <input 
-                            type="text" 
-                            value={businessName}
-                            onChange={e => setBusinessName(e.target.value)}
-                            placeholder={t('auth.companyPlaceholder')}
-                            className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.companyCategory')}</label>
-                          <select
-                            value={businessCategory}
-                            onChange={e => setBusinessCategory(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm"
-                          >
-                            <option value="Spa & Wellness">{t('auth.categorySpa')}</option>
-                            <option value="Fitness & Active">{t('auth.categoryFit')}</option>
-                            <option value="Beauty & Style">{t('auth.categoryBeauty')}</option>
-                            <option value="Restaurant">{t('auth.categoryRestaurant')}</option>
-                            <option value="Service Center">{t('auth.categoryService')}</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">{t('auth.companyDesc')}</label>
-                          <textarea
-                            value={businessDescription}
-                            onChange={e => setBusinessDescription(e.target.value)}
-                            placeholder={t('auth.companyDescPlaceholder')}
-                            rows={2}
-                            className="w-full px-4 py-2 rounded-xl border border-white/10 bg-[#090A0D] text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-sm resize-none"
-                          />
-                        </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+
+              <motion.div
+                className="absolute inset-y-0 left-1/2 w-1/2"
+                initial={false}
+                animate={{ x: isSignupView ? 0 : '-100%' }}
+                transition={{ duration: 0.7, ease: [0.87, 0, 0.13, 1] }}
+              >
+                {isSignupView ? (
+                  <div className="flex h-full flex-col justify-center bg-[#11151C]/95 p-8 sm:p-10">
+                    {authError && (
+                      <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-400">
+                        <Info className="h-4 w-4 shrink-0" />
+                        <span>{authError}</span>
                       </div>
                     )}
 
-                    <button 
-                      type="submit" 
-                      disabled={authLoading}
-                      className="w-full py-3 px-4 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-xl text-sm transition mt-6 flex items-center justify-center gap-2 shadow-lg shadow-teal-500/10 hover:shadow-teal-500/20"
-                    >
-                      {authLoading 
-                        ? (signupType === 'business' ? t('auth.creatingBusiness') : t('auth.creatingAccount')) 
-                        : (signupType === 'business' ? t('auth.registerBusinessBtn') : t('auth.registerBtn'))}
-                    </button>
-                  </form>
+                    <form onSubmit={handleRegister} className="space-y-4">
+                      <div>
+                        <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.accountType')}</label>
+                        <div className="grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-[#090A0D] p-1">
+                          <button type="button" onClick={() => setSignupType('client')} className={`rounded-lg px-3 py-2 text-xs font-bold transition ${signupType === 'client' ? 'bg-teal-500 text-black shadow-lg' : 'text-white/60 hover:text-white'}`}>
+                            {t('auth.clientType')}
+                          </button>
+                          <button type="button" onClick={() => setSignupType('business')} className={`rounded-lg px-3 py-2 text-xs font-bold transition ${signupType === 'business' ? 'bg-teal-500 text-black shadow-lg' : 'text-white/60 hover:text-white'}`}>
+                            {t('auth.businessType')}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.fullName')}</label>
+                        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder={t('auth.fullNamePlaceholder')} className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" required />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.email')}</label>
+                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="username@example.com" className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" required />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.password')}</label>
+                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t('auth.passwordPlaceholder')} className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" required />
+                      </div>
+
+                      {signupType === 'client' ? (
+                        <div>
+                          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.preferences')}</label>
+                          <div className="mt-1 flex flex-wrap gap-1.5">
+                            {availablePrefs.map((pref) => {
+                              const isSelected = preferences.includes(pref.id);
+                              return (
+                                <button key={pref.id} type="button" onClick={() => togglePreference(pref.id)} className={`rounded-full border px-2.5 py-1 text-xs transition ${isSelected ? 'border-teal-500/30 bg-teal-500/10 text-teal-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'}`}>
+                                  {pref.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 border-t border-white/5 pt-2">
+                          <div>
+                            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.companyName')}</label>
+                            <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder={t('auth.companyPlaceholder')} className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" required />
+                          </div>
+                          <div>
+                            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.companyCategory')}</label>
+                            <select value={businessCategory} onChange={e => setBusinessCategory(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30">
+                              <option value="Spa & Wellness">{t('auth.categorySpa')}</option>
+                              <option value="Fitness & Active">{t('auth.categoryFit')}</option>
+                              <option value="Beauty & Style">{t('auth.categoryBeauty')}</option>
+                              <option value="Restaurant">{t('auth.categoryRestaurant')}</option>
+                              <option value="Service Center">{t('auth.categoryService')}</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.companyDesc')}</label>
+                            <textarea value={businessDescription} onChange={e => setBusinessDescription(e.target.value)} placeholder={t('auth.companyDescPlaceholder')} rows={2} className="w-full resize-none rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" />
+                          </div>
+                        </div>
+                      )}
+
+                      <button type="submit" disabled={authLoading} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-4 py-3 text-sm font-bold text-black transition hover:bg-teal-400 disabled:opacity-50">
+                        {authLoading ? (signupType === 'business' ? t('auth.creatingBusiness') : t('auth.creatingAccount')) : (signupType === 'business' ? t('auth.registerBusinessBtn') : t('auth.registerBtn'))}
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="flex h-full flex-col justify-center bg-[#11151C]/95 p-8 sm:p-10">
+                    {authError && (
+                      <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-400">
+                        <Info className="h-4 w-4 shrink-0" />
+                        <span>{authError}</span>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleLogin} className="space-y-4">
+                      <div>
+                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.email')}</label>
+                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="yourname@example.com" className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" required />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.25em] text-white/60">{t('auth.password')}</label>
+                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full rounded-xl border border-white/10 bg-[#090A0D] px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/30" required />
+                      </div>
+                      <button type="submit" disabled={authLoading} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-4 py-3 text-sm font-bold text-black transition hover:bg-teal-400 disabled:opacity-50">
+                        {authLoading ? t('auth.authorizing') : t('auth.loginBtn')}
+                      </button>
+                    </form>
+                  </div>
                 )}
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         ) : (
