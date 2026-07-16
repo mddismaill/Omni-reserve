@@ -1,7 +1,7 @@
-import { auth, defineMcp } from "npm:@lovable.dev/mcp-js";
-import listPublishedBusinessesTool from "./tools/list-published-businesses.ts";
-import listMyBookingsTool from "./tools/list-my-bookings.ts";
-import cancelBookingTool from "./tools/cancel-booking.ts";
+import { auth, defineMcp } from "@lovable.dev/mcp-js";
+import listPublishedBusinessesTool from "./tools/list-published-businesses";
+import listMyBookingsTool from "./tools/list-my-bookings";
+import cancelBookingTool from "./tools/cancel-booking";
 
 // The OAuth issuer MUST be the direct Supabase host (RFC 8414 §3.3).
 // Build from VITE_SUPABASE_PROJECT_ID (Vite inlines this at build time).
