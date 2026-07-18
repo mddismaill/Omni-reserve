@@ -1739,6 +1739,44 @@ ${availableTablesList}
   app.post("/api/recommendations", handleAIRecommendation);
   app.get("/api/recommendation", handleAIRecommendation);
 
+  // API - Gemini Google Maps Grounding assistant
+  app.post("/api/ai/maps-grounding", requireAuth, async (req, res) => {
+    const { query, latitude, longitude } = req.body;
+    if (!query) {
+      return res.status(400).json({ error: "Query is required" });
+    }
+
+    try {
+      const ai = getGeminiClient();
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: query,
+        config: {
+          systemInstruction: `You are an elite, highly knowledgeable geographical concierge in Moscow, helping users navigate to our luxury restaurant and salon hubs (Belorusskaya, Prospekt Mira, Patriarshiye).
+Provide accurate, helpful directions, landmarks, travel times, metro routes, and walking guides based on live Google Maps data. 
+Answer in a refined, elegant tone, in the user's language (default to Russian).`,
+          tools: [{ googleMaps: {} }],
+          toolConfig: {
+            retrievalConfig: {
+              latLng: {
+                latitude: latitude || 55.7558,
+                longitude: longitude || 37.6173
+              }
+            }
+          }
+        }
+      });
+
+      const text = response.text || "No response generated.";
+      const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+
+      res.json({ text, groundingChunks });
+    } catch (err: any) {
+      console.error("Error with Gemini Maps Grounding:", err);
+      res.status(500).json({ error: err.message || "An error occurred with Gemini Maps Grounding." });
+    }
+  });
+
   // API - AI Chat Agent for booking help
   app.post("/api/ai/chat", requireAuth, async (req, res) => {
     const { messages } = req.body;

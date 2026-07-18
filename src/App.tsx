@@ -62,6 +62,7 @@ import { useSupabaseSession, hasActiveSession } from "./lib/auth";
 import { supabase } from "./integrations/supabase/client";
 import RbacPanel from "./components/RbacPanel";
 import AIConcierge from "./components/AIConcierge";
+import InteractiveMapHub from "./components/InteractiveMapHub";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import Tabletop3DViewer from "./components/Tabletop3DViewer";
@@ -2394,6 +2395,16 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* Interactive Google Map Hub with live grounding assistance */}
+                  <InteractiveMapHub
+                    setActiveModule={setActiveModule}
+                    setSelectedRestaurant={setSelectedRestaurant}
+                    setSelectedSalon={setSelectedSalon}
+                    restaurants={restaurants}
+                    salons={salons}
+                    theme={theme}
+                  />
+
                   {/* Google Calendar Sync Center */}
                   <div className={`rounded-2xl border mb-6 overflow-hidden shadow-xl transition-all ${
                     theme === 'light' 
@@ -3184,9 +3195,20 @@ export default function App() {
                       <div className="h-6 w-px bg-white/10 hidden sm:block" />
                       <div>
                         <span className="text-[10px] text-teal-400 font-bold uppercase tracking-wider block">{t('tabletop.restaurantLabel')}</span>
-                        <h3 className="font-display font-black text-lg text-white leading-none">
-                          {selectedRestaurant.name}
-                        </h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-display font-black text-lg text-white leading-none">
+                            {selectedRestaurant.name}
+                          </h3>
+                          {selectedTables.length > 1 && (
+                            <span className="px-2 py-0.5 bg-orange-500 text-black font-extrabold text-[10px] uppercase font-mono rounded-full animate-pulse tracking-wide whitespace-nowrap">
+                              {i18n.language === 'ru' 
+                                ? `${selectedTables.length} столов выбрано` 
+                                : i18n.language === 'ar' 
+                                ? `تم اختيار ${selectedTables.length} طاولات` 
+                                : `${selectedTables.length} Tables Selected`}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -3611,7 +3633,11 @@ export default function App() {
                                               whileHover={isBooked ? {} : { scale: 1.06, filter: "brightness(1.15)" }}
                                               whileTap={isBooked ? {} : { scale: 0.94 }}
                                               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                              style={{ transformOrigin: "center", transformBox: "fill-box" }}
+                                              style={{ 
+                                                transformOrigin: "center", 
+                                                transformBox: "fill-box",
+                                                transition: "fill 0.5s ease-in-out, stroke 0.5s ease-in-out, stroke-width 0.5s ease-in-out"
+                                              }}
                                             />
                                           ) : (
                                             <motion.rect 
@@ -3627,7 +3653,11 @@ export default function App() {
                                               whileHover={isBooked ? {} : { scale: 1.06, filter: "brightness(1.15)" }}
                                               whileTap={isBooked ? {} : { scale: 0.94 }}
                                               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                              style={{ transformOrigin: "center", transformBox: "fill-box" }}
+                                              style={{ 
+                                                transformOrigin: "center", 
+                                                transformBox: "fill-box",
+                                                transition: "fill 0.5s ease-in-out, stroke 0.5s ease-in-out, stroke-width 0.5s ease-in-out"
+                                              }}
                                             />
                                           )}
 
@@ -3636,7 +3666,8 @@ export default function App() {
                                             x={cx}
                                             y={cy + 4}
                                             textAnchor="middle"
-                                            className={`font-display text-xs font-bold pointer-events-none transition ${isMatch ? 'fill-amber-400 font-extrabold text-sm' : isBooked ? 'fill-red-400' : isSelected ? 'fill-black font-extrabold' : 'fill-white/90'}`}
+                                            className={`font-display text-xs font-bold pointer-events-none transition-all duration-500 ${isMatch ? "fill-amber-400 font-extrabold text-sm" : isBooked ? (theme === "light" ? "fill-red-800" : "fill-red-400") : isSelected ? "fill-black font-extrabold" : (theme === "light" ? "fill-gray-900" : "fill-white/90")}`}
+                                            style={{ transition: "fill 0.5s ease-in-out" }}
                                           >
                                             #{t.number}
                                           </text>
@@ -3645,9 +3676,10 @@ export default function App() {
                                             x={cx}
                                             y={cy + 16}
                                             textAnchor="middle"
-                                            className={`text-[9px] font-bold pointer-events-none font-mono ${isSelected ? 'fill-black/60' : 'fill-white/40'}`}
+                                            className={`text-[9px] font-bold pointer-events-none font-mono transition-all duration-500 ${isSelected ? "fill-black/60" : (theme === "light" ? "fill-gray-500" : "fill-white/40")}`}
+                                            style={{ transition: "fill 0.5s ease-in-out" }}
                                           >
-                                            {t.capacity} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : 'pax'}
+                                            {t.capacity} {i18n.language === "ru" ? "чел" : i18n.language === "ar" ? "أشخاص" : "pax"}
                                           </text>
                                         </g>
                                       );
@@ -3657,34 +3689,35 @@ export default function App() {
                                 {/* SVG Gradient patterns definitions */}
                                 <defs>
                                   <linearGradient id="metal-gradient-available" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#1E222B" />
-                                    <stop offset="100%" stopColor="#161920" />
+                                    <stop offset="0%" stopColor={theme === "light" ? "#FFFFFF" : "#1E222B"} style={{ transition: "stop-color 0.5s ease-in-out" }} />
+                                    <stop offset="100%" stopColor={theme === "light" ? "#E5E7EB" : "#161920"} style={{ transition: "stop-color 0.5s ease-in-out" }} />
                                   </linearGradient>
                                   <linearGradient id="metal-gradient-selected" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#2DD4BF" />
-                                    <stop offset="100%" stopColor="#0D9488" />
+                                    <stop offset="0%" stopColor="#2DD4BF" style={{ transition: "stop-color 0.5s ease-in-out" }} />
+                                    <stop offset="100%" stopColor="#0D9488" style={{ transition: "stop-color 0.5s ease-in-out" }} />
                                   </linearGradient>
                                   <linearGradient id="metal-gradient-booked" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#2B161B" />
-                                    <stop offset="100%" stopColor="#200F12" />
+                                    <stop offset="0%" stopColor={theme === "light" ? "#FEE2E2" : "#2B161B"} style={{ transition: "stop-color 0.5s ease-in-out" }} />
+                                    <stop offset="100%" stopColor={theme === "light" ? "#FCA5A5" : "#200F12"} style={{ transition: "stop-color 0.5s ease-in-out" }} />
                                   </linearGradient>
                                 </defs>
                               </svg>
 
                               {/* Zoom / Pan Controls Overlay */}
+                              {/* Zoom / Pan Controls Overlay */}
                               <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
-                                <div className="bg-black/75 backdrop-blur-md border border-white/10 rounded-xl p-1.5 flex flex-col gap-1.5 shadow-xl">
+                                <div className={`backdrop-blur-md rounded-xl p-1.5 flex flex-col gap-1.5 shadow-xl transition-all duration-500 border ${theme === "light" ? "bg-white/80 border-gray-200 text-gray-700" : "bg-black/75 border-white/10 text-white"}`}>
                                   <button
                                     onClick={() => setZoom(prev => Math.min(prev * 1.2, 4))}
-                                    className="p-2 bg-white/5 hover:bg-white/10 text-white hover:text-teal-400 rounded-lg transition cursor-pointer flex items-center justify-center"
-                                    title={i18n.language === 'ru' ? 'Приблизить' : i18n.language === 'ar' ? 'تكبير' : 'Zoom In'}
+                                    className={`p-2 rounded-lg transition cursor-pointer flex items-center justify-center ${theme === "light" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-teal-600" : "bg-white/5 hover:bg-white/10 text-white hover:text-teal-400"}`}
+                                    title={i18n.language === "ru" ? "Приблизить" : i18n.language === "ar" ? "تكبير" : "Zoom In"}
                                   >
                                     <ZoomIn className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => setZoom(prev => Math.max(prev / 1.2, 0.8))}
-                                    className="p-2 bg-white/5 hover:bg-white/10 text-white hover:text-teal-400 rounded-lg transition cursor-pointer flex items-center justify-center"
-                                    title={i18n.language === 'ru' ? 'Отдалить' : i18n.language === 'ar' ? 'تصغير' : 'Zoom Out'}
+                                    className={`p-2 rounded-lg transition cursor-pointer flex items-center justify-center ${theme === "light" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-teal-600" : "bg-white/5 hover:bg-white/10 text-white hover:text-teal-400"}`}
+                                    title={i18n.language === "ru" ? "Отдалить" : i18n.language === "ar" ? "تصغير" : "Zoom Out"}
                                   >
                                     <ZoomOut className="w-4 h-4" />
                                   </button>
@@ -3693,8 +3726,8 @@ export default function App() {
                                       setZoom(1);
                                       setPan({ x: 0, y: 0 });
                                     }}
-                                    className="p-2 bg-white/5 hover:bg-white/10 text-white hover:text-teal-400 rounded-lg transition cursor-pointer flex items-center justify-center"
-                                    title={i18n.language === 'ru' ? 'Сбросить' : i18n.language === 'ar' ? 'إعادة تعيين' : 'Reset View'}
+                                    className={`p-2 rounded-lg transition cursor-pointer flex items-center justify-center ${theme === "light" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-teal-600" : "bg-white/5 hover:bg-white/10 text-white hover:text-teal-400"}`}
+                                    title={i18n.language === "ru" ? "Сбросить" : i18n.language === "ar" ? "إعادة تعيين" : "Reset View"}
                                   >
                                     <RefreshCw className="w-4 h-4" />
                                   </button>
@@ -3702,13 +3735,13 @@ export default function App() {
                               </div>
 
                               {/* Navigation instructions / indicator */}
-                              <div className="absolute bottom-4 left-4 pointer-events-none bg-black/60 backdrop-blur-sm border border-white/5 text-[9px] font-mono text-white/50 py-1 px-2.5 rounded-full z-10 flex items-center gap-1.5">
+                              <div className={`absolute bottom-4 left-4 pointer-events-none backdrop-blur-sm text-[9px] font-mono py-1 px-2.5 rounded-full z-10 flex items-center gap-1.5 transition-all duration-500 border ${theme === "light" ? "bg-white/80 border-gray-200 text-gray-500" : "bg-black/60 border-white/5 text-white/50"}`}>
                                 <span>
-                                  {i18n.language === 'ru' 
-                                    ? 'Перетаскивайте для перемещения • Колёсико для масштаба' 
-                                    : i18n.language === 'ar' 
-                                      ? 'اسحب للتحريك • عجلة الماوس للتكبير' 
-                                      : 'Drag to pan • Scroll to zoom'}
+                                  {i18n.language === "ru" 
+                                    ? "Перетаскивайте для перемещения • Колёсико для масштаба" 
+                                    : i18n.language === "ar"
+                                    ? "اسحب للتحريك • عجلة الماوس للتكبير"
+                                    : "Drag to pan • Scroll to zoom"}
                                 </span>
                                 {zoom !== 1 || pan.x !== 0 || pan.y !== 0 ? (
                                   <span className="text-teal-400 font-bold">
@@ -3825,9 +3858,17 @@ export default function App() {
                                   </span>
                                 )}
                               </div>
-                              <span className="text-xs px-2.5 py-1 bg-teal-500/10 text-teal-300 border border-teal-500/20 rounded-lg font-bold font-mono">
-                                {totalSelectedPrice} ₽ {i18n.language === 'ru' ? 'депо' : i18n.language === 'ar' ? 'تأمين' : 'deposit'}
-                              </span>
+                              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                                <span className="text-xs px-2.5 py-1 bg-teal-500/10 text-teal-300 border border-teal-500/20 rounded-lg font-bold font-mono whitespace-nowrap">
+                                  {totalSelectedPrice} ₽ {i18n.language === 'ru' ? 'депо' : i18n.language === 'ar' ? 'تأمين' : 'deposit'}
+                                </span>
+                                <span className="text-xs px-2.5 py-1 bg-orange-500/10 text-orange-300 border border-orange-500/20 rounded-lg font-bold font-mono flex items-center gap-1.5 whitespace-nowrap">
+                                  <Users className="w-3.5 h-3.5 text-orange-400" />
+                                  <span>
+                                    {totalSelectedCapacity} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : 'guests'}
+                                  </span>
+                                </span>
+                              </div>
                             </div>
 
                             {/* Mini chips to manage/view selected tables */}

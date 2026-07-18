@@ -7,6 +7,9 @@ import {mcpPlugin} from '@lovable.dev/mcp-js/stacks/supabase/vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss(), mcpPlugin()],
+    define: {
+      'process.env.GOOGLE_MAPS_PLATFORM_KEY': JSON.stringify(process.env.GOOGLE_MAPS_PLATFORM_KEY || '')
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

@@ -690,14 +690,15 @@ export default function Tabletop3DViewer({
     const leatherChairMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6 });
     const vipRedChairMat = new THREE.MeshStandardMaterial({ color: 0x500d11, roughness: 0.4 });
     const metalLegMat = new THREE.MeshStandardMaterial({ color: 0x777777, metalness: 0.9, roughness: 0.1 });
-    const selectedOutlineMat = new THREE.MeshBasicMaterial({ color: 0x14f195, wireframe: true });
+    const selectedOutlineMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
 
     // Status beacon light materials
     const beaconGeo = new THREE.SphereGeometry(0.12, 8, 8);
     const beaconPostGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.8, 8);
     
-    const availableBeaconMat = new THREE.MeshBasicMaterial({ color: 0x14f195 });
+    const availableBeaconMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
     const bookedBeaconMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+    const selectedBeaconMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
     const matchBeaconMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
 
     activeRoomTables.forEach((table) => {
@@ -836,7 +837,7 @@ export default function Tabletop3DViewer({
       beaconPost.castShadow = true;
       singleTableGroup.add(beaconPost);
 
-      let beaconMat = isBooked ? bookedBeaconMat : isMatch ? matchBeaconMat : availableBeaconMat;
+      let beaconMat = isBooked ? bookedBeaconMat : isSelected ? selectedBeaconMat : isMatch ? matchBeaconMat : availableBeaconMat;
       const beaconLightMesh = new THREE.Mesh(beaconGeo, beaconMat);
       beaconLightMesh.name = "statusLight";
       beaconLightMesh.position.set(0, 1.8, 0);
@@ -844,7 +845,7 @@ export default function Tabletop3DViewer({
 
       // Add a tiny glowing point light inside available / selected table beacons for atmosphere
       if (!isBooked && (isSelected || isMatch)) {
-        const glowColor = isMatch ? 0xf59e0b : 0x14f195;
+        const glowColor = isSelected ? 0x3b82f6 : isMatch ? 0xf59e0b : 0x10b981;
         const pointLight = new THREE.PointLight(glowColor, 0.5, 3);
         pointLight.position.set(0, 1.8, 0);
         singleTableGroup.add(pointLight);
