@@ -27,6 +27,7 @@ import {
   Grid,
   Bell,
   QrCode,
+  Camera,
   Sliders,
   Utensils,
   Star,
@@ -42,12 +43,18 @@ import {
   Moon,
   Palette,
   MessageSquare,
-  MessageCircle
+  MessageCircle,
+  Eye,
+  Contrast,
+  Bed,
+  CalendarDays,
+  Hotel as HotelIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from "recharts";
-import { User as UserType, Table, Service, Booking, AIRecommendation, TableBooking, ServiceBooking, StaffMember, Restaurant, Salon } from "./types";
+import { User as UserType, Table, Service, Booking, AIRecommendation, TableBooking, ServiceBooking, StaffMember, Restaurant, Salon, Hotel, Room, HotelBooking } from "./types";
+import { INITIAL_HOTELS, INITIAL_ROOMS } from "./data/staysData";
 import {
   listRestaurants,
   listSalons,
@@ -61,12 +68,15 @@ import {
 import { useSupabaseSession, hasActiveSession } from "./lib/auth";
 import { supabase } from "./integrations/supabase/client";
 import RbacPanel from "./components/RbacPanel";
+import StayBookingModule from "./components/StayBookingModule";
 import AIConcierge from "./components/AIConcierge";
 import InteractiveMapHub from "./components/InteractiveMapHub";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import Tabletop3DViewer from "./components/Tabletop3DViewer";
 import RestaurantReviews from "./components/RestaurantReviews";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
+import QRScanner from "./components/QRScanner";
 import WeatherWidget, { WeatherId, weatherPresets } from "./components/WeatherWidget";
 import { 
   initCalendarAuth, 
@@ -77,7 +87,7 @@ import {
   deleteGoogleCalendarEvent, 
   CalendarEvent 
 } from "./lib/googleCalendar";
-import { RefreshCw, Trash2, CalendarDays, Link2, ZoomIn, ZoomOut } from "lucide-react";
+import { RefreshCw, Trash2, Link2, ZoomIn, ZoomOut } from "lucide-react";
 
 export default function App() {
   // Centralized Supabase session — single source of truth for auth checks.
@@ -103,9 +113,51 @@ export default function App() {
   const [businessDescription, setBusinessDescription] = useState("");
 
   // App core state
-  const [activeModule, setActiveModule] = useState<'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant'>('ai-assistant');
+  const [activeModule, setActiveModule] = useState<'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant' | 'stays' | 'analytics'>('ai-assistant');
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  
+  // Stay bookings database state
+  const [hotels, setHotels] = useState<Hotel[]>(INITIAL_HOTELS);
+  const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
+  const [hotelBookings, setHotelBookings] = useState<HotelBooking[]>([
+    {
+      id: "hbook-1",
+      userId: "user-1",
+      type: "hotel",
+      hotelId: "hotel-1",
+      hotelName: "The Grand Atrium Oasis",
+      roomId: "room-101",
+      roomType: "Deluxe Suite with Spa View",
+      checkInDate: "2026-07-15",
+      checkOutDate: "2026-07-18",
+      totalGuests: 2,
+      totalCost: 37500,
+      status: "confirmed",
+      createdAt: "2026-07-10T12:00:00.000Z"
+    },
+    {
+      id: "hbook-2",
+      userId: "user-2",
+      type: "hotel",
+      hotelId: "hotel-2",
+      hotelName: "Alpine Summit Retreat",
+      roomId: "room-201",
+      roomType: "Panoramic Summit Room",
+      checkInDate: "2026-07-14",
+      checkOutDate: "2026-07-16",
+      totalGuests: 1,
+      totalCost: 19000,
+      status: "confirmed",
+      createdAt: "2026-07-09T14:30:00.000Z"
+    }
+  ]);
+
+  // Stay booking search state
+  const [stayDestination, setStayDestination] = useState<string>("all");
+  const [stayCheckIn, setStayCheckIn] = useState<string>("2026-07-15");
+  const [stayCheckOut, setStayCheckOut] = useState<string>("2026-07-18");
+  const [stayGuests, setStayGuests] = useState<number>(2);
   const [services, setServices] = useState<Service[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
@@ -182,7 +234,7 @@ export default function App() {
       } else {
         // Restrict selection of multiple tables to same roomzone for visual consistency
         if (prev.length > 0 && prev[0].room !== t.room) {
-          toast.error(i18n.language === 'ru' ? "Вы можете бронировать столы только в одной зоне за раз." : "You can only book tables in the same room zone at once.");
+          toast.error(i18n.language === 'ru' ? "Вы можете бронировать столы только в одной зоне за раз." : i18n.language === 'hy' ? "Դուք կարող եք միաժամանակ սեղաններ ամրագրել միայն մեկ գոտում:" : "You can only book tables in the same room zone at once.");
           updated = [t];
         } else {
           updated = [...prev, t];
@@ -320,6 +372,14 @@ export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
+
+  // High contrast accessibility theme state
+  const [highContrast, setHighContrast] = useState<boolean>(() => {
+    return localStorage.getItem('highContrast') === 'true';
+  });
+
+  // Header scroll state for dynamic animation
+  const [scrolled, setScrolled] = useState(false);
 
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
@@ -550,6 +610,38 @@ export default function App() {
     }
   }, [theme]);
 
+  useEffect(() => {
+    localStorage.setItem('highContrast', String(highContrast));
+    if (highContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+  }, [highContrast]);
+
+  // Scroll listener for the header transition and height animation
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.scrollY > 20) {
+            setScrolled(true);
+          } else {
+            setScrolled(false);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Run once at start to capture initial load scroll position
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Calendar history view state
   const [bookingHistoryView, setBookingHistoryView] = useState<'list' | 'calendar'>('list');
   const [dateFilter, setDateFilter] = useState<'all' | 'week' | 'month' | 'next_month'>('all');
@@ -631,6 +723,44 @@ export default function App() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const [notificationPermission, setNotificationPermission] = useState<string>(() => {
+    try {
+      if (typeof window !== "undefined" && "Notification" in window) {
+        return Notification.permission;
+      }
+    } catch (e) {
+      console.warn("Notification permission API not fully accessible:", e);
+    }
+    return "default";
+  });
+
+  const requestNotificationPermission = () => {
+    if (!("Notification" in window)) return;
+    try {
+      Notification.requestPermission().then((permission) => {
+        setNotificationPermission(permission);
+        if (permission === "granted") {
+          new Notification(t('common.browserNotificationsEnabled'), {
+            body: "Thank you for enabling notifications!",
+            icon: "/favicon.ico"
+          });
+        }
+      });
+    } catch (e) {
+      console.error("Failed to request notification permission:", e);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined" && "Notification" in window) {
+        setNotificationPermission(Notification.permission);
+      }
+    } catch (e) {
+      console.warn("Could not read Notification permission on mount:", e);
+    }
+  }, []);
 
   // Load user notifications
   const loadUserNotifications = (userId: string) => {
@@ -972,7 +1102,90 @@ export default function App() {
     .catch(err => console.error("Error creating server notification:", err));
   };
 
-  // Periodic check (every 10 seconds) for 2 hours upcoming bookings
+  const showActualBrowserNotification = (booking: Booking) => {
+    // Title
+    const title = t('common.browserNotification30mTitle');
+
+    // Message
+    let body = "";
+    if (booking.type === 'table') {
+      body = t('common.browserNotification30mTable', {
+        tableNumber: booking.tableNumber,
+        restaurantName: (booking as any).restaurantName || 'Grand Atelier',
+        time: booking.time
+      });
+    } else {
+      body = t('common.browserNotification30mService', {
+        serviceName: booking.serviceName,
+        staffName: booking.staffName,
+        time: booking.time
+      });
+    }
+
+    // Trigger browser notification
+    if ("Notification" in window) {
+      if (Notification.permission === "granted") {
+        try {
+          new Notification(title, {
+            body,
+            icon: "/favicon.ico",
+            tag: `booking-30m-${booking.id}`
+          });
+        } catch (err) {
+          console.error("Failed to show HTML5 notification:", err);
+        }
+      } else {
+        console.warn("Desktop notifications not granted. Permission state:", Notification.permission);
+      }
+    }
+
+    // Also add to the in-app notifications and set unreadCount + local state, so there is visibility!
+    if (user && hasActiveSession()) {
+      fetch("/api/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          title,
+          message: body,
+          type: "reminder"
+        })
+      })
+      .then(() => {
+        loadUserNotifications(user.id);
+      })
+      .catch(err => console.error("Error creating server notification for 30m reminder:", err));
+    }
+  };
+
+  const trigger30MinBrowserNotification = (booking: Booking, isTest: boolean = false) => {
+    const storageKey = `browser-notified-30m-${booking.id}`;
+    if (!isTest && localStorage.getItem(storageKey)) {
+      return;
+    }
+    if (!isTest) {
+      localStorage.setItem(storageKey, "true");
+    }
+
+    // Request permission if not granted
+    if ("Notification" in window && Notification.permission === "default") {
+      try {
+        Notification.requestPermission().then((permission) => {
+          setNotificationPermission(permission);
+          if (permission === "granted") {
+            showActualBrowserNotification(booking);
+          }
+        });
+      } catch (e) {
+        console.error("Failed to request permission on notification trigger:", e);
+        showActualBrowserNotification(booking);
+      }
+    } else {
+      showActualBrowserNotification(booking);
+    }
+  };
+
+  // Periodic check (every 10 seconds) for 2 hours upcoming bookings and 30-min desktop reminders
   useEffect(() => {
     if (!user || bookings.length === 0) return;
 
@@ -989,6 +1202,12 @@ export default function App() {
           // If booking is scheduled and starts within 2 hours (e.g. up to 2.1 hours in future, and in future)
           if (diffHours > 0 && diffHours <= 2.1) {
             triggerUpcomingBookingAlert(booking, false);
+          }
+
+          // If booking starts within 30 minutes (e.g. up to 30.5 minutes in future, and in future)
+          const diffMinutes = diffMs / (1000 * 60);
+          if (diffMinutes > 0 && diffMinutes <= 30.5) {
+            trigger30MinBrowserNotification(booking, false);
           }
         } catch (e) {
           console.error("Error parsing booking date:", e);
@@ -1024,6 +1243,112 @@ export default function App() {
   // QR Check-in State
   const [selectedQrBooking, setSelectedQrBooking] = useState<Booking | null>(null);
   const [showPersonalQr, setShowPersonalQr] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
+
+  const [scannedCheckInBooking, setScannedCheckInBooking] = useState<Booking | null>(null);
+  const [scannedCheckInUserPass, setScannedCheckInUserPass] = useState<{ id: string; email: string } | null>(null);
+  const [scannedUserBookings, setScannedUserBookings] = useState<Booking[]>([]);
+
+  const handleGlobalQrScanSuccess = (decodedText: string) => {
+    setShowQrScanner(false); // Close camera viewfinder
+    
+    // Play light beep
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    } catch (e) {}
+
+    try {
+      if (decodedText.startsWith("booking-checkin:")) {
+        const parts = decodedText.split(":");
+        const bookingId = parts[1];
+        
+        // Look up the booking
+        const found = allBookings.find(b => b.id === bookingId) || bookings.find(b => b.id === bookingId) || hotelBookings.find(b => b.id === bookingId);
+        if (found) {
+          setScannedCheckInBooking(found);
+          setScannedCheckInUserPass(null);
+          setScannedUserBookings([]);
+          toast.success(
+            i18n.language === 'ru' 
+              ? "Код бронирования успешно считан!" 
+              : "Booking QR Code successfully decoded!"
+          );
+        } else {
+          toast.error(
+            i18n.language === 'ru'
+              ? "Бронирование не найдено в нашей базе."
+              : "Scanned booking not found in our database."
+          );
+        }
+      } else if (decodedText.startsWith("user-checkin:")) {
+        const parts = decodedText.split(":");
+        const userId = parts[1];
+        const email = parts[2];
+
+        setScannedCheckInUserPass({ id: userId, email });
+        setScannedCheckInBooking(null);
+
+        // Find match for guest bookings
+        const userB = allBookings.filter(b => b.userId === userId) || bookings.filter(b => b.userId === userId);
+        setScannedUserBookings(userB);
+
+        toast.success(
+          i18n.language === 'ru'
+            ? "Универсальная карта гостя считана!"
+            : "Universal Guest Pass successfully decoded!"
+        );
+      } else {
+        toast.error(
+          i18n.language === 'ru'
+            ? "Неверный формат или поврежденный QR-код."
+            : "Invalid QR code payload format."
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error reading scanned QR data");
+    }
+  };
+
+  const handleCheckInBooking = (bookingId: string) => {
+    setAllBookings(prev => prev.map(b => b.id === bookingId ? { ...b, checkedIn: true } : b));
+    setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, checkedIn: true } : b));
+    setHotelBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'confirmed', checkedIn: true } : b));
+    
+    // Sync current scanned booking if it's the one being checked in
+    setScannedCheckInBooking(prev => prev && prev.id === bookingId ? { ...prev, checkedIn: true } : prev);
+    setScannedUserBookings(prev => prev.map(b => b.id === bookingId ? { ...b, checkedIn: true } : b));
+    
+    // Create checkin notification
+    const booking = allBookings.find(b => b.id === bookingId) || bookings.find(b => b.id === bookingId) || hotelBookings.find(b => b.id === bookingId);
+    if (booking) {
+      const isRussian = i18n.language === 'ru';
+      const isArabic = i18n.language === 'ar';
+      const isArmenian = i18n.language === 'hy';
+      
+      const newNotif = {
+        id: `notif-checkin-${Date.now()}`,
+        userId: booking.userId,
+        title: isRussian ? "Регистрация успешна!" : isArabic ? "نجاح التحقق من الوصول!" : isArmenian ? "Գրանցումը հաղոջվեց:" : "Check-in successful!",
+        message: isRussian 
+          ? `Вы успешно зарегистрировались по QR-коду на бронирование #${booking.id}.` 
+          : `Successfully checked in via QR code for reservation #${booking.id}.`,
+        type: 'status',
+        read: false,
+        createdAt: new Date().toISOString()
+      };
+      setNotifications(prev => [newNotif, ...prev]);
+    }
+  };
 
   // Memoized 30-day analytics dataset for Recharts
   const bookingOverviewData = React.useMemo(() => {
@@ -1034,7 +1359,7 @@ export default function App() {
       const d = new Date(baseDate);
       d.setDate(baseDate.getDate() - i);
       const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const displayDate = d.toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { day: "numeric", month: "short" });
+      const displayDate = d.toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', { day: "numeric", month: "short" });
 
       const tableCount = allBookings.filter(b => b.date === dateString && b.type === 'table').length;
       const serviceCount = allBookings.filter(b => b.date === dateString && b.type === 'service').length;
@@ -1299,9 +1624,7 @@ export default function App() {
 
         const tableNumbersString = selectedTables.map(t => `#${t.number}`).join(", ");
         setBookingSuccessMsg(
-          i18n.language === 'ru'
-            ? `Успешно забронировано! Столы: ${tableNumbersString} на ${tabletopDate} в ${tabletopTime}.`
-            : `Success! Tables ${tableNumbersString} booked for ${tabletopDate} at ${tabletopTime}.`
+          i18n.language === 'ru' ? `Успешно забронировано! Столы: ${tableNumbersString} на ${tabletopDate} в ${tabletopTime}.` : i18n.language === 'hy' ? `Հաջողությա՛մբ ամրագրվեց: Սեղաններ՝ ${tableNumbersString}, ${tabletopDate}-ին, ժամը ${tabletopTime}-ին:` : `Success! Tables ${tableNumbersString} booked for ${tabletopDate} at ${tabletopTime}.`
         );
         setSelectedTables([]);
         setSelectedTable(null);
@@ -1336,7 +1659,7 @@ export default function App() {
     const details = [
       `${t('common.restaurantLabel')}: ${selectedRestaurant?.name || t('common.restaurantLabel')}`,
       `${t('common.roomZoneLabel')}: ${uniqueRooms}`,
-      `${i18n.language === 'ru' ? 'Номера столов' : 'Table Numbers'}: ${tableNumbersText}`,
+      `${i18n.language === 'ru' ? 'Номера столов' : i18n.language === 'hy' ? 'Սեղանների համարները' : 'Table Numbers'}: ${tableNumbersText}`,
       `${t('common.capacityLabel')}: ${t('common.capacityValue', { capacity: totalCapacity })}`,
       `${t('common.guestsCountLabel')}: ${guestsCount}`,
       `${t('common.visitDateLabel')}: ${tabletopDate}`,
@@ -1816,9 +2139,35 @@ export default function App() {
             className="flex flex-col min-h-screen"
           >
             {/* Header Navigation Bar */}
-            <header className="bg-[#090A0D] border-b border-white/5 sticky top-0 z-30 shadow-md" id="main-header">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+            <motion.header 
+              id="main-header"
+              className="sticky top-0 z-30 flex items-center transition-shadow duration-300"
+              initial={{ 
+                height: "80px", 
+                backgroundColor: theme === 'light' ? "rgba(255, 255, 255, 0)" : "rgba(9, 10, 13, 0)",
+                borderBottomColor: theme === 'light' ? "rgba(0, 0, 0, 0)" : "rgba(255, 255, 255, 0)",
+                boxShadow: "0 0 0 rgba(0, 0, 0, 0)"
+              }}
+              animate={{ 
+                height: scrolled ? "64px" : "80px",
+                backgroundColor: theme === 'light' 
+                  ? (scrolled ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0)")
+                  : (scrolled ? "rgba(9, 10, 13, 0.95)" : "rgba(9, 10, 13, 0)"),
+                borderBottomColor: theme === 'light'
+                  ? (scrolled ? "rgba(0, 0, 0, 0.08)" : "rgba(0, 0, 0, 0)")
+                  : (scrolled ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0)"),
+                backdropFilter: scrolled ? "blur(12px)" : "blur(0px)",
+                boxShadow: scrolled 
+                  ? (theme === 'light' 
+                      ? "0 4px 20px -2px rgba(0, 0, 0, 0.05)" 
+                      : "0 10px 30px -10px rgba(0, 0, 0, 0.5)") 
+                  : "0 0 0 rgba(0, 0, 0, 0)"
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              style={{ borderBottomWidth: "1px", borderBottomStyle: "solid", transition: "box-shadow 0.3s ease-in-out" }}
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full">
+                <div className="flex items-center justify-between h-full">
                   
                   {/* Left Side Logo */}
                   <div className="flex items-center gap-8">
@@ -1892,6 +2241,30 @@ export default function App() {
                                 )}
                               </div>
                               
+                              {/* Desktop Notification Request Banner */}
+                              {("Notification" in window) && (
+                                <div className="px-4 py-2.5 bg-[#1a1d24] border-b border-white/5 flex flex-col gap-1 text-[11px]">
+                                  {notificationPermission === "default" && (
+                                    <button
+                                      onClick={requestNotificationPermission}
+                                      className="w-full text-center bg-teal-500 hover:bg-teal-400 text-black font-bold py-1.5 px-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-teal-500/10"
+                                    >
+                                      <span className="animate-pulse">🔔</span> {t('common.enableBrowserNotifications')}
+                                    </button>
+                                  )}
+                                  {notificationPermission === "granted" && (
+                                    <div className="text-teal-400 font-semibold flex items-center gap-1.5 justify-center py-1 bg-teal-500/5 rounded-xl border border-teal-500/10">
+                                      <span>✅</span> {t('common.browserNotificationsEnabled')}
+                                    </div>
+                                  )}
+                                  {notificationPermission === "denied" && (
+                                    <div className="text-red-400 font-semibold flex items-center gap-1.5 justify-center py-1 bg-red-500/5 rounded-xl border border-red-500/10">
+                                      <span>❌</span> {t('common.browserNotificationsBlocked')}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              
                               <div className="max-h-72 overflow-y-auto divide-y divide-white/5">
                                 {notifications.length === 0 ? (
                                   <div className="py-8 text-center text-xs text-white/40">
@@ -1909,7 +2282,7 @@ export default function App() {
                                           <span>{n.title}</span>
                                         </div>
                                         <span className="text-[9px] font-mono text-white/30 shrink-0">
-                                          {new Date(n.createdAt).toLocaleTimeString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                                          {new Date(n.createdAt).toLocaleTimeString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                       </div>
                                       <p className="text-white/60 mt-1 leading-relaxed text-left">{n.message}</p>
@@ -1930,6 +2303,16 @@ export default function App() {
                         )}
                       </AnimatePresence>
                     </div>
+
+                    {/* QR Code Scanner Button */}
+                    <button 
+                      onClick={() => setShowQrScanner(true)}
+                      className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1.5 cursor-pointer text-xs font-semibold px-3"
+                      title={i18n.language === 'ru' ? 'Сканировать QR-код чекина' : 'Scan Check-In QR Code'}
+                    >
+                      <Camera className="w-4 h-4 shrink-0 text-indigo-400 animate-pulse" />
+                      <span className="hidden md:inline">{i18n.language === 'ru' ? 'Сканировать QR' : 'Scan QR'}</span>
+                    </button>
 
                     {/* Profile Dropdown */}
                     <div className="flex items-center gap-3 pl-4 border-l border-white/10">
@@ -1968,7 +2351,7 @@ export default function App() {
 
                 </div>
               </div>
-            </header>
+            </motion.header>
 
             {/* Notification messages toast banner */}
             <AnimatePresence mode="wait">
@@ -2052,6 +2435,22 @@ export default function App() {
                   </div>
                 )}
               </AnimatePresence>
+
+
+              {/* ANALYTICS & REVENUE DASHBOARD */}
+              {activeModule === 'analytics' && (
+                <AnalyticsDashboard
+                  user={user}
+                  bookings={bookings}
+                  hotelBookings={hotelBookings}
+                  restaurants={restaurants}
+                  salons={salons}
+                  hotels={hotels}
+                  rooms={rooms}
+                  theme={theme}
+                  onTabChange={(tab) => setActiveModule(tab)}
+                />
+              )}
 
 
               {/* A. DASHBOARD VIEW (Unified client state) */}
@@ -2237,7 +2636,7 @@ export default function App() {
                                 </div>
                               </div>
                               <span className="text-xs px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg text-white font-mono font-bold">
-                                {spending.total.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽
+                                {spending.total.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽
                               </span>
                             </div>
                             
@@ -2266,14 +2665,14 @@ export default function App() {
                                       <div 
                                         style={{ width: `${spending.diningPercent}%` }} 
                                         className="bg-gradient-to-r from-orange-600 to-orange-400 h-full first:rounded-l-full last:rounded-r-full transition-all duration-500" 
-                                        title={`${t('dashboard.diningLabel')}: ${spending.diningTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽`} 
+                                        title={`${t('dashboard.diningLabel')}: ${spending.diningTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽`} 
                                       />
                                     )}
                                     {spending.wellnessTotal > 0 && (
                                       <div 
                                         style={{ width: `${spending.wellnessPercent}%` }} 
                                         className="bg-gradient-to-r from-teal-500 to-teal-400 h-full first:rounded-l-full last:rounded-r-full transition-all duration-500" 
-                                        title={`${t('dashboard.wellnessLabel')}: ${spending.wellnessTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽`} 
+                                        title={`${t('dashboard.wellnessLabel')}: ${spending.wellnessTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽`} 
                                       />
                                     )}
                                   </>
@@ -2288,11 +2687,11 @@ export default function App() {
                               <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-white/[0.03]">
                                 <div className="text-left">
                                   <span className="text-[10px] text-white/40 block font-mono">DINING</span>
-                                  <span className="text-xs font-bold text-white font-mono">{spending.diningTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+                                  <span className="text-xs font-bold text-white font-mono">{spending.diningTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽</span>
                                 </div>
                                 <div className="text-right">
                                   <span className="text-[10px] text-white/40 block font-mono">WELLNESS</span>
-                                  <span className="text-xs font-bold text-white font-mono">{spending.wellnessTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+                                  <span className="text-xs font-bold text-white font-mono">{spending.wellnessTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽</span>
                                 </div>
                               </div>
                             </div>
@@ -2649,7 +3048,7 @@ export default function App() {
                                   <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                                     {googleCalendarEvents.map((evt) => {
                                       const startRaw = evt.start.dateTime || evt.start.date || "";
-                                      const dateFormatted = startRaw ? new Date(startRaw).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', {
+                                      const dateFormatted = startRaw ? new Date(startRaw).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', {
                                         month: 'short',
                                         day: 'numeric',
                                         hour: '2-digit',
@@ -2776,7 +3175,7 @@ export default function App() {
                                   <div className="flex items-center gap-3">
                                     <div className="text-right">
                                       <span className="text-xs text-white/40 block font-mono">{t('dashboard.costLabel')}</span>
-                                      <span className="text-sm font-bold text-white font-mono">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+                                      <span className="text-sm font-bold text-white font-mono">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽</span>
                                     </div>
                                     
                                     <button 
@@ -2785,6 +3184,15 @@ export default function App() {
                                       title={t('dashboard.reminderTooltip')}
                                     >
                                       <Bell className="w-4 h-4" />
+                                    </button>
+
+                                    <button 
+                                      onClick={() => trigger30MinBrowserNotification(booking, true)}
+                                      className="p-2 border border-teal-500/20 bg-teal-500/5 hover:bg-teal-500/20 text-teal-400 rounded-xl transition animate-hover flex items-center gap-1 text-[11px]"
+                                      title="Test 30-min browser notification"
+                                    >
+                                      <Bell className="w-4 h-4 text-teal-400" />
+                                      <span className="text-[9px] font-bold">30m</span>
                                     </button>
 
                                     <button 
@@ -2804,23 +3212,32 @@ export default function App() {
                                     </button>
 
                                     {isGoogleCalendarConnected && (
-                                      <button 
-                                        onClick={() => {
-                                          if (syncedBookingIds[booking.id]) {
-                                            handleUnsyncBooking(booking);
-                                          } else {
-                                            triggerSyncBooking(booking);
-                                          }
-                                        }}
-                                        className={`p-2 border rounded-xl transition animate-hover ${
-                                          syncedBookingIds[booking.id]
-                                            ? 'border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/20 text-emerald-400' 
-                                            : 'border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/20 text-blue-400'
-                                        }`}
-                                        title={syncedBookingIds[booking.id] ? t('dashboard.gcalConnectedTooltip') : t('dashboard.gcalNotConnectedTooltip')}
-                                      >
-                                        <Calendar className="w-4 h-4" />
-                                      </button>
+                                      <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+                                        <span className={`text-[10px] uppercase font-bold tracking-wider whitespace-nowrap ${theme === 'light' ? 'text-gray-500' : 'text-white/40'}`}>
+                                          {t('dashboard.gcalSyncToggle', 'Sync to Google Calendar')}
+                                        </span>
+                                        <button
+                                          onClick={() => {
+                                            if (autoSyncToCalendar) return;
+                                            if (syncedBookingIds[booking.id]) {
+                                              handleUnsyncBooking(booking);
+                                            } else {
+                                              triggerSyncBooking(booking);
+                                            }
+                                          }}
+                                          disabled={isCalendarLoading || autoSyncToCalendar}
+                                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                                            syncedBookingIds[booking.id] || autoSyncToCalendar ? 'bg-emerald-500' : 'bg-white/10'
+                                          } ${autoSyncToCalendar ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                          title={autoSyncToCalendar ? t('dashboard.gcalAutoSyncedTitle', 'Auto-synced') : (syncedBookingIds[booking.id] ? t('dashboard.gcalConnectedTooltip') : t('dashboard.gcalNotConnectedTooltip'))}
+                                        >
+                                          <span
+                                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                                              syncedBookingIds[booking.id] || autoSyncToCalendar ? 'translate-x-4' : 'translate-x-0'
+                                            }`}
+                                          />
+                                        </button>
+                                      </div>
                                     )}
 
                                     <button 
@@ -2861,7 +3278,7 @@ export default function App() {
                               <ChevronLeft className="w-4 h-4" />
                             </button>
                             <span className="font-display font-bold text-sm text-white capitalize min-w-[120px] text-center">
-                              {calendarMonth.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'long', year: 'numeric' })}
+                              {calendarMonth.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', { month: 'long', year: 'numeric' })}
                             </span>
                             <button 
                               onClick={() => {
@@ -2882,12 +3299,7 @@ export default function App() {
 
                         {/* Weekday Labels */}
                         <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] sm:text-xs font-bold text-white/40 uppercase tracking-wider">
-                          {(i18n.language === 'ru' 
-                            ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] 
-                            : i18n.language === 'ar' 
-                              ? ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'] 
-                              : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-                          ).map(day => (
+                          {(i18n.language === 'ru' ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] : i18n.language === 'ar' ? ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'] : i18n.language === 'hy' ? ['Երկ', 'Երք', 'Չոր', 'Հնգ', 'Ուրբ', 'Շաբ', 'Կիր'] : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']).map(day => (
                             <div key={day} className="py-2">{day}</div>
                           ))}
                         </div>
@@ -2981,7 +3393,7 @@ export default function App() {
                               <div className="flex items-center justify-between border-b border-white/5 pb-3">
                                 <h4 className="font-display font-bold text-xs text-white uppercase tracking-wider flex items-center gap-2">
                                   <Calendar className="w-4 h-4 text-teal-400" />
-                                  <span>{t('dashboard.calendarDayDetailsTitle', { date: new Date(selectedCalendarDay).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' }) })}</span>
+                                  <span>{t('dashboard.calendarDayDetailsTitle', { date: new Date(selectedCalendarDay).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' }) })}</span>
                                 </h4>
                                 <button 
                                   onClick={() => setSelectedCalendarDay(null)}
@@ -3043,7 +3455,7 @@ export default function App() {
                                         <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5 font-mono">
                                           <div className="text-left sm:text-right">
                                             <span className="text-[9px] text-white/30 block">{t('dashboard.costLabel')}</span>
-                                            <span className="text-xs font-bold text-white">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+                                            <span className="text-xs font-bold text-white">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽</span>
                                           </div>
 
                                           <button 
@@ -3201,11 +3613,7 @@ export default function App() {
                           </h3>
                           {selectedTables.length > 1 && (
                             <span className="px-2 py-0.5 bg-orange-500 text-black font-extrabold text-[10px] uppercase font-mono rounded-full animate-pulse tracking-wide whitespace-nowrap">
-                              {i18n.language === 'ru' 
-                                ? `${selectedTables.length} столов выбрано` 
-                                : i18n.language === 'ar' 
-                                ? `تم اختيار ${selectedTables.length} طاولات` 
-                                : `${selectedTables.length} Tables Selected`}
+                              {i18n.language === 'ru' ? `${selectedTables.length} столов выбрано` : i18n.language === 'ar' ? `تم اختيار ${selectedTables.length} طاولات` : i18n.language === 'hy' ? `${selectedTables.length} սեղան ընտրված է` : `${selectedTables.length} Tables Selected`}
                             </span>
                           )}
                         </div>
@@ -3233,10 +3641,10 @@ export default function App() {
                           <div>
                             <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
                               <Map className="w-5 h-5 text-teal-400" />
-                              {i18n.language === 'ru' ? 'Интерактивная 2D/3D схема столов' : i18n.language === 'ar' ? 'مخطط الطاولات التفاعلي ثنائي/ثلاثي الأبعاد' : 'Interactive 2D/3D Table Map'}
+                              {i18n.language === 'ru' ? 'Интерактивная 2D/3D схема столов' : i18n.language === 'ar' ? 'مخطط الطاولات التفاعلي ثنائي/ثلاثي الأبعاد' : i18n.language === 'hy' ? 'Սեղանների ինտերակտիվ 2D/3D սխեմա' : 'Interactive 2D/3D Table Map'}
                             </h3>
                             <p className="text-xs text-white/60">
-                              {i18n.language === 'ru' ? 'Выберите нужную зону, рассмотрите расположение столов и кликните на свободный, чтобы забронировать его.' : i18n.language === 'ar' ? 'اختر المنطقة المطلوبة، واعرض موقع الطاولات وانقر على الطاولة الشاغرة لحجزها.' : 'Choose the desired area, view the table layout, and click on an available table to book it.'}
+                              {i18n.language === 'ru' ? 'Выберите нужную зону, рассмотрите расположение столов и кликните на свободный, чтобы забронировать его.' : i18n.language === 'ar' ? 'اختر المنطقة المطلوبة، واعرض موقع الطاولات وانقر على الطاولة الشاغرة لحجزها.' : i18n.language === 'hy' ? 'Ընտրեք ցանկալի գոտին, դիտեք սեղանների դասավորությունը և սեղմեք ազատ սեղանին՝ այն ամրագրելու համար:' : 'Choose the desired area, view the table layout, and click on an available table to book it.'}
                             </p>
                           </div>
                           
@@ -3246,7 +3654,7 @@ export default function App() {
                               <Search className="w-4 h-4 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
                               <input
                                 type="text"
-                                placeholder={i18n.language === 'ru' ? 'Поиск стола по №...' : i18n.language === 'ar' ? 'البحث عن طاولة برقم...' : 'Search table by #...'}
+                                placeholder={i18n.language === 'ru' ? 'Поиск стола по №...' : i18n.language === 'ar' ? 'البحث عن طاولة برقم...' : i18n.language === 'hy' ? 'Սեղանի որոնում ըստ №-ի...' : 'Search table by #...'}
                                 value={tableSearchQuery}
                                 onChange={(e) => setTableSearchQuery(e.target.value)}
                                 className="pl-9 pr-8 py-2 w-full sm:w-40 md:w-44 bg-[#0F1115] border border-white/10 hover:border-white/20 focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 text-xs text-white rounded-xl focus:outline-none font-semibold transition placeholder:text-white/30"
@@ -3293,7 +3701,7 @@ export default function App() {
                         <div className="flex flex-wrap items-center justify-between gap-4 mt-4 mb-6 p-3 bg-[#0F1115]/50 border border-white/5 rounded-2xl text-xs">
                           <div className="flex flex-wrap items-center gap-3">
                             <span className="text-white/40 font-semibold flex items-center gap-1">
-                              <Sliders className="w-3.5 h-3.5 text-teal-400" /> {i18n.language === 'ru' ? 'Фильтры:' : i18n.language === 'ar' ? 'الفلاتر:' : 'Filters:'}
+                              <Sliders className="w-3.5 h-3.5 text-teal-400" /> {i18n.language === 'ru' ? 'Фильтры:' : i18n.language === 'ar' ? 'الفلاتر:' : i18n.language === 'hy' ? 'Ֆիլտրեր:' : 'Filters:'}
                             </span>
                             
                             {/* Party Size Filter */}
@@ -3302,11 +3710,11 @@ export default function App() {
                               onChange={(e) => setPartySizeFilter(Number(e.target.value))}
                               className="bg-[#16191F] border border-white/10 text-white/80 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-teal-500 transition cursor-pointer"
                             >
-                              <option value="0">{i18n.language === 'ru' ? 'Любая вместимость' : i18n.language === 'ar' ? 'أي سعة' : 'Any capacity'}</option>
-                              <option value="2">{i18n.language === 'ru' ? 'От 2 человек' : i18n.language === 'ar' ? 'من شخصين' : 'From 2 people'}</option>
-                              <option value="4">{i18n.language === 'ru' ? 'От 4 человек' : i18n.language === 'ar' ? 'من 4 أشخاص' : 'From 4 people'}</option>
-                              <option value="6">{i18n.language === 'ru' ? 'От 6 человек' : i18n.language === 'ar' ? 'من 6 أشخاص' : 'From 6 people'}</option>
-                              <option value="8">{i18n.language === 'ru' ? 'От 8 человек' : i18n.language === 'ar' ? 'من 8 أشخاص' : 'From 8 people'}</option>
+                              <option value="0">{i18n.language === 'ru' ? 'Любая вместимость' : i18n.language === 'ar' ? 'أي سعة' : i18n.language === 'hy' ? 'Ցանկացած տարողություն' : 'Any capacity'}</option>
+                              <option value="2">{i18n.language === 'ru' ? 'От 2 человек' : i18n.language === 'ar' ? 'من شخصين' : i18n.language === 'hy' ? 'Սկսած 2 հոգուց' : 'From 2 people'}</option>
+                              <option value="4">{i18n.language === 'ru' ? 'От 4 человек' : i18n.language === 'ar' ? 'من 4 أشخاص' : i18n.language === 'hy' ? 'Սկսած 4 հոգուց' : 'From 4 people'}</option>
+                              <option value="6">{i18n.language === 'ru' ? 'От 6 человек' : i18n.language === 'ar' ? 'من 6 أشخاص' : i18n.language === 'hy' ? 'Սկսած 6 հոգուց' : 'From 6 people'}</option>
+                              <option value="8">{i18n.language === 'ru' ? 'От 8 человек' : i18n.language === 'ar' ? 'من 8 أشخاص' : i18n.language === 'hy' ? 'Սկսած 8 հոգուց' : 'From 8 people'}</option>
                             </select>
 
                             {/* Table Type Filter */}
@@ -3315,7 +3723,7 @@ export default function App() {
                               onChange={(e) => setTableTypeFilter(e.target.value)}
                               className="bg-[#16191F] border border-white/10 text-white/80 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-teal-500 transition cursor-pointer"
                             >
-                              <option value="all">{i18n.language === 'ru' ? 'Все типы столов' : i18n.language === 'ar' ? 'جميع أنواع الطاولات' : 'All table types'}</option>
+                              <option value="all">{i18n.language === 'ru' ? 'Все типы столов' : i18n.language === 'ar' ? 'جميع أنواع الطاولات' : i18n.language === 'hy' ? 'Սեղանների բոլոր տեսակները' : 'All table types'}</option>
                               <option value="standard">{t('tabletop.type.standard')}</option>
                               <option value="window">{t('tabletop.type.window')}</option>
                               <option value="vip">{t('tabletop.type.vip')}</option>
@@ -3335,7 +3743,7 @@ export default function App() {
                               }`}
                             >
                               <Map className="w-3.5 h-3.5" />
-                              {i18n.language === 'ru' ? '2D Схема' : i18n.language === 'ar' ? 'مخطط ثنائي الأبعاد' : '2D Layout'}
+                              {i18n.language === 'ru' ? '2D Схема' : i18n.language === 'ar' ? 'مخطط ثنائي الأبعاد' : i18n.language === 'hy' ? '2D Սխեմա' : '2D Layout'}
                             </button>
                             <button
                               type="button"
@@ -3347,7 +3755,7 @@ export default function App() {
                               }`}
                             >
                               <Sparkles className="w-3.5 h-3.5 text-current animate-pulse" />
-                              {i18n.language === 'ru' ? '3D Зал' : i18n.language === 'ar' ? 'صالة ثلاثية الأبعاد' : '3D Hall'}
+                              {i18n.language === 'ru' ? '3D Зал' : i18n.language === 'ar' ? 'صالة ثلاثية الأبعاد' : i18n.language === 'hy' ? '3D Սրահ' : '3D Hall'}
                             </button>
                           </div>
                         </div>
@@ -3376,11 +3784,7 @@ export default function App() {
                               </span>
                               <div>
                                 <span className="font-extrabold uppercase tracking-wider text-[9px] block mb-0.5">
-                                  {i18n.language === 'ru' 
-                                    ? `Влияние погоды на террасу (${weatherPresets[currentWeatherId].temp}°C)` 
-                                    : i18n.language === 'ar' 
-                                      ? `تأثير الطقس على التراس (${weatherPresets[currentWeatherId].temp}°م)` 
-                                      : `Weather impact on terrace (${weatherPresets[currentWeatherId].temp}°C)`}
+                                  {i18n.language === 'ru' ? `Влияние погоды на террасу (${weatherPresets[currentWeatherId].temp}°C)` : i18n.language === 'ar' ? `تأثير الطقس على التراس (${weatherPresets[currentWeatherId].temp}°م)` : i18n.language === 'hy' ? `Եղանակի ազդեցությունը տեռասի վրա (${weatherPresets[currentWeatherId].temp}°C)` : `Weather impact on terrace (${weatherPresets[currentWeatherId].temp}°C)`}
                                 </span>
                                 <p className="font-medium text-white/90">
                                   {t('weather.recommendation.' + currentWeatherId)}
@@ -3391,7 +3795,7 @@ export default function App() {
                             {/* Weather condition switcher inside restaurant view for easier accessibility! */}
                             <div className="flex items-center gap-1.5 self-start sm:self-auto bg-black/40 p-1 rounded-xl border border-white/5 shrink-0">
                               <span className="text-[9px] text-white/40 uppercase font-bold tracking-wide px-2 font-mono">
-                                {i18n.language === 'ru' ? 'симулятор:' : i18n.language === 'ar' ? 'المحاكي:' : 'simulator:'}
+                                {i18n.language === 'ru' ? 'симулятор:' : i18n.language === 'ar' ? 'المحاكي:' : i18n.language === 'hy' ? 'սիմուլյատոր:' : 'simulator:'}
                               </span>
                               {(Object.keys(weatherPresets) as WeatherId[]).map((wId) => (
                                 <button
@@ -3417,18 +3821,18 @@ export default function App() {
                             <div className="flex items-center gap-2 text-white/70">
                               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                               <span>
-                                {i18n.language === 'ru' ? 'Поиск' : i18n.language === 'ar' ? 'بحث' : 'Search'} <strong className="text-amber-400">"{tableSearchQuery}"</strong>:
+                                {i18n.language === 'ru' ? 'Поиск' : i18n.language === 'ar' ? 'بحث' : i18n.language === 'hy' ? 'Որոնում' : 'Search'} <strong className="text-amber-400">"{tableSearchQuery}"</strong>:
                                 {matchedTables.length > 0 ? (
-                                  <> {i18n.language === 'ru' ? 'найдено' : i18n.language === 'ar' ? 'تم العثور على' : 'found'} <strong className="text-white">{matchedTables.length}</strong> {i18n.language === 'ru' ? (matchedTables.length === 1 ? "столик" : "столика(ов)") : i18n.language === 'ar' ? "طاولة" : "table(s)"}</>
+                                  <> {i18n.language === 'ru' ? 'найдено' : i18n.language === 'ar' ? 'تم العثور على' : i18n.language === 'hy' ? 'գտնվել է' : 'found'} <strong className="text-white">{matchedTables.length}</strong> {i18n.language === 'ru' ? (matchedTables.length === 1 ? "столик" : "столика(ов)") : i18n.language === 'ar' ? "طاولة" : "table(s)"}</>
                                 ) : (
-                                  <> {i18n.language === 'ru' ? 'совпадений в этом зале нет' : i18n.language === 'ar' ? 'لا يوجد تطابق في هذه القاعة' : 'no matches in this hall'}</>
+                                  <> {i18n.language === 'ru' ? 'совпадений в этом зале нет' : i18n.language === 'ar' ? 'لا يوجد تطابق في هذه القاعة' : i18n.language === 'hy' ? 'այս սրահում համընկնումներ չկան' : 'no matches in this hall'}</>
                                 )}
                               </span>
                             </div>
                             {matchedTables.length > 0 && (
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">
-                                  {i18n.language === 'ru' ? 'Быстрый выбор:' : i18n.language === 'ar' ? 'اختيار سريع:' : 'Quick Select:'}
+                                  {i18n.language === 'ru' ? 'Быстрый выбор:' : i18n.language === 'ar' ? 'اختيار سريع:' : i18n.language === 'hy' ? 'Արագ ընտրություն:' : 'Quick Select:'}
                                 </span>
                                 {matchedTables.map(t => {
                                   const isSelected = selectedTables.some(item => item.id === t.id) || selectedTable?.id === t.id;
@@ -3465,7 +3869,7 @@ export default function App() {
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-2 bg-[#0F1115]/80 z-20">
                               <div className="w-8 h-8 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
                               <p className="text-xs text-stone-400">
-                                {i18n.language === 'ru' ? 'Получаем статус столов...' : i18n.language === 'ar' ? 'جاري جلب حالة الطاولات...' : 'Fetching tables status...'}
+                                {i18n.language === 'ru' ? 'Получаем статус столов...' : i18n.language === 'ar' ? 'جاري جلب حالة الطاولات...' : i18n.language === 'hy' ? 'Ստացվում է սեղանների կարգավիճակը...' : 'Fetching tables status...'}
                               </p>
                             </div>
                           ) : null}
@@ -3498,14 +3902,14 @@ export default function App() {
                               {selectedRoom === 'main' && (
                                 <>
                                   <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/5 text-white/50 text-[10px] font-mono py-1 px-4 rounded-b-lg border-b border-x border-white/5 uppercase tracking-widest font-bold">
-                                    {i18n.language === 'ru' ? 'ВХОД / РЕСЕПШН' : i18n.language === 'ar' ? 'المدخل / الاستقبال' : 'ENTRANCE / RECEPTION'}
+                                    {i18n.language === 'ru' ? 'ВХОД / РЕСЕПШН' : i18n.language === 'ar' ? 'المدخل / الاستقبال' : i18n.language === 'hy' ? 'ՄՈՒՏՔ / ԸՆԴՈՒՆԱՐԱՆ' : 'ENTRANCE / RECEPTION'}
                                   </div>
                                   <div className="absolute bottom-4 left-4 bg-white/5 text-white/50 text-[10px] font-mono py-2 px-3 rounded-xl border border-white/5 uppercase tracking-widest font-bold">
-                                    {i18n.language === 'ru' ? 'БАРНАЯ ЗОНА' : i18n.language === 'ar' ? 'منطقة البار' : 'BAR ZONE'}
+                                    {i18n.language === 'ru' ? 'БАРНАЯ ЗОНА' : i18n.language === 'ar' ? 'منطقة البار' : i18n.language === 'hy' ? 'ԲԱՐԻ ԳՈՏԻ' : 'BAR ZONE'}
                                   </div>
                                   <div className="absolute top-1/3 right-0 -translate-y-1/2 w-4 bg-white/5 h-24 rounded-l-md border-y border-l border-white/5 flex items-center justify-center">
                                     <span className="text-[9px] text-white/40 font-mono tracking-widest uppercase rotate-90 origin-center whitespace-nowrap block">
-                                      {i18n.language === 'ru' ? 'ПАНОРАМНЫЕ ОКНА' : i18n.language === 'ar' ? 'نوافذ بانورامية' : 'PANORAMIC WINDOWS'}
+                                      {i18n.language === 'ru' ? 'ПАНОРАМНЫЕ ОКНА' : i18n.language === 'ar' ? 'نوافذ بانورامية' : i18n.language === 'hy' ? 'ՊԱՆՈՐԱՄԱՅԻՆ ՊԱՏՈՒՀԱՆՆԵՐ' : 'PANORAMIC WINDOWS'}
                                     </span>
                                   </div>
                                 </>
@@ -3513,7 +3917,7 @@ export default function App() {
                               {selectedRoom === 'vip' && (
                                 <>
                                   <div className="absolute top-0 left-4 bg-white/5 text-white/50 text-[10px] font-mono py-1 px-4 rounded-b-lg border-b border-x border-white/5 uppercase tracking-widest font-bold">
-                                    {i18n.language === 'ru' ? 'КАМИННАЯ ЗОНА' : i18n.language === 'ar' ? 'منطقة المدفأة' : 'FIREPLACE ZONE'}
+                                    {i18n.language === 'ru' ? 'КАМИННАЯ ЗОНА' : i18n.language === 'ar' ? 'منطقة المدفأة' : i18n.language === 'hy' ? 'ԲՈՒԽԱՐՈՒ ԳՈՏԻ' : 'FIREPLACE ZONE'}
                                   </div>
                                   <div className="absolute inset-0 border-4 border-white/5 rounded-2xl pointer-events-none" />
                                 </>
@@ -3521,11 +3925,11 @@ export default function App() {
                               {selectedRoom === 'terrace' && (
                                 <>
                                   <div className="absolute inset-x-0 bottom-0 bg-teal-500/5 text-teal-400/80 text-[10px] font-mono py-1 text-center border-t border-teal-500/10 uppercase tracking-widest font-bold">
-                                    {i18n.language === 'ru' ? 'ЖИВОПИСНАЯ РЕКА & НАБЕРЕЖНАЯ' : i18n.language === 'ar' ? 'نهر خلاب وكورنيش' : 'PICTURESQUE RIVER & WATERFRONT'}
+                                    {i18n.language === 'ru' ? 'ЖИВОПИСНАЯ РЕКА & НАБЕРЕЖНАЯ' : i18n.language === 'ar' ? 'نهر خلاب وكورنيش' : i18n.language === 'hy' ? 'ԳԵՂԱՏԵՍԻԼ ԳԵՏ ԵՎ ԱՓԱՄԵՐՁ ԳՈՏԻ' : 'PICTURESQUE RIVER & WATERFRONT'}
                                   </div>
                                   <div className="absolute top-4 right-4 bg-teal-500/10 text-teal-400 text-[9px] font-mono py-1 px-2.5 rounded-full border border-teal-500/10 flex items-center gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
-                                    {i18n.language === 'ru' ? 'ОТКРЫТЫЙ ВОЗДУХ' : i18n.language === 'ar' ? 'في الهواء الطلق' : 'OPEN AIR'}
+                                    {i18n.language === 'ru' ? 'ОТКРЫТЫЙ ВОЗДУХ' : i18n.language === 'ar' ? 'في الهواء الطلق' : i18n.language === 'hy' ? 'ԲԱՑՕԹՅԱ' : 'OPEN AIR'}
                                   </div>
                                 </>
                               )}
@@ -3679,7 +4083,7 @@ export default function App() {
                                             className={`text-[9px] font-bold pointer-events-none font-mono transition-all duration-500 ${isSelected ? "fill-black/60" : (theme === "light" ? "fill-gray-500" : "fill-white/40")}`}
                                             style={{ transition: "fill 0.5s ease-in-out" }}
                                           >
-                                            {t.capacity} {i18n.language === "ru" ? "чел" : i18n.language === "ar" ? "أشخاص" : "pax"}
+                                            {t.capacity} {i18n.language === 'ru' ? "чел" : i18n.language === 'ar' ? "أشخاص" : i18n.language === 'hy' ? "անձ" : "pax"}
                                           </text>
                                         </g>
                                       );
@@ -3710,14 +4114,14 @@ export default function App() {
                                   <button
                                     onClick={() => setZoom(prev => Math.min(prev * 1.2, 4))}
                                     className={`p-2 rounded-lg transition cursor-pointer flex items-center justify-center ${theme === "light" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-teal-600" : "bg-white/5 hover:bg-white/10 text-white hover:text-teal-400"}`}
-                                    title={i18n.language === "ru" ? "Приблизить" : i18n.language === "ar" ? "تكبير" : "Zoom In"}
+                                    title={i18n.language === 'ru' ? "Приблизить" : i18n.language === 'ar' ? "تكبير" : i18n.language === 'hy' ? "Մեծացնել" : "Zoom In"}
                                   >
                                     <ZoomIn className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => setZoom(prev => Math.max(prev / 1.2, 0.8))}
                                     className={`p-2 rounded-lg transition cursor-pointer flex items-center justify-center ${theme === "light" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-teal-600" : "bg-white/5 hover:bg-white/10 text-white hover:text-teal-400"}`}
-                                    title={i18n.language === "ru" ? "Отдалить" : i18n.language === "ar" ? "تصغير" : "Zoom Out"}
+                                    title={i18n.language === 'ru' ? "Отдалить" : i18n.language === 'ar' ? "تصغير" : i18n.language === 'hy' ? "Փոքրացնել" : "Zoom Out"}
                                   >
                                     <ZoomOut className="w-4 h-4" />
                                   </button>
@@ -3727,7 +4131,7 @@ export default function App() {
                                       setPan({ x: 0, y: 0 });
                                     }}
                                     className={`p-2 rounded-lg transition cursor-pointer flex items-center justify-center ${theme === "light" ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-teal-600" : "bg-white/5 hover:bg-white/10 text-white hover:text-teal-400"}`}
-                                    title={i18n.language === "ru" ? "Сбросить" : i18n.language === "ar" ? "إعادة تعيين" : "Reset View"}
+                                    title={i18n.language === 'ru' ? "Сбросить" : i18n.language === 'ar' ? "إعادة تعيين" : i18n.language === 'hy' ? "Վերակայել" : "Reset View"}
                                   >
                                     <RefreshCw className="w-4 h-4" />
                                   </button>
@@ -3737,11 +4141,7 @@ export default function App() {
                               {/* Navigation instructions / indicator */}
                               <div className={`absolute bottom-4 left-4 pointer-events-none backdrop-blur-sm text-[9px] font-mono py-1 px-2.5 rounded-full z-10 flex items-center gap-1.5 transition-all duration-500 border ${theme === "light" ? "bg-white/80 border-gray-200 text-gray-500" : "bg-black/60 border-white/5 text-white/50"}`}>
                                 <span>
-                                  {i18n.language === "ru" 
-                                    ? "Перетаскивайте для перемещения • Колёсико для масштаба" 
-                                    : i18n.language === "ar"
-                                    ? "اسحب للتحريك • عجلة الماوس للتكبير"
-                                    : "Drag to pan • Scroll to zoom"}
+                                  {i18n.language === 'ru' ? "Перетаскивайте для перемещения • Колёсико для масштаба" : i18n.language === 'ar' ? "اسحب للتحريك • عجلة الماوس للتكبير" : i18n.language === 'hy' ? "Քաշեք տեղաշարժելու համար • Պտտեք անիվը մասշտաբի համար" : "Drag to pan • Scroll to zoom"}
                                 </span>
                                 {zoom !== 1 || pan.x !== 0 || pan.y !== 0 ? (
                                   <span className="text-teal-400 font-bold">
@@ -3772,7 +4172,7 @@ export default function App() {
                           </div>
                         </div>
                         <span className="font-mono text-[10px] uppercase text-white/40">
-                          {i18n.language === 'ru' ? 'Кликните на стол для выбора' : i18n.language === 'ar' ? 'انقر على طاولة للاختيار' : 'Click on table to select'}
+                          {i18n.language === 'ru' ? 'Кликните на стол для выбора' : i18n.language === 'ar' ? 'انقر على طاولة للاختيار' : i18n.language === 'hy' ? 'Սեղմեք սեղանին՝ այն ընտրելու համար' : 'Click on table to select'}
                         </span>
                       </div>
 
@@ -3784,10 +4184,10 @@ export default function App() {
                         
                         <div>
                           <h3 className="font-display font-bold text-base text-white mb-1">
-                            {i18n.language === 'ru' ? 'Параметры визита' : i18n.language === 'ar' ? 'معايير الزيارة' : 'Visit parameters'}
+                            {i18n.language === 'ru' ? 'Параметры визита' : i18n.language === 'ar' ? 'معايير الزيارة' : i18n.language === 'hy' ? 'Այցելության պարամետրեր' : 'Visit parameters'}
                           </h3>
                           <p className="text-xs text-white/40">
-                            {i18n.language === 'ru' ? 'Установите дату и время посещения для обновления доступности.' : i18n.language === 'ar' ? 'حدد التاريخ ووقت الزيارة لتحديث التوفر.' : 'Set the date and time of the visit to update availability.'}
+                            {i18n.language === 'ru' ? 'Установите дату и время посещения для обновления доступности.' : i18n.language === 'ar' ? 'حدد التاريخ ووقت الزيارة لتحديث التوفر.' : i18n.language === 'hy' ? 'Սահմանեք այցելության ամսաթիվն ու ժամը՝ հասանելիությունը թարմացնելու համար:' : 'Set the date and time of the visit to update availability.'}
                           </p>
                         </div>
 
@@ -3808,7 +4208,7 @@ export default function App() {
 
                           <div>
                             <label className="block text-xs font-semibold text-white/60 mb-1.5">
-                              {i18n.language === 'ru' ? 'Время прибытия' : i18n.language === 'ar' ? 'وقت الوصول' : 'Arrival time'}
+                              {i18n.language === 'ru' ? 'Время прибытия' : i18n.language === 'ar' ? 'وقت الوصول' : i18n.language === 'hy' ? 'Ժամանման ժամը' : 'Arrival time'}
                             </label>
                             <div className="relative">
                               <Clock className="w-4 h-4 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -3817,14 +4217,14 @@ export default function App() {
                                 onChange={e => { setTabletopTime(e.target.value); setSelectedTable(null); }}
                                 className="w-full pl-10 pr-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-sm focus:outline-none focus:border-teal-500 font-semibold"
                               >
-                                <option value="12:00">12:00 ({i18n.language === 'ru' ? 'Обед' : i18n.language === 'ar' ? 'الغداء' : 'Lunch'})</option>
-                                <option value="13:30">13:30 ({i18n.language === 'ru' ? 'Обед' : i18n.language === 'ar' ? 'الغداء' : 'Lunch'})</option>
-                                <option value="15:00">15:00 ({i18n.language === 'ru' ? 'День' : i18n.language === 'ar' ? 'بعد الظهر' : 'Afternoon'})</option>
-                                <option value="17:00">17:00 ({i18n.language === 'ru' ? 'Ранний ужин' : i18n.language === 'ar' ? 'عشاء مبكر' : 'Early dinner'})</option>
-                                <option value="18:30">18:30 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : '🔥 Premium / High Demand'})</option>
-                                <option value="19:00">19:00 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : '🔥 Premium / High Demand'})</option>
-                                <option value="20:30">20:30 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : '🔥 Premium / High Demand'})</option>
-                                <option value="22:00">22:00 ({i18n.language === 'ru' ? 'Ночь' : i18n.language === 'ar' ? 'مساءً' : 'Night'})</option>
+                                <option value="12:00">12:00 ({i18n.language === 'ru' ? 'Обед' : i18n.language === 'ar' ? 'الغداء' : i18n.language === 'hy' ? 'Ճաշ' : 'Lunch'})</option>
+                                <option value="13:30">13:30 ({i18n.language === 'ru' ? 'Обед' : i18n.language === 'ar' ? 'الغداء' : i18n.language === 'hy' ? 'Ճաշ' : 'Lunch'})</option>
+                                <option value="15:00">15:00 ({i18n.language === 'ru' ? 'День' : i18n.language === 'ar' ? 'بعد الظهر' : i18n.language === 'hy' ? 'Ցերեկ' : 'Afternoon'})</option>
+                                <option value="17:00">17:00 ({i18n.language === 'ru' ? 'Ранний ужин' : i18n.language === 'ar' ? 'عشاء مبكر' : i18n.language === 'hy' ? 'Վաղ ընթրիք' : 'Early dinner'})</option>
+                                <option value="18:30">18:30 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : i18n.language === 'hy' ? '🔥 Պրեմիում / Բարձր պահանջարկ' : '🔥 Premium / High Demand'})</option>
+                                <option value="19:00">19:00 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : i18n.language === 'hy' ? '🔥 Պրեմիում / Բարձր պահանջարկ' : '🔥 Premium / High Demand'})</option>
+                                <option value="20:30">20:30 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : i18n.language === 'hy' ? '🔥 Պրեմիում / Բարձր պահանջարկ' : '🔥 Premium / High Demand'})</option>
+                                <option value="22:00">22:00 ({i18n.language === 'ru' ? 'Ночь' : i18n.language === 'ar' ? 'مساءً' : i18n.language === 'hy' ? 'Գիշեր' : 'Night'})</option>
                               </select>
                             </div>
                           </div>
@@ -3841,31 +4241,31 @@ export default function App() {
                               <div>
                                 <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider block">
                                   {selectedTables.length === 1 
-                                    ? (i18n.language === 'ru' ? 'ВЫБРАННЫЙ СТОЛИК' : i18n.language === 'ar' ? 'الطاولة المحددة' : 'SELECTED TABLE')
-                                    : (i18n.language === 'ru' ? 'ВЫБРАННЫЙ ПАКЕТ СТОЛОВ' : i18n.language === 'ar' ? 'مجموعة الطاولات المحددة' : 'SELECTED TABLES PACKAGE')
+                                    ? (i18n.language === 'ru' ? 'ВЫБРАННЫЙ СТОЛИК' : i18n.language === 'ar' ? 'الطاولة المحددة' : i18n.language === 'hy' ? 'SELECTED TABLE' : 'SELECTED TABLE')
+                                    : (i18n.language === 'ru' ? 'ВЫБРАННЫЙ ПАКЕТ СТОЛОВ' : i18n.language === 'ar' ? 'مجموعة الطاولات المحددة' : i18n.language === 'hy' ? 'SELECTED TABLES PACKAGE' : 'SELECTED TABLES PACKAGE')
                                   }
                                 </span>
                                 <span className="font-display font-bold text-lg text-white block">
                                   {selectedTables.length === 1 
                                     ? t('tabletop.tableNumber', { n: selectedTables[0].number })
-                                    : `${i18n.language === 'ru' ? 'Столы:' : 'Tables:'} ${selectedTables.map(t => `#${t.number}`).join(', ')}`
+                                    : `${i18n.language === 'ru' ? 'Столы:' : i18n.language === 'hy' ? 'Սեղաններ՝' : 'Tables:'} ${selectedTables.map(t => `#${t.number}`).join(', ')}`
                                   }
                                 </span>
                                 {holdTimer !== null && (
                                   <span className="inline-flex items-center gap-1.5 mt-1.5 text-[10px] font-bold text-amber-400 bg-amber-400/15 border border-amber-500/20 px-2 py-0.5 rounded-lg animate-pulse">
                                     <Clock className="w-3 h-3 text-amber-400" />
-                                    {i18n.language === 'ru' ? 'Удержание:' : i18n.language === 'ar' ? 'حجز مؤقت:' : 'Hold:'} {holdTimer}s
+                                    {i18n.language === 'ru' ? 'Удержание:' : i18n.language === 'ar' ? 'حجز مؤقت:' : i18n.language === 'hy' ? 'Hold:' : 'Hold:'} {holdTimer}s
                                   </span>
                                 )}
                               </div>
                               <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
                                 <span className="text-xs px-2.5 py-1 bg-teal-500/10 text-teal-300 border border-teal-500/20 rounded-lg font-bold font-mono whitespace-nowrap">
-                                  {totalSelectedPrice} ₽ {i18n.language === 'ru' ? 'депо' : i18n.language === 'ar' ? 'تأمين' : 'deposit'}
+                                  {totalSelectedPrice} ₽ {i18n.language === 'ru' ? 'депо' : i18n.language === 'ar' ? 'تأمين' : i18n.language === 'hy' ? 'deposit' : 'deposit'}
                                 </span>
                                 <span className="text-xs px-2.5 py-1 bg-orange-500/10 text-orange-300 border border-orange-500/20 rounded-lg font-bold font-mono flex items-center gap-1.5 whitespace-nowrap">
                                   <Users className="w-3.5 h-3.5 text-orange-400" />
                                   <span>
-                                    {totalSelectedCapacity} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : 'guests'}
+                                    {totalSelectedCapacity} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : i18n.language === 'hy' ? 'guests' : 'guests'}
                                   </span>
                                 </span>
                               </div>
@@ -3894,15 +4294,15 @@ export default function App() {
                             <div className="grid grid-cols-2 gap-2 text-xs text-white/60">
                               <div>
                                 <span className="text-white/40 block text-[10px] uppercase">
-                                  {i18n.language === 'ru' ? 'ОБЩАЯ ВМЕСТИМОСТЬ' : i18n.language === 'ar' ? 'إجمالي السعة' : 'TOTAL CAPACITY'}
+                                  {i18n.language === 'ru' ? 'ОБЩАЯ ВМЕСТИМОСТЬ' : i18n.language === 'ar' ? 'إجمالي السعة' : i18n.language === 'hy' ? 'TOTAL CAPACITY' : 'TOTAL CAPACITY'}
                                 </span>
                                 <span className="font-semibold text-white/80">
-                                  {i18n.language === 'ru' ? `до ${totalSelectedCapacity} человек` : i18n.language === 'ar' ? `حتى ${totalSelectedCapacity} أشخاص` : `up to ${totalSelectedCapacity} people`}
+                                  {i18n.language === 'ru' ? `до ${totalSelectedCapacity} человек` : i18n.language === 'ar' ? `حتى ${totalSelectedCapacity} أشخاص` : i18n.language === 'hy' ? `up to ${totalSelectedCapacity} people` : `up to ${totalSelectedCapacity} people`}
                                 </span>
                               </div>
                               <div>
                                 <span className="text-white/40 block text-[10px] uppercase">
-                                  {i18n.language === 'ru' ? 'ЗОНА ЗАЛА' : i18n.language === 'ar' ? 'منطقة القاعة' : 'HALL ZONE'}
+                                  {i18n.language === 'ru' ? 'ЗОНА ЗАЛА' : i18n.language === 'ar' ? 'منطقة القاعة' : i18n.language === 'hy' ? 'HALL ZONE' : 'HALL ZONE'}
                                 </span>
                                 <span className="font-semibold text-white/80 uppercase">
                                   {selectedTables[0].room === 'main' 
@@ -3920,7 +4320,7 @@ export default function App() {
                                 <label className="block text-[10px] font-semibold text-white/40">{t('auth.guestsCountLabel')}</label>
                                 {guestsCount > totalSelectedCapacity && (
                                   <span className="text-[9px] font-bold text-red-400 animate-pulse">
-                                    {i18n.language === 'ru' ? 'Недостаточно мест!' : 'Over capacity!'}
+                                    {i18n.language === 'ru' ? 'Недостаточно мест!' : i18n.language === 'hy' ? 'Տեղերը բավարար չեն:' : 'Over capacity!'}
                                   </span>
                                 )}
                               </div>
@@ -3949,7 +4349,7 @@ export default function App() {
                                     -
                                   </button>
                                   <span className="font-mono text-sm font-bold text-white flex-1 text-center">
-                                    {guestsCount} {i18n.language === 'ru' ? 'чел.' : 'guests'}
+                                    {guestsCount} {i18n.language === 'ru' ? 'чел.' : i18n.language === 'hy' ? 'հոգի' : 'guests'}
                                   </span>
                                   <button 
                                     onClick={() => setGuestsCount(prev => Math.min(totalSelectedCapacity, prev + 1))}
@@ -3967,7 +4367,7 @@ export default function App() {
                               <textarea 
                                 value={tableNotes}
                                 onChange={e => setTableNotes(e.target.value)}
-                                placeholder={i18n.language === 'ru' ? 'Например: день рождения жены, нужен детский стул, тихая зона...' : i18n.language === 'ar' ? 'مثال: عيد ميلاد زوجتي، بحاجة لكرسي أطفال، منطقة هادئة...' : 'For example: wife\'s birthday, need high chair, quiet area...'}
+                                placeholder={i18n.language === 'ru' ? 'Например: день рождения жены, нужен детский стул, тихая зона...' : i18n.language === 'ar' ? 'مثال: عيد ميلاد زوجتي، بحاجة لكرسي أطفال، منطقة هادئة...' : i18n.language === 'hy' ? 'Օրինակ՝ կնոջս ծննդյան օրն է, անհրաժեշտ է մանկական աթոռ, խաղաղ տարածք...' : 'For example: wife\'s birthday, need high chair, quiet area...'}
                                 className="w-full p-2.5 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                                 rows={2}
                               />
@@ -3979,10 +4379,10 @@ export default function App() {
                                 <span className="text-base select-none leading-none">🔥</span>
                                 <div className="space-y-0.5 text-left">
                                   <div className="font-bold">
-                                    {i18n.language === 'ru' ? 'Высокий спрос (Премиум-слот)' : i18n.language === 'ar' ? 'طلب مرتفع (فترة مميزة)' : 'High Demand (Premium slot)'}
+                                    {i18n.language === 'ru' ? 'Высокий спрос (Премиум-слот)' : i18n.language === 'ar' ? 'طلب مرتفع (فترة مميزة)' : i18n.language === 'hy' ? 'High Demand (Premium slot)' : 'High Demand (Premium slot)'}
                                   </div>
                                   <div className="text-amber-300/80 leading-normal">
-                                    {i18n.language === 'ru' ? 'В это время наблюдается максимальная нагрузка. К стандартному тарифу стола добавлена наценка +25%.' : i18n.language === 'ar' ? 'يوجد حد أقصى للطلب في هذا الوقت. تمت إضافة رسوم إضافية بنسبة +25% على السعر القياسي للطاولة.' : 'Peak hours load. A +25% surcharge is added to the standard table rate.'}
+                                    {i18n.language === 'ru' ? 'В это время наблюдается максимальная нагрузка. К стандартному тарифу стола добавлена наценка +25%.' : i18n.language === 'ar' ? 'يوجد حد أقصى للطلب في هذا الوقت. تمت إضافة رسوم إضافية بنسبة +25% على السعر القياسي للطاولة.' : i18n.language === 'hy' ? 'Peak hours load. A +25% surcharge is added to the standard table rate.' : 'Peak hours load. A +25% surcharge is added to the standard table rate.'}
                                   </div>
                                 </div>
                               </div>
@@ -3990,20 +4390,20 @@ export default function App() {
 
                             {/* Price analysis and payment */}
                             <div className="pt-3 border-t border-teal-500/10 flex items-center justify-between text-xs">
-                              <span className="text-white/40">{i18n.language === 'ru' ? 'Сумма депозита:' : i18n.language === 'ar' ? 'مبلغ التأمين:' : 'Deposit amount:'}</span>
-                              <span className="font-bold text-white font-mono text-base">{totalSelectedPrice.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+                              <span className="text-white/40">{i18n.language === 'ru' ? 'Сумма депозита:' : i18n.language === 'ar' ? 'مبلغ التأمين:' : i18n.language === 'hy' ? 'Deposit amount:' : 'Deposit amount:'}</span>
+                              <span className="font-bold text-white font-mono text-base">{totalSelectedPrice.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽</span>
                             </div>
 
                             {user.balance < totalSelectedPrice ? (
                               <div className="p-2.5 bg-red-500/10 rounded-xl text-[11px] text-red-400 border border-red-500/20">
-                                {i18n.language === 'ru' ? 'Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).' : i18n.language === 'ar' ? 'الرصيد غير كافٍ. يرجى إعادة شحن رصيدك من القائمة العلوية (+).' : 'Insufficient balance. Please top up your balance from the header (+).'}
+                                {i18n.language === 'ru' ? 'Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).' : i18n.language === 'ar' ? 'الرصيد غير كافٍ. يرجى إعادة شحن رصيدك من القائمة العلوية (+).' : i18n.language === 'hy' ? 'Insufficient balance. Please top up your balance from the header (+).' : 'Insufficient balance. Please top up your balance from the header (+).'}
                               </div>
                             ) : null}
 
                           </motion.div>
                         ) : (
                           <div className="p-8 bg-white/[0.01] rounded-2xl border border-dashed border-white/10 text-center text-xs text-white/40">
-                            {i18n.language === 'ru' ? 'Выберите один или несколько свободных столиков на схеме слева, чтобы начать оформление заказа.' : i18n.language === 'ar' ? 'اختر أي طاولة شاغرة من المخطط على اليسار لبدء الحجز.' : 'Select one or more available tables on the layout on the left to start booking.'}
+                            {i18n.language === 'ru' ? 'Выберите один или несколько свободных столиков на схеме слева, чтобы начать оформление заказа.' : i18n.language === 'ar' ? 'اختر أي طاولة شاغرة من المخطط على اليسار لبدء الحجز.' : i18n.language === 'hy' ? 'Select one or more available tables on the layout on the left to start booking.' : 'Select one or more available tables on the layout on the left to start booking.'}
                           </div>
                         )}
 
@@ -4017,10 +4417,10 @@ export default function App() {
                           className="w-full py-3 px-4 bg-teal-500 hover:bg-teal-400 text-black font-extrabold rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-teal-500/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {tableActionLoading 
-                            ? (i18n.language === 'ru' ? 'Обработка...' : i18n.language === 'ar' ? 'جاري المعالجة...' : 'Processing...') 
+                            ? (i18n.language === 'ru' ? 'Обработка...' : i18n.language === 'ar' ? 'جاري المعالجة...' : i18n.language === 'hy' ? 'Processing...' : 'Processing...') 
                             : (selectedTables.length > 1
-                              ? (i18n.language === 'ru' ? `Забронировать пакет (${selectedTables.length} стола)` : `Book package (${selectedTables.length} tables)`)
-                              : (i18n.language === 'ru' ? 'Забронировать этот столик' : i18n.language === 'ar' ? 'حجز هذه الطاولة' : 'Book this table'))}
+                              ? (i18n.language === 'ru' ? `Забронировать пакет (${selectedTables.length} стола)` : i18n.language === 'hy' ? `Ամրագրել փաթեթը (${selectedTables.length} սեղան)` : `Book package (${selectedTables.length} tables)`)
+                              : (i18n.language === 'ru' ? 'Забронировать этот столик' : i18n.language === 'ar' ? 'حجز هذه الطاولة' : i18n.language === 'hy' ? 'Book this table' : 'Book this table'))}
                         </button>
                       </div>
 
@@ -4039,7 +4439,7 @@ export default function App() {
                     <div className="space-y-3 text-center md:text-left flex-1">
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                         <h4 className="font-display font-black text-2xl text-white">
-                          {i18n.language === 'ru' ? `О заведении ${selectedRestaurant.name}` : i18n.language === 'ar' ? `حول مطعم ${selectedRestaurant.name}` : `About ${selectedRestaurant.name}`}
+                          {i18n.language === 'ru' ? `О заведении ${selectedRestaurant.name}` : i18n.language === 'ar' ? `حول مطعم ${selectedRestaurant.name}` : i18n.language === 'hy' ? `About ${selectedRestaurant.name}` : `About ${selectedRestaurant.name}`}
                         </h4>
                         <span className="px-2.5 py-1 bg-teal-500/10 text-teal-400 rounded-lg border border-teal-500/10 text-xs font-bold font-mono">
                           {selectedRestaurant.cuisine}
@@ -4075,10 +4475,10 @@ export default function App() {
                         <div className="space-y-1">
                           <h3 className="font-display font-black text-2xl text-white tracking-tight flex items-center gap-2">
                             <Compass className="w-5 h-5 text-teal-400 animate-spin" style={{ animationDuration: '40s' }} />
-                            {i18n.language === 'ru' ? 'Выберите велнес-салон или бьюти-центр' : i18n.language === 'ar' ? 'اختر صالون عافية أو مركز تجميل' : 'Select a wellness salon or beauty center'}
+                            {i18n.language === 'ru' ? 'Выберите велнес-салон или бьюти-центр' : i18n.language === 'ar' ? 'اختر صالون عافية أو مركز تجميل' : i18n.language === 'hy' ? 'Select a wellness salon or beauty center' : 'Select a wellness salon or beauty center'}
                           </h3>
                           <p className="text-xs text-white/60">
-                            {i18n.language === 'ru' ? 'Подарите себе минуты безупречного ухода. Выберите подходящее заведение или зарегистрируйте собственное!' : i18n.language === 'ar' ? 'امنح نفسك لحظات من العناية المثالية. اختر منشأة مناسبة أو سجل منشأتك الخاصة!' : 'Treat yourself to moments of flawless care. Choose a suitable venue or register your own!'}
+                            {i18n.language === 'ru' ? 'Подарите себе минуты безупречного ухода. Выберите подходящее заведение или зарегистрируйте собственное!' : i18n.language === 'ar' ? 'امنح نفسك لحظات من العناية المثالية. اختر منشأة مناسبة أو سجل منشأتك الخاصة!' : i18n.language === 'hy' ? 'Treat yourself to moments of flawless care. Choose a suitable venue or register your own!' : 'Treat yourself to moments of flawless care. Choose a suitable venue or register your own!'}
                           </p>
                         </div>
                         <button
@@ -4138,7 +4538,7 @@ export default function App() {
                                 className="w-full py-3 bg-white/5 hover:bg-teal-500 text-white hover:text-black font-extrabold rounded-xl text-xs uppercase tracking-wider transition duration-300 flex items-center justify-center gap-2 cursor-pointer"
                               >
                                 <Compass className="w-4 h-4" />
-                                {i18n.language === 'ru' ? 'Открыть услуги' : i18n.language === 'ar' ? 'عرض الخدمات' : 'Open Services'}
+                                {i18n.language === 'ru' ? 'Открыть услуги' : i18n.language === 'ar' ? 'عرض الخدمات' : i18n.language === 'hy' ? 'Open Services' : 'Open Services'}
                               </button>
                             </div>
                           </motion.div>
@@ -4153,7 +4553,7 @@ export default function App() {
                           <button
                             onClick={() => setSelectedSalon(null)}
                             className="p-2.5 bg-white/5 hover:bg-[#1E232E] text-white rounded-xl transition border border-white/10"
-                            title={i18n.language === 'ru' ? 'Назад к списку салонов' : i18n.language === 'ar' ? 'العودة لقائمة الصالونات' : 'Back to salon list'}
+                            title={i18n.language === 'ru' ? 'Назад к списку салонов' : i18n.language === 'ar' ? 'العودة لقائمة الصالونات' : i18n.language === 'hy' ? 'Back to salon list' : 'Back to salon list'}
                           >
                             <ArrowLeft className="w-4 h-4" />
                           </button>
@@ -4162,7 +4562,7 @@ export default function App() {
                               {selectedSalon.name}
                             </h3>
                             <p className="text-xs text-white/60">
-                              {i18n.language === 'ru' ? 'Категория:' : i18n.language === 'ar' ? 'الفئة:' : 'Category:'} {selectedSalon.category} • {i18n.language === 'ru' ? 'Адрес:' : i18n.language === 'ar' ? 'العنوان:' : 'Address:'} {selectedSalon.address}
+                              {i18n.language === 'ru' ? 'Категория:' : i18n.language === 'ar' ? 'الفئة:' : i18n.language === 'hy' ? 'Category:' : 'Category:'} {selectedSalon.category} • {i18n.language === 'ru' ? 'Адрес:' : i18n.language === 'ar' ? 'العنوان:' : i18n.language === 'hy' ? 'Address:' : 'Address:'} {selectedSalon.address}
                             </p>
                           </div>
                         </div>
@@ -4174,7 +4574,7 @@ export default function App() {
                               onClick={() => setSelectedCategory(cat)}
                               className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${selectedCategory === cat ? 'bg-teal-500 border-teal-500 text-black shadow-md shadow-teal-500/10 font-bold' : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'}`}
                             >
-                              {cat === 'all' ? (i18n.language === 'ru' ? 'Все категории' : i18n.language === 'ar' ? 'جميع الفئات' : 'All categories') : cat}
+                              {cat === 'all' ? (i18n.language === 'ru' ? 'Все категории' : i18n.language === 'ar' ? 'جميع الفئات' : i18n.language === 'hy' ? 'All categories' : 'All categories') : cat}
                             </button>
                           ))}
                         </div>
@@ -4218,8 +4618,8 @@ export default function App() {
                                         <p className="text-xs text-white/60 line-clamp-2 leading-relaxed">{service.description}</p>
                                         
                                         <div className="flex items-center gap-3 text-[11px] text-white/40 font-medium">
-                                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {service.duration} {i18n.language === 'ru' ? 'мин' : i18n.language === 'ar' ? 'دقيقة' : 'min'}</span>
-                                          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {service.staff.length} {i18n.language === 'ru' ? 'специалиста' : i18n.language === 'ar' ? 'أخصائيين' : 'specialists'}</span>
+                                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {service.duration} {i18n.language === 'ru' ? 'мин' : i18n.language === 'ar' ? 'دقيقة' : i18n.language === 'hy' ? 'min' : 'min'}</span>
+                                          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {service.staff.length} {i18n.language === 'ru' ? 'специалиста' : i18n.language === 'ar' ? 'أخصائيين' : i18n.language === 'hy' ? 'specialists' : 'specialists'}</span>
                                         </div>
                                       </div>
                                     </div>
@@ -4227,9 +4627,9 @@ export default function App() {
                                     <div className="p-4 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
                                       <div className="font-mono text-xs font-bold text-white">
                                         <span className="text-white/40 block text-[9px] font-sans font-semibold uppercase">
-                                          {i18n.language === 'ru' ? 'Стоимость' : i18n.language === 'ar' ? 'السعر' : 'Price'}
+                                          {i18n.language === 'ru' ? 'Стоимость' : i18n.language === 'ar' ? 'السعر' : i18n.language === 'hy' ? 'Price' : 'Price'}
                                         </span>
-                                        {service.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽
+                                        {service.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽
                                       </div>
                                       <button
                                         onClick={() => {
@@ -4238,7 +4638,7 @@ export default function App() {
                                         }}
                                         className="px-3.5 py-1.5 bg-white/5 hover:bg-teal-500 hover:text-black text-white font-bold rounded-lg text-xs transition border border-white/10 hover:border-transparent cursor-pointer animate-hover"
                                       >
-                                        {i18n.language === 'ru' ? 'Записаться' : i18n.language === 'ar' ? 'حجز' : 'Book Now'}
+                                        {i18n.language === 'ru' ? 'Записаться' : i18n.language === 'ar' ? 'حجز' : i18n.language === 'hy' ? 'Book Now' : 'Book Now'}
                                       </button>
                                     </div>
                                   </div>
@@ -4253,10 +4653,10 @@ export default function App() {
                             
                             <div>
                               <h3 className="font-display font-bold text-base text-white mb-1">
-                                {i18n.language === 'ru' ? 'Детали сеанса' : i18n.language === 'ar' ? 'تفاصيل الجلسة' : 'Session details'}
+                                {i18n.language === 'ru' ? 'Детали сеанса' : i18n.language === 'ar' ? 'تفاصيل الجلسة' : i18n.language === 'hy' ? 'Session details' : 'Session details'}
                               </h3>
                               <p className="text-xs text-white/40">
-                                {i18n.language === 'ru' ? 'Выберите мастера, дату и желаемое время для сеанса.' : i18n.language === 'ar' ? 'اختر المعالج والتاريخ والوقت المطلوب للجلسة.' : 'Select a specialist, date, and preferred time for the session.'}
+                                {i18n.language === 'ru' ? 'Выберите мастера, дату и желаемое время для сеанса.' : i18n.language === 'ar' ? 'اختر المعالج والتاريخ والوقت المطلوب للجلسة.' : i18n.language === 'hy' ? 'Select a specialist, date, and preferred time for the session.' : 'Select a specialist, date, and preferred time for the session.'}
                               </p>
                             </div>
 
@@ -4275,14 +4675,14 @@ export default function App() {
                                   <div>
                                     <span className="text-[9px] font-bold text-teal-400 uppercase tracking-widest block">{selectedService.category}</span>
                                     <h4 className="font-display font-bold text-xs text-white line-clamp-1">{selectedService.name}</h4>
-                                    <span className="text-[10px] font-mono text-white/40 block mt-0.5">{selectedService.duration} {i18n.language === 'ru' ? 'мин' : i18n.language === 'ar' ? 'دقيقة' : 'min'} • {selectedService.price} ₽</span>
+                                    <span className="text-[10px] font-mono text-white/40 block mt-0.5">{selectedService.duration} {i18n.language === 'ru' ? 'мин' : i18n.language === 'ar' ? 'دقيقة' : i18n.language === 'hy' ? 'min' : 'min'} • {selectedService.price} ₽</span>
                                   </div>
                                 </div>
 
                                 {/* Specialist selector */}
                                 <div>
                                   <label className="block text-xs font-semibold text-white/60 mb-1.5">
-                                    {i18n.language === 'ru' ? 'Выберите специалиста' : i18n.language === 'ar' ? 'اختر الأخصائي' : 'Select specialist'}
+                                    {i18n.language === 'ru' ? 'Выберите специалиста' : i18n.language === 'ar' ? 'اختر الأخصائي' : i18n.language === 'hy' ? 'Select specialist' : 'Select specialist'}
                                   </label>
                                   <div className="space-y-2">
                                     {selectedService.staff.map((st) => {
@@ -4316,7 +4716,7 @@ export default function App() {
                                 {/* Date Choice */}
                                 <div>
                                   <label className="block text-xs font-semibold text-white/60 mb-1.5">
-                                    {i18n.language === 'ru' ? 'Дата сеанса' : i18n.language === 'ar' ? 'تاريخ الجلسة' : 'Session date'}
+                                    {i18n.language === 'ru' ? 'Дата сеанса' : i18n.language === 'ar' ? 'تاريخ الجلسة' : i18n.language === 'hy' ? 'Session date' : 'Session date'}
                                   </label>
                                   <div className="relative">
                                     <Calendar className="w-4 h-4 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -4332,7 +4732,7 @@ export default function App() {
                                 {/* Time Slots Choice */}
                                 <div>
                                   <label className="block text-xs font-semibold text-white/60 mb-1.5">
-                                    {i18n.language === 'ru' ? 'Доступное время' : i18n.language === 'ar' ? 'الوقت المتاح' : 'Available time'}
+                                    {i18n.language === 'ru' ? 'Доступное время' : i18n.language === 'ar' ? 'الوقت المتاح' : i18n.language === 'hy' ? 'Available time' : 'Available time'}
                                   </label>
                                   <div className="grid grid-cols-4 gap-1.5">
                                     {["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00", "19:30"].map((slot) => {
@@ -4352,14 +4752,14 @@ export default function App() {
 
                                 {user.balance < selectedService.price ? (
                                   <div className="p-2.5 bg-red-500/10 rounded-xl text-[11px] text-red-400 border border-red-500/20">
-                                    {i18n.language === 'ru' ? 'Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).' : i18n.language === 'ar' ? 'الرصيد غير كافٍ. يرجى إعادة شحن رصيدك من القائمة العلوية (+).' : 'Insufficient balance. Please top up your balance from the header (+).'}
+                                    {i18n.language === 'ru' ? 'Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).' : i18n.language === 'ar' ? 'الرصيد غير كافٍ. يرجى إعادة شحن رصيدك من القائمة العلوية (+).' : i18n.language === 'hy' ? 'Insufficient balance. Please top up your balance from the header (+).' : 'Insufficient balance. Please top up your balance from the header (+).'}
                                   </div>
                                 ) : null}
 
                               </motion.div>
                             ) : (
                               <div className="p-8 bg-white/[0.01] rounded-2xl border border-dashed border-white/10 text-center text-xs text-white/40">
-                                {i18n.language === 'ru' ? 'Выберите любую услугу в списке слева, чтобы начать оформление визита.' : i18n.language === 'ar' ? 'اختر أي خدمة من القائمة على اليسار لبدء الحجز.' : 'Select any service from the list on the left to start booking your visit.'}
+                                {i18n.language === 'ru' ? 'Выберите любую услугу в списке слева, чтобы начать оформление визита.' : i18n.language === 'ar' ? 'اختر أي خدمة من القائمة على اليسار لبدء الحجز.' : i18n.language === 'hy' ? 'Select any service from the list on the left to start booking your visit.' : 'Select any service from the list on the left to start booking your visit.'}
                               </div>
                             )}
 
@@ -4373,8 +4773,8 @@ export default function App() {
                               className="w-full py-3 px-4 bg-teal-500 hover:bg-teal-400 text-black font-extrabold rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-teal-500/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                               {serviceActionLoading 
-                                ? (i18n.language === 'ru' ? 'Запись...' : i18n.language === 'ar' ? 'جاري التسجيل...' : 'Booking...') 
-                                : (i18n.language === 'ru' ? 'Подтвердить запись' : i18n.language === 'ar' ? 'تأكيد الحجز' : 'Confirm appointment')}
+                                ? (i18n.language === 'ru' ? 'Запись...' : i18n.language === 'ar' ? 'جاري التسجيل...' : i18n.language === 'hy' ? 'Booking...' : 'Booking...') 
+                                : (i18n.language === 'ru' ? 'Подтвердить запись' : i18n.language === 'ar' ? 'تأكيد الحجز' : i18n.language === 'hy' ? 'Confirm appointment' : 'Confirm appointment')}
                             </button>
                           </div>
 
@@ -4417,12 +4817,10 @@ export default function App() {
                   <div className="text-left space-y-1">
                     <h2 className="text-2xl font-display font-black text-white uppercase tracking-tight flex items-center gap-2">
                       <Sparkles className="w-6 h-6 text-teal-400 animate-pulse" />
-                      {i18n.language === 'ru' ? 'Персональный ИИ-Консьерж' : i18n.language === 'ar' ? 'المساعد الشخصي الذكي' : 'Personal AI Concierge'}
+                      {i18n.language === 'ru' ? 'Персональный ИИ-Консьерж' : i18n.language === 'ar' ? 'المساعد الشخصي الذكي' : i18n.language === 'hy' ? 'Personal AI Concierge' : 'Personal AI Concierge'}
                     </h2>
                     <p className="text-xs text-white/50 leading-relaxed max-w-xl">
-                      {i18n.language === 'ru' 
-                        ? 'Заказывайте столы в ресторанах Sakura Zen или Grand Atelier, записывайтесь на тренировки и массаж в Lotus Spa в свободной форме. ИИ-помощник мгновенно создаст бронь.' 
-                        : 'Book Michelin-starred tables, fitness coaches, or luxury spa sessions by simply talking to your elite concierge.'
+                      {i18n.language === 'ru' ? 'Заказывайте столы в ресторанах Sakura Zen или Grand Atelier, записывайтесь на тренировки и массаж в Lotus Spa в свободной форме. ИИ-помощник мгновенно создаст бронь.' : i18n.language === 'hy' ? 'Ամրագրեք սեղաններ Sakura Zen կամ Grand Atelier ռեստորաններում, գրանցվեք մարզումների և մերսման Lotus Spa-ում ազատ ոճով։ ԱԻ օգնականն ակնթարթորեն կստեղծի ամրագրումը։' : 'Book Michelin-starred tables, fitness coaches, or luxury spa sessions by simply talking to your elite concierge.'
                       }
                     </p>
                   </div>
@@ -4451,6 +4849,18 @@ export default function App() {
                     />
                   </div>
                 </div>
+              )}
+
+              {/* F. OVERNIGHT STAYS ENGINE (OmniStay) */}
+              {activeModule === 'stays' && (
+                <StayBookingModule
+                  user={user}
+                  setUser={setUser}
+                  hotels={hotels}
+                  rooms={rooms}
+                  hotelBookings={hotelBookings}
+                  setHotelBookings={setHotelBookings}
+                />
               )}
 
             </main>
@@ -4486,10 +4896,10 @@ export default function App() {
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-sm text-white">
-                            {i18n.language === 'ru' ? 'Универсальный QR-чекин' : i18n.language === 'ar' ? 'التحقق العالمي عبر رمز QR' : 'Universal QR Check-in'}
+                            {i18n.language === 'ru' ? 'Универсальный QR-чекин' : i18n.language === 'ar' ? 'التحقق العالمي عبر رمز QR' : i18n.language === 'hy' ? 'Universal QR Check-in' : 'Universal QR Check-in'}
                           </h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">
-                            {i18n.language === 'ru' ? 'Карта гостя OmniReserve' : i18n.language === 'ar' ? 'بطاقة ضيف OmniReserve' : 'OmniReserve Guest Pass'}
+                            {i18n.language === 'ru' ? 'Карта гостя OmniReserve' : i18n.language === 'ar' ? 'بطاقة ضيف OmniReserve' : i18n.language === 'hy' ? 'OmniReserve Guest Pass' : 'OmniReserve Guest Pass'}
                           </span>
                         </div>
                       </div>
@@ -4514,7 +4924,7 @@ export default function App() {
                     <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-left space-y-2 mb-4">
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-white/40">
-                          {i18n.language === 'ru' ? 'ИМЯ ГОСТЯ:' : i18n.language === 'ar' ? 'اسم الضيف:' : 'GUEST NAME:'}
+                          {i18n.language === 'ru' ? 'ИМЯ ГОСТЯ:' : i18n.language === 'ar' ? 'اسم الضيف:' : i18n.language === 'hy' ? 'GUEST NAME:' : 'GUEST NAME:'}
                         </span>
                         <span className="text-white font-bold">{user.name}</span>
                       </div>
@@ -4524,14 +4934,14 @@ export default function App() {
                       </div>
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-white/40">
-                          {i18n.language === 'ru' ? 'РОЛЬ В СИСТЕМЕ:' : i18n.language === 'ar' ? 'الدور في النظام:' : 'SYSTEM ROLE:'}
+                          {i18n.language === 'ru' ? 'РОЛЬ В СИСТЕМЕ:' : i18n.language === 'ar' ? 'الدور في النظام:' : i18n.language === 'hy' ? 'ԴԵՐԸ ՀԱՄԱԿԱՐԳՈՒՄ:' : 'SYSTEM ROLE:'}
                         </span>
                         <span className="text-teal-400 font-mono font-bold uppercase">{user.role}</span>
                       </div>
                     </div>
 
                     <p className="text-[11px] text-white/40 leading-relaxed px-4">
-                      {i18n.language === 'ru' ? 'Предъявите этот QR-код при входе в ресторан или на ресепшн спа-центра для мгновенной регистрации вашего прибытия.' : i18n.language === 'ar' ? 'يرجى تقديم رمز QR هذا عند دخول المطعم أو في مكتب استقبال مركز السبا للتسجيل الفوري لوصولك.' : 'Present this QR code at the entrance of the restaurant or at the spa reception desk for instant check-in.'}
+                      {i18n.language === 'ru' ? 'Предъявите этот QR-код при входе в ресторан или на ресепшн спа-центра для мгновенной регистрации вашего прибытия.' : i18n.language === 'ar' ? 'يرجى تقديم رمز QR هذا عند دخول المطعم أو في مكتب استقبال مركز السبا للتسجيل الفوري لوصولك.' : i18n.language === 'hy' ? 'Ներկայացրեք այս QR կոդը ռեստորանի մուտքի մոտ կամ սպա կենտրոնի ընդունարանում՝ Ձեր ժամանումն ակնթարթորեն գրանցելու համար:' : 'Present this QR code at the entrance of the restaurant or at the spa reception desk for instant check-in.'}
                     </p>
                   </motion.div>
                 </div>
@@ -4569,7 +4979,7 @@ export default function App() {
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-sm text-white">
-                            {i18n.language === 'ru' ? 'QR-код Бронирования' : i18n.language === 'ar' ? 'رمز QR للحجز' : 'Booking QR Code'}
+                            {i18n.language === 'ru' ? 'QR-код Бронирования' : i18n.language === 'ar' ? 'رمز QR للحجز' : i18n.language === 'hy' ? 'Ամրագրման QR կոդ' : 'Booking QR Code'}
                           </h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">ID: {selectedQrBooking.id}</span>
                         </div>
@@ -4595,57 +5005,257 @@ export default function App() {
                     <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-left space-y-2 mb-4">
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-white/40">
-                          {i18n.language === 'ru' ? 'НАЗВАНИЕ / ОБЪЕКТ:' : i18n.language === 'ar' ? 'الاسم / الكائن:' : 'NAME / VENUE:'}
+                          {i18n.language === 'ru' ? 'НАЗВАНИЕ / ОБЪЕКТ:' : i18n.language === 'ar' ? 'الاسم / الكائن:' : i18n.language === 'hy' ? 'ԱՆՎԱՆՈՒՄ / ՎԱՅՐ:' : 'NAME / VENUE:'}
                         </span>
                         <span className="text-white font-bold text-right truncate max-w-[180px]">
                           {selectedQrBooking.type === 'table' 
-                            ? (i18n.language === 'ru' ? `Столик #${selectedQrBooking.tableNumber} (Ресторан)` : i18n.language === 'ar' ? `طاولة #${selectedQrBooking.tableNumber} (المطعم)` : `Table #${selectedQrBooking.tableNumber} (Restaurant)`) 
+                            ? (i18n.language === 'ru' ? `Столик #${selectedQrBooking.tableNumber} (Ресторан)` : i18n.language === 'ar' ? `طاولة #${selectedQrBooking.tableNumber} (المطعم)` : i18n.language === 'hy' ? `Սեղան #${selectedQrBooking.tableNumber} (Ռեստորան)` : `Table #${selectedQrBooking.tableNumber} (Restaurant)`) 
                             : selectedQrBooking.serviceName}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-white/40">
-                          {i18n.language === 'ru' ? 'ДАТА И ВРЕМЯ:' : i18n.language === 'ar' ? 'التاريخ والوقت:' : 'DATE & TIME:'}
+                          {i18n.language === 'ru' ? 'ДАТА И ВРЕМЯ:' : i18n.language === 'ar' ? 'التاريخ والوقت:' : i18n.language === 'hy' ? 'ԱՄՍԱԹԻՎ ԵՎ ԺԱՄ:' : 'DATE & TIME:'}
                         </span>
                         <span className="text-teal-400 font-bold font-mono">
-                          {selectedQrBooking.date} {i18n.language === 'ru' ? 'в' : i18n.language === 'ar' ? 'في' : 'at'} {selectedQrBooking.time}
+                          {selectedQrBooking.date} {i18n.language === 'ru' ? 'в' : i18n.language === 'ar' ? 'في' : i18n.language === 'hy' ? 'ժամը' : 'at'} {selectedQrBooking.time}
                         </span>
                       </div>
                       {selectedQrBooking.type === 'table' ? (
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-white/40">
-                            {i18n.language === 'ru' ? 'ЗАЛ И ГОСТИ:' : i18n.language === 'ar' ? 'القاعة والضيوف:' : 'ROOM & GUESTS:'}
+                            {i18n.language === 'ru' ? 'ЗАЛ И ГОСТИ:' : i18n.language === 'ar' ? 'القاعة والضيوف:' : i18n.language === 'hy' ? 'ՍՐԱՀ ԵՎ ՀՅՈՒՐԵՐ:' : 'ROOM & GUESTS:'}
                           </span>
                           <span className="text-white font-medium">
                             {selectedQrBooking.room === 'main' 
-                              ? (i18n.language === 'ru' ? 'Главный' : i18n.language === 'ar' ? 'الرئيسية' : 'Main') 
+                              ? (i18n.language === 'ru' ? 'Главный' : i18n.language === 'ar' ? 'الرئيسية' : i18n.language === 'hy' ? 'Գլխավոր' : 'Main') 
                               : selectedQrBooking.room === 'vip' 
                                 ? 'VIP' 
-                                : (i18n.language === 'ru' ? 'Терраса' : i18n.language === 'ar' ? 'الشرفة' : 'Terrace')
-                            }, {selectedQrBooking.guests} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : 'guests'}
+                                : (i18n.language === 'ru' ? 'Терраса' : i18n.language === 'ar' ? 'الشرفة' : i18n.language === 'hy' ? 'Տեռաս' : 'Terrace')
+                            }, {selectedQrBooking.guests} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : i18n.language === 'hy' ? 'guests' : 'guests'}
                           </span>
                         </div>
                       ) : (
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-white/40">
-                            {i18n.language === 'ru' ? 'СПЕЦИАЛИСТ:' : i18n.language === 'ar' ? 'الأخصائي:' : 'SPECIALIST:'}
+                            {i18n.language === 'ru' ? 'СПЕЦИАЛИСТ:' : i18n.language === 'ar' ? 'الأخصائي:' : i18n.language === 'hy' ? 'ՄԱՍՆԱԳԵՏ:' : 'SPECIALIST:'}
                           </span>
                           <span className="text-white font-medium">{selectedQrBooking.staffName}</span>
                         </div>
                       )}
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-white/40">
-                          {i18n.language === 'ru' ? 'СТАТУС ЧЕКИНА:' : i18n.language === 'ar' ? 'حالة تسجيل الوصول:' : 'CHECK-IN STATUS:'}
+                          {i18n.language === 'ru' ? 'СТАТУС ЧЕКИНА:' : i18n.language === 'ar' ? 'حالة تسجيل الوصول:' : i18n.language === 'hy' ? 'ԳՐԱՆՑՄԱՆ ԿԱՐԳԱՎԻՃԱԿ:' : 'CHECK-IN STATUS:'}
                         </span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider animate-pulse">
-                          {i18n.language === 'ru' ? 'Ожидает прибытия' : i18n.language === 'ar' ? 'في انتظار الوصول' : 'Awaiting arrival'}
+                          {i18n.language === 'ru' ? 'Ожидает прибытия' : i18n.language === 'ar' ? 'في انتظار الوصول' : i18n.language === 'hy' ? 'Սպասում է ժամանմանը' : 'Awaiting arrival'}
                         </span>
                       </div>
                     </div>
 
                     <p className="text-[11px] text-white/40 leading-relaxed px-4">
-                      {i18n.language === 'ru' ? 'Покажите данный код менеджеру или просканируйте его на терминале при входе для автоматической активации визита.' : i18n.language === 'ar' ? 'يرجى إظهار هذا الرمز للمدير أو مسحه ضوئيًا عند المدخل لتفعيل زيارتك تلقائيًا.' : 'Show this code to the manager or scan it at the terminal upon entrance for automatic visit activation.'}
+                      {i18n.language === 'ru' ? 'Покажите данный код менеджеру или просканируйте его на терминале при входе для автоматической активации визита.' : i18n.language === 'ar' ? 'يرجى إظهار هذا الرمز للمدير أو مسحه ضوئيًا عند المدخل لتفعيل زيارتك تلقائيًا.' : i18n.language === 'hy' ? 'Ցույց տվեք այս կոդը մենեջերին կամ սկանավորեք այն մուտքի մոտ գտնվող տերմինալով՝ այցն ավտոմատ ակտիվացնելու համար:' : 'Show this code to the manager or scan it at the terminal upon entrance for automatic visit activation.'}
                     </p>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+
+            {/* Camera QR Code Scanner */}
+            <QRScanner
+              isOpen={showQrScanner}
+              onClose={() => setShowQrScanner(false)}
+              onScanSuccess={handleGlobalQrScanSuccess}
+            />
+
+            {/* Globally Scanned Check-In Confirmation Modal */}
+            <AnimatePresence>
+              {(scannedCheckInBooking || scannedCheckInUserPass) && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => {
+                      setScannedCheckInBooking(null);
+                      setScannedCheckInUserPass(null);
+                      setScannedUserBookings([]);
+                    }}
+                    className="absolute inset-0 bg-black/85 backdrop-blur-md"
+                  />
+
+                  <motion.div
+                    initial={{ scale: 0.95, opacity: 0, y: 15 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                    className="bg-[#16191F] border border-white/10 rounded-3xl p-6 max-w-sm w-full relative z-10 text-center shadow-2xl overflow-hidden"
+                  >
+                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="flex justify-between items-center mb-6 relative">
+                      <div className="flex items-center gap-2 text-left">
+                        <div className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                          <QrCode className="w-5 h-5 animate-pulse" />
+                        </div>
+                        <div>
+                          <h4 className="font-display font-bold text-sm text-white">
+                            {i18n.language === 'ru' ? 'Результат сканирования' : 'Scan Result Verification'}
+                          </h4>
+                          <span className="text-[9px] font-mono text-teal-400 uppercase tracking-wider block font-bold">
+                            OmniReserve Secure Check-In
+                          </span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setScannedCheckInBooking(null);
+                          setScannedCheckInUserPass(null);
+                          setScannedUserBookings([]);
+                        }}
+                        className="p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/60 hover:text-white transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* SCENARIO 1: Booking QR Code successfully scanned */}
+                    {scannedCheckInBooking && (
+                      <div className="space-y-4">
+                        <div className="text-center">
+                          <h5 className="text-white/60 text-xs uppercase tracking-wider font-semibold">
+                            {scannedCheckInBooking.type === 'table' ? (i18n.language === 'ru' ? 'БРОНИРОВАНИЕ СТОЛИКА' : 'TABLE RESERVATION') : (i18n.language === 'ru' ? 'БРОНИРОВАНИЕ УСЛУГИ' : 'SERVICE RESERVATION')}
+                          </h5>
+                          <h3 className="text-lg font-display font-bold text-white mt-1">
+                            {scannedCheckInBooking.type === 'table' 
+                              ? (i18n.language === 'ru' ? `Столик #${scannedCheckInBooking.tableNumber}` : `Table #${scannedCheckInBooking.tableNumber}`) 
+                              : scannedCheckInBooking.serviceName}
+                          </h3>
+                          <span className="text-[10px] font-mono text-white/40 block mt-0.5">ID: {scannedCheckInBooking.id}</span>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-left space-y-2.5 text-xs text-white/70">
+                          <div className="flex justify-between items-center py-1 border-b border-white/[0.03]">
+                            <span className="text-white/40">{i18n.language === 'ru' ? 'Заведение:' : 'Venue:'}</span>
+                            <span className="text-white font-semibold">
+                              {scannedCheckInBooking.type === 'table' ? scannedCheckInBooking.restaurantName : scannedCheckInBooking.salonName || 'Spa & Wellness Center'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center py-1 border-b border-white/[0.03]">
+                            <span className="text-white/40">{i18n.language === 'ru' ? 'Дата и время:' : 'Date & Time:'}</span>
+                            <span className="text-teal-400 font-bold font-mono">{scannedCheckInBooking.date} в {scannedCheckInBooking.time}</span>
+                          </div>
+                          {scannedCheckInBooking.type === 'table' ? (
+                            <div className="flex justify-between items-center py-1">
+                              <span className="text-white/40">{i18n.language === 'ru' ? 'Зал и Гости:' : 'Room & Guests:'}</span>
+                              <span className="text-white font-medium">
+                                <span className="capitalize">{scannedCheckInBooking.room}</span> room, {scannedCheckInBooking.guests} pax
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex justify-between items-center py-1">
+                              <span className="text-white/40">{i18n.language === 'ru' ? 'Специалист:' : 'Staff Member:'}</span>
+                              <span className="text-white font-semibold">{scannedCheckInBooking.staffName}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Scan status & confirmation triggers */}
+                        {scannedCheckInBooking.checkedIn ? (
+                          <div className="p-3 bg-[#14f195]/10 border border-[#14f195]/20 rounded-xl text-center space-y-1">
+                            <span className="text-xs font-bold text-[#14f195] block">✓ {i18n.language === 'ru' ? 'УСПЕШНО ЗАРЕГИСТРИРОВАН' : 'CHECK-IN CONFIRMED'}</span>
+                            <span className="text-[10px] text-white/40 block">
+                              {i18n.language === 'ru' ? 'Гость успешно прошел верификацию.' : 'Guest has been registered successfully.'}
+                            </span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              handleCheckInBooking(scannedCheckInBooking.id);
+                              toast.success(i18n.language === 'ru' ? "Чекин успешно выполнен!" : "Check-in completed!");
+                            }}
+                            className="w-full py-3 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-teal-500/20"
+                          >
+                            <Check className="w-4 h-4" />
+                            {i18n.language === 'ru' ? 'Подтвердить прибытие гостя' : 'Confirm Guest Check-In'}
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* SCENARIO 2: Universal Guest Pass successfully scanned */}
+                    {scannedCheckInUserPass && (
+                      <div className="space-y-4">
+                        <div className="text-center">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#14f195]/10 text-[#14f195] border border-[#14f195]/20 text-[9px] font-mono uppercase tracking-wider font-bold">
+                            {i18n.language === 'ru' ? 'КАРТА ГОСТЯ OmniReserve' : 'OMNIRESERVE GUEST CARD'}
+                          </span>
+                          <h3 className="text-base font-display font-bold text-white mt-2">
+                            {scannedUserBookings.length > 0 && scannedUserBookings[0].userId === "user-1" 
+                              ? "Мария Смирнова" 
+                              : scannedUserBookings.length > 0 && scannedUserBookings[0].userId === "user-2"
+                                ? "Алексей Иванов"
+                                : user.name
+                            }
+                          </h3>
+                          <span className="text-[10px] font-mono text-white/40 block mt-0.5">{scannedCheckInUserPass.email}</span>
+                        </div>
+
+                        {/* List of matched reservations */}
+                        <div className="space-y-2 text-left">
+                          <h5 className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
+                            {i18n.language === 'ru' ? 'НАЙДЕННЫЕ БРОНИРОВАНИЯ ГОСТЯ:' : 'MATCHED RESERVATIONS:'}
+                          </h5>
+
+                          {scannedUserBookings.length === 0 ? (
+                            <div className="p-4 bg-white/[0.01] border border-white/5 rounded-2xl text-center space-y-1">
+                              <p className="text-xs text-white/40">{i18n.language === 'ru' ? 'Активных броней не найдено' : 'No upcoming bookings found'}</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                              {scannedUserBookings.map(b => (
+                                <div key={b.id} className="p-3 bg-white/5 border border-white/5 rounded-xl flex items-center justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <span className="text-xs font-semibold text-white truncate block">
+                                      {b.type === 'table' ? (i18n.language === 'ru' ? `Столик #${b.tableNumber}` : `Table #${b.tableNumber}`) : b.serviceName}
+                                    </span>
+                                    <span className="text-[10px] font-mono text-white/40 block mt-0.5">
+                                      {b.date} в {b.time}
+                                    </span>
+                                  </div>
+
+                                  <div>
+                                    {b.checkedIn ? (
+                                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-[#14f195] bg-[#14f195]/10 border border-[#14f195]/20 px-2 py-0.5 rounded-full uppercase">
+                                        <Check className="w-3 h-3" /> Ok
+                                      </span>
+                                    ) : (
+                                      <button
+                                        onClick={() => handleCheckInBooking(b.id)}
+                                        className="px-2.5 py-1 bg-teal-500 hover:bg-teal-400 text-black font-extrabold text-[10px] uppercase rounded-lg transition"
+                                      >
+                                        {i18n.language === 'ru' ? 'Вход' : 'In'}
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setScannedCheckInBooking(null);
+                        setScannedCheckInUserPass(null);
+                        setScannedUserBookings([]);
+                      }}
+                      className="w-full mt-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-xl text-xs font-medium transition"
+                    >
+                      {i18n.language === 'ru' ? 'Закрыть панель' : 'Close Panel'}
+                    </button>
                   </motion.div>
                 </div>
               )}
@@ -4680,7 +5290,7 @@ export default function App() {
                         <div>
                           <h4 className="font-display font-bold text-base text-white">{confirmModalData.title}</h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">
-                            {i18n.language === 'ru' ? 'Проверка условий перед подтверждением' : i18n.language === 'ar' ? 'التحقق من الشروط قبل التأكيد' : 'Checking terms before confirmation'}
+                            {i18n.language === 'ru' ? 'Проверка условий перед подтверждением' : i18n.language === 'ar' ? 'التحقق من الشروط قبل التأكيد' : i18n.language === 'hy' ? 'Պայմանների ստուգում հաստատումից առաջ' : 'Checking terms before confirmation'}
                           </span>
                         </div>
                       </div>
@@ -4696,7 +5306,7 @@ export default function App() {
                       {/* Summary details */}
                       <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-2 text-xs">
                         <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider block mb-2">
-                          {i18n.language === 'ru' ? 'Детали заказа' : i18n.language === 'ar' ? 'تفاصيل الطلب' : 'Order details'}
+                          {i18n.language === 'ru' ? 'Детали заказа' : i18n.language === 'ar' ? 'تفاصيل الطلب' : i18n.language === 'hy' ? 'Պատվերի մանրամասներ' : 'Order details'}
                         </span>
                         {confirmModalData.details.map((detail, index) => {
                           const parts = detail.split(":");
@@ -4723,7 +5333,7 @@ export default function App() {
                           <span className="text-xs text-white/50">{t('common.debitInstantly')}</span>
                         </div>
                         <span className="font-mono font-bold text-xl text-teal-300">
-                          {confirmModalData.cost.toLocaleString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽
+                          {confirmModalData.cost.toLocaleString(i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽
                         </span>
                       </div>
 
@@ -4795,10 +5405,10 @@ export default function App() {
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-base text-white">
-                            {i18n.language === 'ru' ? 'Настройки профиля' : i18n.language === 'ar' ? 'إعدادات الملف الشخصي' : 'Profile Settings'}
+                            {i18n.language === 'ru' ? 'Настройки профиля' : i18n.language === 'ar' ? 'إعدادات الملف الشخصي' : i18n.language === 'hy' ? 'Պրոֆիլի կարգավորումներ' : 'Profile Settings'}
                           </h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">
-                            {i18n.language === 'ru' ? 'управление аккаунтом и темой' : i18n.language === 'ar' ? 'إدارة الحساب والمظهر' : 'manage account and theme'}
+                            {i18n.language === 'ru' ? 'управление аккаунтом и темой' : i18n.language === 'ar' ? 'إدارة الحساب والمظهر' : i18n.language === 'hy' ? 'հաշվի և թեմայի կառավարում' : 'manage account and theme'}
                           </span>
                         </div>
                       </div>
@@ -4820,7 +5430,7 @@ export default function App() {
                         />
                         <div className="space-y-1">
                           <span className="text-xs font-mono text-teal-400 font-bold uppercase tracking-wider">
-                            {i18n.language === 'ru' ? 'Ваш аккаунт' : i18n.language === 'ar' ? 'حسابك' : 'Your account'}
+                            {i18n.language === 'ru' ? 'Ваш аккаунт' : i18n.language === 'ar' ? 'حسابك' : i18n.language === 'hy' ? 'Ձեր հաշիվը' : 'Your account'}
                           </span>
                           <h5 className="font-bold text-white text-sm">{user.name}</h5>
                           <span className="text-xs text-white/40 block font-mono">{user.email}</span>
@@ -4830,7 +5440,7 @@ export default function App() {
                       {/* Edit Username Field */}
                       <div className="space-y-2">
                         <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">
-                          {i18n.language === 'ru' ? 'Имя пользователя' : i18n.language === 'ar' ? 'اسم المستخدم' : 'Username'}
+                          {i18n.language === 'ru' ? 'Имя пользователя' : i18n.language === 'ar' ? 'اسم المستخدم' : i18n.language === 'hy' ? 'Օգտանուն' : 'Username'}
                         </label>
                         <input 
                           type="text" 
@@ -4841,14 +5451,14 @@ export default function App() {
                             localStorage.setItem(`user_${user.email}`, JSON.stringify(updatedUser));
                           }}
                           className="w-full bg-black/40 border border-white/10 focus:border-teal-500/40 rounded-xl px-4 py-3 text-xs text-white focus:outline-hidden transition"
-                          placeholder={i18n.language === 'ru' ? 'Ваше имя' : i18n.language === 'ar' ? 'اسمك' : 'Your name'}
+                          placeholder={i18n.language === 'ru' ? 'Ваше имя' : i18n.language === 'ar' ? 'اسمك' : i18n.language === 'hy' ? 'Ձեր անունը' : 'Your name'}
                         />
                       </div>
 
                       {/* Change Avatar Preset */}
                       <div className="space-y-2">
                         <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">
-                          {i18n.language === 'ru' ? 'Выберите аватар' : i18n.language === 'ar' ? 'اختر صورتك الرمزية' : 'Select avatar'}
+                          {i18n.language === 'ru' ? 'Выберите аватар' : i18n.language === 'ar' ? 'اختر صورتك الرمزية' : i18n.language === 'hy' ? 'Ընտրել ավատար' : 'Select avatar'}
                         </label>
                         <div className="flex gap-2">
                           {[
@@ -4880,29 +5490,29 @@ export default function App() {
                       {/* More Details Section */}
                       <div className="space-y-3 pt-4 border-t border-white/5">
                         <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">
-                          {i18n.language === 'ru' ? 'Детали профиля' : i18n.language === 'ar' ? 'تفاصيل الحساب' : 'Profile Details'}
+                          {i18n.language === 'ru' ? 'Детали профиля' : i18n.language === 'ar' ? 'تفاصيل الحساب' : i18n.language === 'hy' ? 'Պրոֆիլի մանրամասներ' : 'Profile Details'}
                         </label>
                         
                         <div className="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-3 text-xs">
                           {/* Role detail */}
                           <div className="flex justify-between items-center">
-                            <span className="text-white/40">{i18n.language === 'ru' ? 'Роль:' : i18n.language === 'ar' ? 'الدور:' : 'User Role:'}</span>
+                            <span className="text-white/40">{i18n.language === 'ru' ? 'Роль:' : i18n.language === 'ar' ? 'الدور:' : i18n.language === 'hy' ? 'Դեր:' : 'User Role:'}</span>
                             <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold font-mono tracking-wide uppercase ${
                               user.role === 'client' 
                                 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/10' 
                                 : 'bg-teal-500/10 text-teal-400 border border-teal-500/15'
                             }`}>
                               {user.role === 'client' 
-                                ? (i18n.language === 'ru' ? 'Клиент' : i18n.language === 'ar' ? 'عميل' : 'Client') 
+                                ? (i18n.language === 'ru' ? 'Клиент' : i18n.language === 'ar' ? 'عميل' : i18n.language === 'hy' ? 'Հաճախորդ' : 'Client') 
                                 : (user.role === 'business_owner' 
-                                  ? (i18n.language === 'ru' ? 'Владелец бизнеса' : i18n.language === 'ar' ? 'مالك عمل' : 'Business Owner')
+                                  ? (i18n.language === 'ru' ? 'Владелец бизнеса' : i18n.language === 'ar' ? 'مالك عمل' : i18n.language === 'hy' ? 'Բիզնեսի սեփականատեր' : 'Business Owner')
                                   : user.role)}
                             </span>
                           </div>
 
                           {/* Balance detail */}
                           <div className="flex justify-between items-center">
-                            <span className="text-white/40">{i18n.language === 'ru' ? 'Баланс счета:' : i18n.language === 'ar' ? 'الرصيد:' : 'Account Balance:'}</span>
+                            <span className="text-white/40">{i18n.language === 'ru' ? 'Баланс счета:' : i18n.language === 'ar' ? 'الرصيد:' : i18n.language === 'hy' ? 'Հաշվի հաշվեկշիռ:' : 'Account Balance:'}</span>
                             <span className="font-mono font-bold text-teal-400">{user.balance.toLocaleString('ru-RU')} ₽</span>
                           </div>
 
@@ -4910,12 +5520,12 @@ export default function App() {
                           {user.businessName && (
                             <div className="pt-2.5 border-t border-white/5 space-y-2">
                               <div className="flex justify-between">
-                                <span className="text-white/40">{i18n.language === 'ru' ? 'Компания:' : i18n.language === 'ar' ? 'الشركة:' : 'Business Name:'}</span>
+                                <span className="text-white/40">{i18n.language === 'ru' ? 'Компания:' : i18n.language === 'ar' ? 'الشركة:' : i18n.language === 'hy' ? 'Բիզնեսի անվանումը:' : 'Business Name:'}</span>
                                 <span className="font-bold text-white text-right">{user.businessName}</span>
                               </div>
                               {user.businessCategory && (
                                 <div className="flex justify-between">
-                                  <span className="text-white/40">{i18n.language === 'ru' ? 'Категория:' : i18n.language === 'ar' ? 'الفئة:' : 'Category:'}</span>
+                                  <span className="text-white/40">{i18n.language === 'ru' ? 'Категория:' : i18n.language === 'ar' ? 'الفئة:' : i18n.language === 'hy' ? 'Category:' : 'Category:'}</span>
                                   <span className="text-white/70 font-mono text-[11px]">{user.businessCategory}</span>
                                 </div>
                               )}
@@ -4925,7 +5535,7 @@ export default function App() {
                           {/* Preferences Detail */}
                           {user.preferences && user.preferences.length > 0 && (
                             <div className="pt-2.5 border-t border-white/5">
-                              <span className="text-white/40 block mb-1.5">{i18n.language === 'ru' ? 'Предпочтения:' : i18n.language === 'ar' ? 'التفضيلات:' : 'Preferences:'}</span>
+                              <span className="text-white/40 block mb-1.5">{i18n.language === 'ru' ? 'Предпочтения:' : i18n.language === 'ar' ? 'التفضيلات:' : i18n.language === 'hy' ? 'Նախընտրություններ:' : 'Preferences:'}</span>
                               <div className="flex flex-wrap gap-1">
                                 {user.preferences.map((pref, index) => (
                                   <span key={index} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-[10px] text-white/70">
@@ -4939,7 +5549,7 @@ export default function App() {
                           {/* System Diagnostics */}
                           <div className="pt-2.5 border-t border-white/5 flex justify-between items-center text-[10px] text-white/30 font-mono">
                             <span>UID: {user.id.slice(0, 8).toUpperCase()}</span>
-                            <span>{i18n.language === 'ru' ? 'СТАТУС: АКТИВЕН' : i18n.language === 'ar' ? 'الحالة: نشط' : 'STATUS: ACTIVE'}</span>
+                            <span>{i18n.language === 'ru' ? 'СТАТУС: АКТИВЕН' : i18n.language === 'ar' ? 'الحالة: نشط' : i18n.language === 'hy' ? 'ԿԱՐԳԱՎԻՃԱԿ՝ ԱԿՏԻՎ' : 'STATUS: ACTIVE'}</span>
                           </div>
                         </div>
                       </div>
@@ -4948,10 +5558,10 @@ export default function App() {
                       <div className="space-y-3 pt-4 border-t border-white/5">
                         <div>
                           <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">
-                            {i18n.language === 'ru' ? 'Тема оформления' : i18n.language === 'ar' ? 'المظهر' : 'Visual theme'}
+                            {i18n.language === 'ru' ? 'Тема оформления' : i18n.language === 'ar' ? 'المظهر' : i18n.language === 'hy' ? 'Արտաքին տեսքի թեմա' : 'Visual theme'}
                           </label>
                           <span className="text-[10px] text-white/30 block">
-                            {i18n.language === 'ru' ? 'Выберите визуальное оформление приложения' : i18n.language === 'ar' ? 'اختر المظهر المرئي للتطبيق' : 'Choose application visual appearance'}
+                            {i18n.language === 'ru' ? 'Выберите визуальное оформление приложения' : i18n.language === 'ar' ? 'اختر المظهر المرئي للتطبيق' : i18n.language === 'hy' ? 'Ընտրեք հավելվածի արտաքին տեսքը' : 'Choose application visual appearance'}
                           </span>
                         </div>
 
@@ -4969,10 +5579,10 @@ export default function App() {
                             <Moon className="w-4 h-4" />
                             <div className="text-left">
                               <span className="text-xs block leading-none font-bold">
-                                {i18n.language === 'ru' ? 'Темная' : i18n.language === 'ar' ? 'داكن' : 'Dark'}
+                                {i18n.language === 'ru' ? 'Темная' : i18n.language === 'ar' ? 'داكن' : i18n.language === 'hy' ? 'Մուգ' : 'Dark'}
                               </span>
                               <span className="text-[8px] opacity-60 block mt-0.5">
-                                {i18n.language === 'ru' ? 'Энергосберегающая' : i18n.language === 'ar' ? 'موفّر للطاقة' : 'Energy saving'}
+                                {i18n.language === 'ru' ? 'Энергосберегающая' : i18n.language === 'ar' ? 'موفّر للطاقة' : i18n.language === 'hy' ? 'Էներգախնայող' : 'Energy saving'}
                               </span>
                             </div>
                           </button>
@@ -4990,14 +5600,69 @@ export default function App() {
                             <Sun className="w-4 h-4" />
                             <div className="text-left">
                               <span className="text-xs block leading-none font-bold">
-                                {i18n.language === 'ru' ? 'Светлая' : i18n.language === 'ar' ? 'فاتح' : 'Light'}
+                                {i18n.language === 'ru' ? 'Светлая' : i18n.language === 'ar' ? 'فاتح' : i18n.language === 'hy' ? 'Բաց' : 'Light'}
                               </span>
                               <span className="text-[8px] opacity-60 block mt-0.5">
-                                {i18n.language === 'ru' ? 'Высококонтрастная' : i18n.language === 'ar' ? 'تباين عالي' : 'High contrast'}
+                                {i18n.language === 'ru' ? 'Высококонтрастная' : i18n.language === 'ar' ? 'تباين عالي' : i18n.language === 'hy' ? 'Բարձր կոնտրաստայնություն' : 'High contrast'}
                               </span>
                             </div>
                           </button>
                         </div>
+                      </div>
+
+                      {/* Accessibility Settings (High Contrast Mode) */}
+                      <div className="space-y-3 pt-4 border-t border-white/5">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <label className="text-[11px] font-mono text-white/40 uppercase tracking-wider font-extrabold block">
+                              {i18n.language === 'ru' ? 'Специальные возможности' : i18n.language === 'ar' ? 'إمكانية الوصول' : i18n.language === 'hy' ? 'Հատուկ հնարավորություններ' : 'Accessibility'}
+                            </label>
+                            <span className="text-[10px] text-white/30 block max-w-[280px]">
+                              {i18n.language === 'ru' ? 'Высококонтрастный режим для слабовидящих пользователей (соответствие WCAG)' : i18n.language === 'ar' ? 'وضع التباين العالي للمستخدمين ضعاف البصر (متوافق مع WCAG)' : i18n.language === 'hy' ? 'Բարձր կոնտրաստային ռեժիմ թույլ տեսողություն ունեցողների համար (WCAG համատեղելի)' : 'High contrast mode for visually impaired users (WCAG compliant)'}
+                            </span>
+                          </div>
+                          
+                          <button
+                            type="button"
+                            onClick={() => setHighContrast(!highContrast)}
+                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                              highContrast ? 'bg-teal-500' : 'bg-white/10'
+                            }`}
+                            aria-pressed={highContrast}
+                          >
+                            <span className="sr-only">Toggle High Contrast</span>
+                            <span
+                              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                                highContrast ? 'translate-x-5 bg-black' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {/* Interactive Preview Button */}
+                        <button
+                          type="button"
+                          onClick={() => setHighContrast(!highContrast)}
+                          className={`w-full flex items-center justify-between gap-3 p-3 rounded-xl border transition ${
+                            highContrast 
+                              ? 'bg-teal-500/10 border-teal-500 text-teal-400 font-bold' 
+                              : 'bg-black/20 border-white/5 text-white/50 hover:text-white hover:border-white/10'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Contrast className="w-4 h-4" />
+                            <div className="text-left">
+                              <span className="text-xs block font-bold">
+                                {i18n.language === 'ru' ? 'Высокий контраст' : i18n.language === 'ar' ? 'تباين عالي' : i18n.language === 'hy' ? 'Բարձր կոնտրաստ' : 'High Contrast Mode'}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-white/10">
+                            {highContrast 
+                              ? (i18n.language === 'ru' ? 'ВКЛ' : i18n.language === 'ar' ? 'مفعل' : i18n.language === 'hy' ? 'ՄԻԱՑՎԱԾ' : 'ON') 
+                              : (i18n.language === 'ru' ? 'ВЫКЛ' : i18n.language === 'ar' ? 'معطل' : i18n.language === 'hy' ? 'ԱՆՋԱՏՎԱԾ' : 'OFF')}
+                          </span>
+                        </button>
                       </div>
 
                       {/* Save Status / Close button */}
@@ -5006,7 +5671,7 @@ export default function App() {
                           onClick={() => setShowSettingsModal(false)}
                           className="w-full py-3 px-4 bg-teal-500 hover:bg-teal-400 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition shadow-lg shadow-teal-500/10 cursor-pointer flex items-center justify-center gap-2"
                         >
-                          {i18n.language === 'ru' ? 'Сохранить настройки' : i18n.language === 'ar' ? 'حفظ الإعدادات' : 'Save Settings'}
+                          {i18n.language === 'ru' ? 'Сохранить настройки' : i18n.language === 'ar' ? 'حفظ الإعدادات' : i18n.language === 'hy' ? 'Պահպանել կարգավորումները' : 'Save Settings'}
                         </button>
 
                         <button
@@ -5017,7 +5682,7 @@ export default function App() {
                           className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/15 border border-red-500/20 text-red-400 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <LogOut className="w-4 h-4" />
-                          {i18n.language === 'ru' ? 'Выйти из аккаунта' : i18n.language === 'ar' ? 'تسجيل الخروج' : 'Log out'}
+                          {i18n.language === 'ru' ? 'Выйти из аккаунта' : i18n.language === 'ar' ? 'تسجيل الخروج' : i18n.language === 'hy' ? 'Դուրս գալ' : 'Log out'}
                         </button>
                       </div>
 
@@ -5055,10 +5720,10 @@ export default function App() {
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-base text-white">
-                            {i18n.language === 'ru' ? 'Регистрация бьюти-бизнеса' : i18n.language === 'ar' ? 'تسجيل عمل تجاري جمالي' : 'Beauty business registration'}
+                            {i18n.language === 'ru' ? 'Регистрация бьюти-бизнеса' : i18n.language === 'ar' ? 'تسجيل عمل تجاري جمالي' : i18n.language === 'hy' ? 'Գեղեցկության բիզնեսի գրանցում' : 'Beauty business registration'}
                           </h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">
-                            {i18n.language === 'ru' ? 'Создание нового велнес/салонного центра' : i18n.language === 'ar' ? 'إنشاء مركز عافية/صالون جديد' : 'Create new wellness/salon center'}
+                            {i18n.language === 'ru' ? 'Создание нового велнес/салонного центра' : i18n.language === 'ar' ? 'إنشاء مركز عافية/صالون جديد' : i18n.language === 'hy' ? 'Նոր վելնես/սրահի կենտրոնի ստեղծում' : 'Create new wellness/salon center'}
                           </span>
                         </div>
                       </div>
@@ -5073,14 +5738,14 @@ export default function App() {
                     <form onSubmit={handleRegisterSalon} className="space-y-4 relative">
                       <div>
                         <label className="block text-xs font-semibold text-white/60 mb-1">
-                          {i18n.language === 'ru' ? 'Название заведения *' : i18n.language === 'ar' ? 'اسم المنشأة *' : 'Venue Name *'}
+                          {i18n.language === 'ru' ? 'Название заведения *' : i18n.language === 'ar' ? 'اسم المنشأة *' : i18n.language === 'hy' ? 'Հաստատության անվանումը *' : 'Venue Name *'}
                         </label>
                         <input 
                           type="text" 
                           required
                           value={newSalonForm.name}
                           onChange={e => setNewSalonForm({...newSalonForm, name: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'Например: Aura Spa & Wellness' : i18n.language === 'ar' ? 'مثال: Aura Spa & Wellness' : 'Example: Aura Spa & Wellness'}
+                          placeholder={i18n.language === 'ru' ? 'Например: Aura Spa & Wellness' : i18n.language === 'ar' ? 'مثال: Aura Spa & Wellness' : i18n.language === 'hy' ? 'Օրինակ՝ Aura Spa & Wellness' : 'Example: Aura Spa & Wellness'}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                         />
                       </div>
@@ -5088,7 +5753,7 @@ export default function App() {
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-white/60 mb-1">
-                            {i18n.language === 'ru' ? 'Категория *' : i18n.language === 'ar' ? 'الفئة *' : 'Category *'}
+                            {i18n.language === 'ru' ? 'Категория *' : i18n.language === 'ar' ? 'الفئة *' : i18n.language === 'hy' ? 'Կատեգորիա *' : 'Category *'}
                           </label>
                           <select 
                             value={newSalonForm.category}
@@ -5102,14 +5767,14 @@ export default function App() {
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-white/60 mb-1">
-                            {i18n.language === 'ru' ? 'Адрес *' : i18n.language === 'ar' ? 'العنوان *' : 'Address *'}
+                            {i18n.language === 'ru' ? 'Адрес *' : i18n.language === 'ar' ? 'العنوان *' : i18n.language === 'hy' ? 'Հասցե *' : 'Address *'}
                           </label>
                           <input 
                             type="text" 
                             required
                             value={newSalonForm.address}
                             onChange={e => setNewSalonForm({...newSalonForm, address: e.target.value})}
-                            placeholder={i18n.language === 'ru' ? 'ул. Ленина, д. 45' : i18n.language === 'ar' ? 'شارع السلام، مبنى 45' : '45 Lenin St.'}
+                            placeholder={i18n.language === 'ru' ? 'ул. Ленина, д. 45' : i18n.language === 'ar' ? 'شارع السلام، مبنى 45' : i18n.language === 'hy' ? 'Լենինի փ., տ. 45' : '45 Lenin St.'}
                             className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                           />
                         </div>
@@ -5117,12 +5782,12 @@ export default function App() {
 
                       <div>
                         <label className="block text-xs font-semibold text-white/60 mb-1">
-                          {i18n.language === 'ru' ? 'Краткое описание' : i18n.language === 'ar' ? 'وصف قصير' : 'Brief description'}
+                          {i18n.language === 'ru' ? 'Краткое описание' : i18n.language === 'ar' ? 'وصف قصير' : i18n.language === 'hy' ? 'Համառոտ նկարագրություն' : 'Brief description'}
                         </label>
                         <textarea 
                           value={newSalonForm.description}
                           onChange={e => setNewSalonForm({...newSalonForm, description: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'Опишите концепцию, удобства и особенности вашего салона...' : i18n.language === 'ar' ? 'صف المفهوم والمرافق والميزات للصالون الخاص بك...' : 'Describe the concept, amenities, and features of your salon...'}
+                          placeholder={i18n.language === 'ru' ? 'Опишите концепцию, удобства и особенности вашего салона...' : i18n.language === 'ar' ? 'صف المفهوم والمرافق والميزات للصالون الخاص بك...' : i18n.language === 'hy' ? 'Նկարագրեք Ձեր սրահի հայեցակարգը, հարմարություններն ու առանձնահատկությունները...' : 'Describe the concept, amenities, and features of your salon...'}
                           rows={2}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500 resize-none"
                         />
@@ -5130,32 +5795,32 @@ export default function App() {
 
                       <div>
                         <label className="block text-xs font-semibold text-white/60 mb-1">
-                          {i18n.language === 'ru' ? 'Ссылка на фото (URL)' : i18n.language === 'ar' ? 'رابط الصورة (URL)' : 'Photo Link (URL)'}
+                          {i18n.language === 'ru' ? 'Ссылка на фото (URL)' : i18n.language === 'ar' ? 'رابط الصورة (URL)' : i18n.language === 'hy' ? 'Լուսանկարի հղում (URL)' : 'Photo Link (URL)'}
                         </label>
                         <input 
                           type="text" 
                           value={newSalonForm.image}
                           onChange={e => setNewSalonForm({...newSalonForm, image: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
+                          placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : i18n.language === 'hy' ? 'https://images.unsplash.com/... (Թողնել դատարկ ավտոմատ գեներացման համար)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                         />
                       </div>
 
                       <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl space-y-3">
                         <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider block">
-                          {i18n.language === 'ru' ? 'Первая услуга салона (для старта)' : i18n.language === 'ar' ? 'أول خدمة للصالون (للبدء)' : 'First salon service (to start)'}
+                          {i18n.language === 'ru' ? 'Первая услуга салона (для старта)' : i18n.language === 'ar' ? 'أول خدمة للصالون (للبدء)' : i18n.language === 'hy' ? 'Սրահի առաջին ծառայությունը (սկսելու համար)' : 'First salon service (to start)'}
                         </span>
                         
                         <div>
                           <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                            {i18n.language === 'ru' ? 'Название услуги *' : i18n.language === 'ar' ? 'اسم الخدمة *' : 'Service name *'}
+                            {i18n.language === 'ru' ? 'Название услуги *' : i18n.language === 'ar' ? 'اسم الخدمة *' : i18n.language === 'hy' ? 'Ծառայության անվանումը *' : 'Service name *'}
                           </label>
                           <input 
                             type="text" 
                             required
                             value={newSalonForm.serviceName}
                             onChange={e => setNewSalonForm({...newSalonForm, serviceName: e.target.value})}
-                            placeholder={i18n.language === 'ru' ? 'Например: Классический шведский массаж' : i18n.language === 'ar' ? 'مثال: تدليك سويدي كلاسيكي' : 'Example: Classic Swedish Massage'}
+                            placeholder={i18n.language === 'ru' ? 'Например: Классический шведский массаж' : i18n.language === 'ar' ? 'مثال: تدليك سويدي كلاسيكي' : i18n.language === 'hy' ? 'Օրինակ՝ Դասական շվեդական մերսում' : 'Example: Classic Swedish Massage'}
                             className="w-full px-4 py-1.5 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                           />
                         </div>
@@ -5163,7 +5828,7 @@ export default function App() {
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                              {i18n.language === 'ru' ? 'Стоимость (₽) *' : i18n.language === 'ar' ? 'السعر (₽) *' : 'Price (₽) *'}
+                              {i18n.language === 'ru' ? 'Стоимость (₽) *' : i18n.language === 'ar' ? 'السعر (₽) *' : i18n.language === 'hy' ? 'Արժեքը (₽) *' : 'Price (₽) *'}
                             </label>
                             <input 
                               type="number" 
@@ -5176,7 +5841,7 @@ export default function App() {
                           </div>
                           <div>
                             <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                              {i18n.language === 'ru' ? 'Длительность (мин) *' : i18n.language === 'ar' ? 'المدة (دقيقة) *' : 'Duration (min) *'}
+                              {i18n.language === 'ru' ? 'Длительность (мин) *' : i18n.language === 'ar' ? 'المدة (دقيقة) *' : i18n.language === 'hy' ? 'Տևողությունը (րոպե) *' : 'Duration (min) *'}
                             </label>
                             <input 
                               type="number" 
@@ -5196,7 +5861,7 @@ export default function App() {
                           onClick={() => setShowRegisterSalonModal(false)}
                           className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                         >
-                          {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : 'Cancel'}
+                          {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : i18n.language === 'hy' ? 'Չեղարկել' : 'Cancel'}
                         </button>
                         <button 
                           type="submit" 
@@ -5204,8 +5869,8 @@ export default function App() {
                           className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-black rounded-xl text-xs font-black transition cursor-pointer shadow-lg shadow-teal-500/10 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {registeringSalon 
-                            ? (i18n.language === 'ru' ? 'Регистрируем…' : i18n.language === 'ar' ? 'جاري التسجيل...' : 'Registering...') 
-                            : (i18n.language === 'ru' ? 'Зарегистрировать салон' : i18n.language === 'ar' ? 'تسجيل الصالون' : 'Register Salon')}
+                            ? (i18n.language === 'ru' ? 'Регистрируем…' : i18n.language === 'ar' ? 'جاري التسجيل...' : i18n.language === 'hy' ? 'Գրանցվում է...' : 'Registering...') 
+                            : (i18n.language === 'ru' ? 'Зарегистрировать салон' : i18n.language === 'ar' ? 'تسجيل الصالون' : i18n.language === 'hy' ? 'Գրանցել սրահը' : 'Register Salon')}
                         </button>
                       </div>
                     </form>
@@ -5242,10 +5907,10 @@ export default function App() {
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-base text-white">
-                            {i18n.language === 'ru' ? 'Регистрация ресторана / кафе' : i18n.language === 'ar' ? 'تسجيل مطعم / مقهى' : 'Restaurant / Cafe registration'}
+                            {i18n.language === 'ru' ? 'Регистрация ресторана / кафе' : i18n.language === 'ar' ? 'تسجيل مطعم / مقهى' : i18n.language === 'hy' ? 'Ռեստորանի / սրճարանի գրանցում' : 'Restaurant / Cafe registration'}
                           </h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">
-                            {i18n.language === 'ru' ? 'Создание нового гастрономического пространства' : i18n.language === 'ar' ? 'إنشاء مساحة طهي جديدة' : 'Create new gastronomic space'}
+                            {i18n.language === 'ru' ? 'Создание нового гастрономического пространства' : i18n.language === 'ar' ? 'إنشاء مساحة طهي جديدة' : i18n.language === 'hy' ? 'Նոր գաստրոնոմիական տարածքի ստեղծում' : 'Create new gastronomic space'}
                           </span>
                         </div>
                       </div>
@@ -5260,14 +5925,14 @@ export default function App() {
                     <form onSubmit={handleRegisterRestaurant} className="space-y-4 relative">
                       <div>
                         <label className="block text-xs font-semibold text-white/60 mb-1">
-                          {i18n.language === 'ru' ? 'Название заведения *' : i18n.language === 'ar' ? 'اسم المنشأة *' : 'Venue Name *'}
+                          {i18n.language === 'ru' ? 'Название заведения *' : i18n.language === 'ar' ? 'اسم المنشأة *' : i18n.language === 'hy' ? 'Հաստատության անվանումը *' : 'Venue Name *'}
                         </label>
                         <input 
                           type="text" 
                           required
                           value={newRestaurantForm.name}
                           onChange={e => setNewRestaurantForm({...newRestaurantForm, name: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'Например: Bistro Gusto' : i18n.language === 'ar' ? 'مثال: Bistro Gusto' : 'Example: Bistro Gusto'}
+                          placeholder={i18n.language === 'ru' ? 'Например: Bistro Gusto' : i18n.language === 'ar' ? 'مثال: Bistro Gusto' : i18n.language === 'hy' ? 'Օրինակ՝ Bistro Gusto' : 'Example: Bistro Gusto'}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                         />
                       </div>
@@ -5275,20 +5940,20 @@ export default function App() {
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-white/60 mb-1">
-                            {i18n.language === 'ru' ? 'Кухня *' : i18n.language === 'ar' ? 'المطبخ *' : 'Cuisine *'}
+                            {i18n.language === 'ru' ? 'Кухня *' : i18n.language === 'ar' ? 'المطبخ *' : i18n.language === 'hy' ? 'Խոհանոց *' : 'Cuisine *'}
                           </label>
                           <input 
                             type="text" 
                             required
                             value={newRestaurantForm.cuisine}
                             onChange={e => setNewRestaurantForm({...newRestaurantForm, cuisine: e.target.value})}
-                            placeholder={i18n.language === 'ru' ? 'Европейская, Азиатская, Итальянская' : i18n.language === 'ar' ? 'أوروبية، آسيوية، إيطالية' : 'European, Asian, Italian'}
+                            placeholder={i18n.language === 'ru' ? 'Европейская, Азиатская, Итальянская' : i18n.language === 'ar' ? 'أوروبية، آسيوية، إيطالية' : i18n.language === 'hy' ? 'Եվրոպական, Ասիական, Իտալական' : 'European, Asian, Italian'}
                             className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                           />
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-white/60 mb-1">
-                            {i18n.language === 'ru' ? 'Количество столов для старта *' : i18n.language === 'ar' ? 'عدد الطاولات للبدء *' : 'Number of tables to start *'}
+                            {i18n.language === 'ru' ? 'Количество столов для старта *' : i18n.language === 'ar' ? 'عدد الطاولات للبدء *' : i18n.language === 'hy' ? 'Սեղանների քանակը սկսելու համար *' : 'Number of tables to start *'}
                           </label>
                           <input 
                             type="number" 
@@ -5304,12 +5969,12 @@ export default function App() {
 
                       <div>
                         <label className="block text-xs font-semibold text-white/60 mb-1">
-                          {i18n.language === 'ru' ? 'Описание концепции' : i18n.language === 'ar' ? 'وصف المفهوم' : 'Concept description'}
+                          {i18n.language === 'ru' ? 'Описание концепции' : i18n.language === 'ar' ? 'وصف المفهوم' : i18n.language === 'hy' ? 'Հայեցակարգի նկարագրություն' : 'Concept description'}
                         </label>
                         <textarea 
                           value={newRestaurantForm.description}
                           onChange={e => setNewRestaurantForm({...newRestaurantForm, description: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'Опишите атмосферу, фирменные блюда и особенности заведения...' : i18n.language === 'ar' ? 'صف الأجواء، الأطباق المميزة وميزات المنشأة...' : 'Describe the atmosphere, signature dishes, and features of the venue...'}
+                          placeholder={i18n.language === 'ru' ? 'Опишите атмосферу, фирменные блюда и особенности заведения...' : i18n.language === 'ar' ? 'صف الأجواء، الأطباق المميزة وميزات المنشأة...' : i18n.language === 'hy' ? 'Նկարագրեք հաստատության մթնոլորտը, ֆիրմային ուտեստներն ու առանձնահատկությունները...' : 'Describe the atmosphere, signature dishes, and features of the venue...'}
                           rows={3}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500 resize-none"
                         />
@@ -5317,13 +5982,13 @@ export default function App() {
 
                       <div>
                         <label className="block text-xs font-semibold text-white/60 mb-1">
-                          {i18n.language === 'ru' ? 'Ссылка на фото (URL)' : i18n.language === 'ar' ? 'رابط الصورة (URL)' : 'Photo Link (URL)'}
+                          {i18n.language === 'ru' ? 'Ссылка на фото (URL)' : i18n.language === 'ar' ? 'رابط الصورة (URL)' : i18n.language === 'hy' ? 'Լուսանկարի հղում (URL)' : 'Photo Link (URL)'}
                         </label>
                         <input 
                           type="text" 
                           value={newRestaurantForm.image}
                           onChange={e => setNewRestaurantForm({...newRestaurantForm, image: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
+                          placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : i18n.language === 'hy' ? 'https://images.unsplash.com/... (Թողնել դատարկ ավտոմատ գեներացման համար)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                         />
                       </div>
@@ -5334,7 +5999,7 @@ export default function App() {
                           onClick={() => setShowRegisterRestaurantModal(false)}
                           className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                         >
-                          {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : 'Cancel'}
+                          {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : i18n.language === 'hy' ? 'Չեղարկել' : 'Cancel'}
                         </button>
                         <button 
                           type="submit" 
@@ -5342,8 +6007,8 @@ export default function App() {
                           className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-black rounded-xl text-xs font-black transition cursor-pointer shadow-lg shadow-teal-500/10 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {registeringRestaurant 
-                            ? (i18n.language === 'ru' ? 'Создаём…' : i18n.language === 'ar' ? 'جاري الإنشاء...' : 'Creating...') 
-                            : (i18n.language === 'ru' ? 'Создать ресторан' : i18n.language === 'ar' ? 'إنشاء مطعم' : 'Create Restaurant')}
+                            ? (i18n.language === 'ru' ? 'Создаём…' : i18n.language === 'ar' ? 'جاري الإنشاء...' : i18n.language === 'hy' ? 'Ստեղծվում է...' : 'Creating...') 
+                            : (i18n.language === 'ru' ? 'Создать ресторан' : i18n.language === 'ar' ? 'إنشاء مطعم' : i18n.language === 'hy' ? 'Ստեղծել ռեստորան' : 'Create Restaurant')}
                         </button>
                       </div>
                     </form>
@@ -5382,7 +6047,7 @@ export default function App() {
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-base text-white">
-                            {i18n.language === 'ru' ? 'Синхронизация события' : i18n.language === 'ar' ? 'مزامنة الحدث' : 'Event Synchronization'}
+                            {i18n.language === 'ru' ? 'Синхронизация события' : i18n.language === 'ar' ? 'مزامنة الحدث' : i18n.language === 'hy' ? 'Իրադարձության սինխրոնացում' : 'Event Synchronization'}
                           </h4>
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Google Calendar Confirmation</span>
                         </div>
@@ -5400,56 +6065,44 @@ export default function App() {
 
                     <div className="space-y-4 relative text-sm text-white/80">
                       <p className="text-xs text-white/60">
-                        {i18n.language === 'ru' ? 'Вы собираетесь добавить следующее событие в ваш основной Google Календарь:' : i18n.language === 'ar' ? 'أنت على وشك إضافة الحدث التالي إلى تقويم Google الرئيسي الخاص بك:' : 'You are about to add the following event to your main Google Calendar:'}
+                        {i18n.language === 'ru' ? 'Вы собираетесь добавить следующее событие в ваш основной Google Календарь:' : i18n.language === 'ar' ? 'أنت على وشك إضافة الحدث التالي إلى تقويم Google الرئيسي الخاص بك:' : i18n.language === 'hy' ? 'Դուք պատրաստվում եք ավելացնել հետևյալ իրադարձությունը Ձեր հիմնական Google Օրացույցին՝' : 'You are about to add the following event to your main Google Calendar:'}
                       </p>
 
                       <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-2 text-xs">
                         <div className="flex justify-between py-1 border-b border-white/[0.02]">
                           <span className="text-white/50">
-                            {i18n.language === 'ru' ? 'Название:' : i18n.language === 'ar' ? 'الاسم:' : 'Name:'}
+                            {i18n.language === 'ru' ? 'Название:' : i18n.language === 'ar' ? 'الاسم:' : i18n.language === 'hy' ? 'Անվանում՝' : 'Name:'}
                           </span>
                           <span className="font-semibold text-white">
                             {pendingSyncBooking.type === "table" 
-                              ? (i18n.language === 'ru' 
-                                  ? `🍽️ Бронь столика #${pendingSyncBooking.tableNumber} в ресторан` 
-                                  : i18n.language === 'ar' 
-                                    ? `🍽️ حجز طاولة #${pendingSyncBooking.tableNumber} في مطعم` 
-                                    : `🍽️ Table #${pendingSyncBooking.tableNumber} Restaurant Booking`)
+                              ? (i18n.language === 'ru' ? `🍽️ Бронь столика #${pendingSyncBooking.tableNumber} в ресторан` : i18n.language === 'ar' ? `🍽️ حجز طاولة #${pendingSyncBooking.tableNumber} في مطعم` : i18n.language === 'hy' ? `🍽️ Սեղանի ամրագրում #${pendingSyncBooking.tableNumber} ռեստորանում` : `🍽️ Table #${pendingSyncBooking.tableNumber} Restaurant Booking`)
                               : `🌸 ${pendingSyncBooking.serviceName}`}
                           </span>
                         </div>
                         <div className="flex justify-between py-1 border-b border-white/[0.02]">
                           <span className="text-white/50">
-                            {i18n.language === 'ru' ? 'Дата и время:' : i18n.language === 'ar' ? 'التاريخ والوقت:' : 'Date & time:'}
+                            {i18n.language === 'ru' ? 'Дата и время:' : i18n.language === 'ar' ? 'التاريخ والوقت:' : i18n.language === 'hy' ? 'Ամսաթիվ և ժամ՝' : 'Date & time:'}
                           </span>
                           <span className="font-semibold text-white">
-                            {pendingSyncBooking.date} {i18n.language === 'ru' ? 'в' : i18n.language === 'ar' ? 'في' : 'at'} {pendingSyncBooking.time}
+                            {pendingSyncBooking.date} {i18n.language === 'ru' ? 'в' : i18n.language === 'ar' ? 'في' : i18n.language === 'hy' ? 'ժամը' : 'at'} {pendingSyncBooking.time}
                           </span>
                         </div>
                         <div className="flex justify-between py-1 border-b border-white/[0.02]">
                           <span className="text-white/50">
-                            {i18n.language === 'ru' ? 'Место:' : i18n.language === 'ar' ? 'الموقع:' : 'Location:'}
+                            {i18n.language === 'ru' ? 'Место:' : i18n.language === 'ar' ? 'الموقع:' : i18n.language === 'hy' ? 'Վայր՝' : 'Location:'}
                           </span>
                           <span className="font-semibold text-white">
                             {pendingSyncBooking.type === "table"
-                              ? (i18n.language === 'ru' 
-                                  ? 'Ресторан OmniReserve, ул. Лесная, д. 5, стр. 2' 
-                                  : i18n.language === 'ar' 
-                                    ? 'مطعم OmniReserve، شارع ليسنايا، مبنى 5' 
-                                    : 'OmniReserve Restaurant, 5 Lesnaya St.')
-                              : (i18n.language === 'ru' 
-                                  ? 'Lotus Spa, ул. Лесная, д. 5, стр. 2' 
-                                  : i18n.language === 'ar' 
-                                    ? 'لوتس سبا، شارع ليسنايا، مبنى 5' 
-                                    : 'Lotus Spa, 5 Lesnaya St.')}
+                              ? (i18n.language === 'ru' ? 'Ресторан OmniReserve, ул. Лесная, д. 5, стр. 2' : i18n.language === 'ar' ? 'مطعم OmniReserve، شارع ليسنايا، مبنى 5' : i18n.language === 'hy' ? 'OmniReserve ռեստորան, Լեսնայա փող., տ. 5, շին. 2' : 'OmniReserve Restaurant, 5 Lesnaya St.')
+                              : (i18n.language === 'ru' ? 'Lotus Spa, ул. Лесная, д. 5, стр. 2' : i18n.language === 'ar' ? 'لوتس سبا، شارع ليسنايا، مبنى 5' : i18n.language === 'hy' ? 'Lotus Spa, Լեսնայա փող., տ. 5, շին. 2' : 'Lotus Spa, 5 Lesnaya St.')}
                           </span>
                         </div>
                         <div className="flex justify-between py-1">
                           <span className="text-white/50">
-                            {i18n.language === 'ru' ? 'Напоминания:' : i18n.language === 'ar' ? 'التذكيرات:' : 'Reminders:'}
+                            {i18n.language === 'ru' ? 'Напоминания:' : i18n.language === 'ar' ? 'التذكيرات:' : i18n.language === 'hy' ? 'Հիշեցումներ՝' : 'Reminders:'}
                           </span>
                           <span className="font-semibold text-teal-400">
-                            {i18n.language === 'ru' ? 'Всплывающее (30 мин) & Email (2 ч)' : i18n.language === 'ar' ? 'منبثق (30 دقيقة) وبريد إلكتروني (ساعتان)' : 'Popup (30 min) & Email (2 hours)'}
+                            {i18n.language === 'ru' ? 'Всплывающее (30 мин) & Email (2 ч)' : i18n.language === 'ar' ? 'منبثق (30 دقيقة) وبريد إلكتروني (ساعتان)' : i18n.language === 'hy' ? 'Ծագող պատուհան (30 րոպե) և Էլ. փոստ (2 ժ)' : 'Popup (30 min) & Email (2 hours)'}
                           </span>
                         </div>
                       </div>
@@ -5462,7 +6115,7 @@ export default function App() {
                           }}
                           className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold text-xs transition cursor-pointer"
                         >
-                          {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : 'Cancel'}
+                          {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : i18n.language === 'hy' ? 'Չեղարկել' : 'Cancel'}
                         </button>
                         <button
                           onClick={confirmSyncBooking}
@@ -5473,7 +6126,7 @@ export default function App() {
                             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                           ) : (
                             <span>
-                              {i18n.language === 'ru' ? 'Подтвердить запись' : i18n.language === 'ar' ? 'تأكيد الحجز' : 'Confirm reservation'}
+                              {i18n.language === 'ru' ? 'Подтвердить запись' : i18n.language === 'ar' ? 'تأكيد الحجز' : i18n.language === 'hy' ? 'Հաստատել գրանցումը' : 'Confirm reservation'}
                             </span>
                           )}
                         </button>
@@ -5502,7 +6155,7 @@ export default function App() {
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                       </span>
                       <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider">
-                        {i18n.language === 'ru' ? 'Через 2 часа' : i18n.language === 'ar' ? 'خلال ساعتين' : 'In 2 hours'}
+                        {i18n.language === 'ru' ? 'Через 2 часа' : i18n.language === 'ar' ? 'خلال ساعتين' : i18n.language === 'hy' ? '2 ժամից' : 'In 2 hours'}
                       </span>
                     </div>
 
@@ -5525,7 +6178,7 @@ export default function App() {
                       <div className="flex items-center gap-1.5 text-[10px] text-amber-300 font-bold uppercase tracking-wider">
                         <MapPin className="w-3.5 h-3.5" />
                         <span>
-                          {i18n.language === 'ru' ? 'Адрес назначения' : i18n.language === 'ar' ? 'عنوان الوجهة' : 'Destination Address'}
+                          {i18n.language === 'ru' ? 'Адрес назначения' : i18n.language === 'ar' ? 'عنوان الوجهة' : i18n.language === 'hy' ? 'Նպատակակետի հասցե' : 'Destination Address'}
                         </span>
                       </div>
                       <p className="text-[10px] font-semibold text-white leading-snug">
@@ -5534,7 +6187,7 @@ export default function App() {
                       <div className="flex items-start gap-1.5 text-[10px] text-white/40 pt-1.5 border-t border-white/[0.03]">
                         <Navigation className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                         <span className="leading-relaxed">
-                          <strong>{i18n.language === 'ru' ? 'Как добраться:' : i18n.language === 'ar' ? 'كيفية الوصول:' : 'How to get there:'}</strong> {alert.directions}
+                          <strong>{i18n.language === 'ru' ? 'Как добраться:' : i18n.language === 'ar' ? 'كيفية الوصول:' : i18n.language === 'hy' ? 'Ինչպես հասնել՝' : 'How to get there:'}</strong> {alert.directions}
                         </span>
                       </div>
                     </div>
@@ -5542,7 +6195,7 @@ export default function App() {
                     {/* Footer bar with Booking ID and close button */}
                     <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[10px]">
                       <span className="font-mono text-white/30 uppercase">
-                        {i18n.language === 'ru' ? 'ID брони:' : i18n.language === 'ar' ? 'معرّف الحجز:' : 'Booking ID:'} <strong className="text-white/60">{alert.bookingId}</strong>
+                        {i18n.language === 'ru' ? 'ID брони:' : i18n.language === 'ar' ? 'معرّف الحجز:' : i18n.language === 'hy' ? 'Ամրագրման ID:' : 'Booking ID:'} <strong className="text-white/60">{alert.bookingId}</strong>
                       </span>
                       <button
                         onClick={() => {
@@ -5550,7 +6203,7 @@ export default function App() {
                         }}
                         className="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-bold transition cursor-pointer"
                       >
-                        {i18n.language === 'ru' ? 'Понятно' : i18n.language === 'ar' ? 'مفهوم' : 'Got it'}
+                        {i18n.language === 'ru' ? 'Понятно' : i18n.language === 'ar' ? 'مفهوم' : i18n.language === 'hy' ? 'Հասկանալի է' : 'Got it'}
                       </button>
                     </div>
                   </motion.div>
@@ -5562,11 +6215,7 @@ export default function App() {
             <footer className="bg-[#0F1115] border-t border-white/5 py-8 text-center text-xs text-white/40 mt-12 pb-28" id="main-footer">
               <div className="max-w-7xl mx-auto px-4">
                 <p>
-                  {i18n.language === 'ru' 
-                    ? '© 2026 OmniReserve Booking Superapp. Объединенная клиентская база Bookly & Tabletop.' 
-                    : i18n.language === 'ar' 
-                      ? '© 2026 OmniReserve Booking Superapp. قاعدة عملاء موحدة لـ Bookly & Tabletop.' 
-                      : '© 2026 OmniReserve Booking Superapp. Unified Bookly & Tabletop client base.'}
+                  {i18n.language === 'ru' ? '© 2026 OmniReserve Booking Superapp. Объединенная клиентская база Bookly & Tabletop.' : i18n.language === 'ar' ? '© 2026 OmniReserve Booking Superapp. قاعدة عملاء موحدة لـ Bookly & Tabletop.' : i18n.language === 'hy' ? '© 2026 OmniReserve Booking Superapp: Bookly և Tabletop հաճախորդների միասնական բազա:' : '© 2026 OmniReserve Booking Superapp. Unified Bookly & Tabletop client base.'}
                 </p>
                 <p className="mt-1 font-mono text-[10px] text-white/20">SYSTEM TIME: 2026-07-10 | CLIENT: {user.name}</p>
               </div>
@@ -5574,13 +6223,15 @@ export default function App() {
 
             {/* Elegant Sticky/Floating Bottom Navigation Dock */}
             <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#090A0D]/90 backdrop-blur-xl border-t border-white/5 py-3 px-4 shadow-[0_-8px_30px_rgba(0,0,0,0.8)] pb-safe">
-              <div className="max-w-xl mx-auto flex items-center justify-around gap-2">
+              <div className="max-w-2xl mx-auto flex items-center justify-around gap-2">
                 {[
-                  { id: 'ai-assistant' as const, label: i18n.language === 'ru' ? 'ИИ-Консьерж' : i18n.language === 'ar' ? 'المساعد الذكي' : 'AI Assistant', icon: Sparkles },
-                  { id: 'dashboard' as const, label: i18n.language === 'ru' ? 'Панель' : i18n.language === 'ar' ? 'لوحة التحكم' : 'Dashboard', icon: Grid },
-                  { id: 'tabletop' as const, label: i18n.language === 'ru' ? 'Столики' : i18n.language === 'ar' ? 'حجز الطاولات' : 'Tabletop', icon: Utensils },
-                  { id: 'bookly' as const, label: i18n.language === 'ru' ? 'Услуги' : i18n.language === 'ar' ? 'حجز الخدمات' : 'Bookly', icon: Calendar },
-                  { id: 'rbac' as const, label: i18n.language === 'ru' ? 'Доступ' : i18n.language === 'ar' ? 'الإدارة' : 'RBAC', icon: Sliders },
+                  { id: 'ai-assistant' as const, label: i18n.language === 'ru' ? 'ИИ-Консьерж' : i18n.language === 'ar' ? 'المساعد الذكي' : i18n.language === 'hy' ? 'ԱԻ օգնական' : 'AI Assistant', icon: Sparkles },
+                  { id: 'dashboard' as const, label: i18n.language === 'ru' ? 'Панель' : i18n.language === 'ar' ? 'لوحة التحكم' : i18n.language === 'hy' ? 'Կառավարման վահանակ' : 'Dashboard', icon: Grid },
+                  { id: 'analytics' as const, label: i18n.language === 'ru' ? 'Аналитика' : i18n.language === 'ar' ? 'التحлиلات' : i18n.language === 'hy' ? 'Վերլուծություն' : 'Analytics', icon: TrendingUp },
+                  { id: 'tabletop' as const, label: i18n.language === 'ru' ? 'Столики' : i18n.language === 'ar' ? 'حجز الطاولات' : i18n.language === 'hy' ? 'Սեղաններ' : 'Tabletop', icon: Utensils },
+                  { id: 'bookly' as const, label: i18n.language === 'ru' ? 'Услуги' : i18n.language === 'ar' ? 'حجز الخدمات' : i18n.language === 'hy' ? 'Ծառայություններ' : 'Bookly', icon: Calendar },
+                  { id: 'stays' as const, label: i18n.language === 'ru' ? 'Отели' : i18n.language === 'ar' ? 'الفنادق' : i18n.language === 'hy' ? 'Հյուրանոցներ' : 'Stays', icon: HotelIcon },
+                  { id: 'rbac' as const, label: i18n.language === 'ru' ? 'Доступ' : i18n.language === 'ar' ? 'الإدارة' : i18n.language === 'hy' ? 'Հասանելիություն' : 'RBAC', icon: Sliders },
                 ].filter(item => item.id !== 'rbac' || (user && user.role !== 'client')).map((item) => {
                   const isActive = activeModule === item.id;
                   const Icon = item.icon;
@@ -5667,7 +6318,7 @@ export default function App() {
                     ? "bg-[#1E2230] text-teal-400 border border-teal-500/20" 
                     : "bg-gradient-to-tr from-teal-500 to-emerald-400 text-black shadow-teal-500/20"
                 }`}
-                title={i18n.language === 'ru' ? 'Чат с OmniConcierge' : 'Chat with OmniConcierge'}
+                title={i18n.language === 'ru' ? 'Чат с OmniConcierge' : i18n.language === 'hy' ? 'Չաթ OmniConcierge-ի հետ' : 'Chat with OmniConcierge'}
               >
                 {isAIChatOpen ? (
                   <X className="w-6 h-6" />

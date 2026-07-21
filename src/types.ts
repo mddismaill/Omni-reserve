@@ -93,6 +93,7 @@ export interface TableBooking {
   price: number;
   restaurantId?: string;
   restaurantName?: string;
+  checkedIn?: boolean;
 }
 
 export interface ServiceBooking {
@@ -111,6 +112,7 @@ export interface ServiceBooking {
   salonId?: string;
   salonName?: string;
   duration?: number;
+  checkedIn?: boolean;
 }
 
 export interface Review {
@@ -125,7 +127,54 @@ export interface Review {
   isVerified?: boolean;
 }
 
-export type Booking = TableBooking | ServiceBooking;
+export interface Hotel {
+  id: string;
+  name: string;
+  description: string;
+  images: string[];
+  rating: number;
+  address: string;
+  amenities: string[];
+}
+
+export interface Room {
+  id: string;
+  hotelId: string;
+  type: string;
+  pricePerNight: number;
+  capacity: number;
+  bedsCount: number;
+  isAvailable?: boolean;
+}
+
+export interface HotelBooking {
+  id: string;
+  userId: string;
+  type: 'hotel';
+  hotelId: string;
+  hotelName: string;
+  roomId: string;
+  roomType: string;
+  checkInDate: string;
+  checkOutDate: string;
+  totalGuests: number;
+  totalCost: number;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  createdAt: string;
+  checkedIn?: boolean;
+  // Polymorphic union helper properties
+  date?: string;
+  time?: string;
+  price?: number;
+  serviceName?: string;
+  staffName?: string;
+  category?: string;
+  tableNumber?: number;
+  salonName?: string;
+  restaurantName?: string;
+}
+
+export type Booking = TableBooking | ServiceBooking | HotelBooking;
 
 export interface AIRecommendation {
   summary: string;

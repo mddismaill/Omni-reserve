@@ -191,6 +191,7 @@ export default function InteractiveMapHub({
   }
 
   const isRu = i18n.language === 'ru';
+  const isHy = i18n.language === 'hy';
 
   return (
     <div className="bg-[#16191F] border border-white/5 rounded-2xl p-6 sm:p-8 text-white shadow-xl space-y-6" id="google-maps-dashboard-hub">
@@ -202,11 +203,11 @@ export default function InteractiveMapHub({
               <Navigation className="w-4 h-4 animate-spin-slow" />
             </div>
             <h3 className="font-display font-black text-lg text-white">
-              {isRu ? 'Интерактивная карта OmniHub' : 'OmniHub Interactive Locations'}
+              {isHy ? 'OmniHub ինտերակտիվ քարտեզ' : isRu ? 'Интерактивная карта OmniHub' : 'OmniHub Interactive Locations'}
             </h3>
           </div>
           <p className="text-white/40 text-xs mt-1">
-            {isRu ? 'Выберите премиальный комплекс для просмотра на карте и бронирования' : 'Select a premium location hub to explore coordinates and make instant reservations'}
+            {isHy ? 'Ընտրեք պրեմիում համալիրը քարտեզի վրա դիտելու և ամրագրելու համար' : isRu ? 'Выберите премиальный комплекс для просмотра на карте и бронирования' : 'Select a premium location hub to explore coordinates and make instant reservations'}
           </p>
         </div>
 
@@ -240,10 +241,14 @@ export default function InteractiveMapHub({
                 <MapPin className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
                 <div className="text-left">
                   <span className="text-[10px] font-mono text-white/40 uppercase block font-bold">
-                    {isRu ? 'АДРЕС ХАБА' : 'HUB ADDRESS'}
+                    {isHy ? 'ՀԱԲԻ ՀԱՍՑԵՆ' : isRu ? 'АДРЕС ХАБА' : 'HUB ADDRESS'}
                   </span>
                   <span className="text-xs font-bold text-white leading-tight">
-                    {isRu ? selectedHub.addressRu : selectedHub.addressEn}
+                    {isHy ? (
+                      selectedHub.id === 'belorusskaya-hub' ? 'Լեսնայա փողոց, 5, շին․ 2, Մոսկվա (Դեպո)' :
+                      selectedHub.id === 'prospekt-mira-hub' ? 'Միրայի պողոտա, 42, Մոսկվա (Օլիմպիկ Պլազա)' :
+                      'Բոլշոյ Կոզիխինսկի նրբանցք, 12, Մոսկվա'
+                    ) : isRu ? selectedHub.addressRu : selectedHub.addressEn}
                   </span>
                 </div>
               </div>
@@ -252,10 +257,14 @@ export default function InteractiveMapHub({
                 <Compass className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
                 <div className="text-left">
                   <span className="text-[10px] font-mono text-white/40 uppercase block font-bold">
-                    {isRu ? 'КАК ДОБРАТЬСЯ НА МЕТРО' : 'METRO DIRECTIONS'}
+                    {isHy ? 'ԻՆՉՊԵՍ ՀԱՍՆԵԼ ՄԵՏՐՈՅՈՎ' : isRu ? 'КАК ДОБРАТЬСЯ НА МЕТРО' : 'METRO DIRECTIONS'}
                   </span>
                   <p className="text-[11px] text-white/70 leading-normal">
-                    {isRu ? selectedHub.metroDirectionsRu : selectedHub.metroDirectionsEn}
+                    {isHy ? (
+                      selectedHub.id === 'belorusskaya-hub' ? 'Բելորուսսկայա մետրո (ելք 3): 5 րոպե քայլել Լեսնայա փողոցով:' :
+                      selectedHub.id === 'prospekt-mira-hub' ? 'Պրոսպեկտ Միրա մետրո (ռադիալ), ելք 1: Անցեք ճանապարհը:' :
+                      'Պուշկինսկայա / Մայակովսկայա մետրո: 8 րոպե քայլել նրբանցքներով:'
+                    ) : isRu ? selectedHub.metroDirectionsRu : selectedHub.metroDirectionsEn}
                   </p>
                 </div>
               </div>
@@ -315,14 +324,14 @@ export default function InteractiveMapHub({
               className="px-3 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-orange-500/10 cursor-pointer"
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>{isRu ? 'Заказать Стол' : 'Book Table'}</span>
+              <span>{isHy ? 'Ամրագրել Սեղան' : isRu ? 'Заказать Стол' : 'Book Table'}</span>
             </button>
             <button
               onClick={handleBookService}
               className="px-3 py-2.5 bg-teal-500 hover:bg-teal-400 text-black font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-teal-500/10 cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>{isRu ? 'Записать Услугу' : 'Book Wellness'}</span>
+              <span>{isHy ? 'Ամրագրել Սպա' : isRu ? 'Записать Услугу' : 'Book Wellness'}</span>
             </button>
           </div>
         </div>
@@ -367,7 +376,7 @@ export default function InteractiveMapHub({
                       {HUBS.find(h => h.id === activeMarkerId)?.name}
                     </p>
                     <p className="text-[10px] text-gray-500 mt-0.5">
-                      {isRu ? 'Гастрономический и спа-комплекс OmniReserve' : 'Luxury gastronomic & spa ecosystem'}
+                      {isHy ? 'OmniReserve շքեղ գաստրոնոմիկ և սպա էկոհամակարգ' : isRu ? 'Гастрономический и спа-комплекс OmniReserve' : 'Luxury gastronomic & spa ecosystem'}
                     </p>
                   </div>
                 </InfoWindow>
@@ -386,10 +395,10 @@ export default function InteractiveMapHub({
             </div>
             <div>
               <h4 className="font-display font-bold text-sm text-white">
-                {isRu ? 'Локационный AI-помощник (Grounding)' : 'AI Location Advisor (Maps Grounding)'}
+                {isHy ? 'Տեղորոշման ԱԻ օգնական (Grounding)' : isRu ? 'Локационный AI-помощник (Grounding)' : 'AI Location Advisor (Maps Grounding)'}
               </h4>
               <p className="text-[11px] text-white/50">
-                {isRu ? 'Используйте Gemini 3.5 с поиском по Google Maps для построения маршрутов, изучения окрестностей или парковок.' : 'Query Gemini 3.5 utilizing Google Maps tools to find routes, transit links, local parks, and coordinates.'}
+                {isHy ? 'Օգտագործեք Gemini 3.5-ը Google Maps որոնմամբ՝ երթուղիներ կառուցելու կամ շրջակայքն ուսումնասիրելու համար:' : isRu ? 'Используйте Gemini 3.5 с поиском по Google Maps для построения маршрутов, изучения окрестностей или парковок.' : 'Query Gemini 3.5 utilizing Google Maps tools to find routes, transit links, local parks, and coordinates.'}
               </p>
             </div>
           </div>
@@ -405,6 +414,8 @@ export default function InteractiveMapHub({
             value={groundingQuery}
             onChange={(e) => setGroundingQuery(e.target.value)}
             placeholder={
+              isHy
+                ? `Օրինակ՝ "Ինչպե՞ս գնալ Բելորուսսկայայից մինչև Լեսնայա փողոց 5?" կամ "Որտե՞ղ կայանել Միրա պողոտա 42-ի մոտ:"` :
               isRu
                 ? `Например: "Как проехать от Белорусской до ул. Лесная 5?" или "Где припарковаться у пр-та Мира 42?"`
                 : `e.g. "What sights are near 12 Bolshoy Kozikhinsky?" or "Best walking route from Depo to Belorusskaya Metro"`
@@ -421,7 +432,7 @@ export default function InteractiveMapHub({
             ) : (
               <Sparkles className="w-3.5 h-3.5 text-teal-400" />
             )}
-            <span>{isRu ? 'Спросить ИИ' : 'Ask AI'}</span>
+            <span>{isHy ? 'Հարցնել ԱԻ-ին' : isRu ? 'Спросить ИИ' : 'Ask AI'}</span>
           </button>
         </form>
 
@@ -432,7 +443,7 @@ export default function InteractiveMapHub({
               <div className="py-6 flex flex-col items-center justify-center space-y-2">
                 <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
                 <span className="text-xs text-white/40 font-medium">
-                  {isRu ? 'Gemini исследует карту и строит точный ответ...' : 'Gemini is querying live Maps data for real-time accuracy...'}
+                  {isHy ? 'Gemini-ն ուսումնասիրում է քարտեզը և կառուցում պատասխանը...' : isRu ? 'Gemini исследует карту и строит точный ответ...' : 'Gemini is querying live Maps data for real-time accuracy...'}
                 </span>
               </div>
             ) : groundingError ? (
@@ -451,7 +462,7 @@ export default function InteractiveMapHub({
                 {groundingChunks && groundingChunks.length > 0 && (
                   <div className="border-t border-white/[0.04] pt-3">
                     <span className="text-[10px] text-white/40 font-bold block uppercase tracking-wider mb-2">
-                      {isRu ? 'ПРОВЕРЕННЫЕ ИСТОЧНИКИ GOOGLE MAPS' : 'VERIFIED GOOGLE MAPS SOURCES'}
+                      {isHy ? 'ՎԱՎԵՐԱՑՎԱԾ GOOGLE MAPS ԱՂԲՅՈՒՐՆԵՐ' : isRu ? 'ПРОВЕРЕННЫЕ ИСТОЧНИКИ GOOGLE MAPS' : 'VERIFIED GOOGLE MAPS SOURCES'}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {groundingChunks.map((chunk: any, index: number) => {

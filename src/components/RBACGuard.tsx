@@ -199,6 +199,8 @@ export function SmartRbacDemo() {
     toast.success(
       i18n.language === "ru"
         ? `Столик №${selectedTable.number} успешно забронирован на ваше имя!`
+        : i18n.language === "hy"
+        ? `Սեղան №${selectedTable.number}-ը հաջողությամբ ամրագրվել է ձեր անունով:`
         : `Table #${selectedTable.number} has been reserved successfully!`
     );
   };

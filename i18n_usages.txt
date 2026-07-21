@@ -1,0 +1,214 @@
+185: toast.error(i18n.language === 'ru' ? "Вы можете бронировать столы только в одной зоне за раз." : "You can only book tables in the same room zone at once.");
+1164: const displayDate = d.toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { day: "numeric", month: "short" });
+1429: i18n.language === 'ru'
+1466: `${i18n.language === 'ru' ? 'Номера столов' : 'Table Numbers'}: ${tableNumbersText}`,
+2063: {new Date(n.createdAt).toLocaleTimeString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+2391: {spending.total.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽
+2420: title={`${t('dashboard.diningLabel')}: ${spending.diningTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽`}
+2427: title={`${t('dashboard.wellnessLabel')}: ${spending.wellnessTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽`}
+2442: <span className="text-xs font-bold text-white font-mono">{spending.diningTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+2446: <span className="text-xs font-bold text-white font-mono">{spending.wellnessTotal.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+2803: const dateFormatted = startRaw ? new Date(startRaw).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', {
+2930: <span className="text-sm font-bold text-white font-mono">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+3024: {calendarMonth.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'long', year: 'numeric' })}
+3045: {(i18n.language === 'ru'
+3047: : i18n.language === 'ar'
+3144: <span>{t('dashboard.calendarDayDetailsTitle', { date: new Date(selectedCalendarDay).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' }) })}</span>
+3206: <span className="text-xs font-bold text-white">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+3364: {i18n.language === 'ru'
+3366: : i18n.language === 'ar'
+3396: {i18n.language === 'ru' ? 'Интерактивная 2D/3D схема столов' : i18n.language === 'ar' ? 'مخطط الطاولات التفاعلي ثنائي/ثلاثي الأبعاد' : 'Interactive 2D/3D Table Map'}
+3399: {i18n.language === 'ru' ? 'Выберите нужную зону, рассмотрите расположение столов и кликните на свободный, чтобы забронировать его.' : i18n.language === 'ar' ? 'اختر المنطقة المطلوبة، واعرض موقع الطاولات وانقر على الطاولة الشاغرة لحجزها.' : 'Choose the desired area, view the table layout, and click on an available table to book it.'}
+3409: placeholder={i18n.language === 'ru' ? 'Поиск стола по №...' : i18n.language === 'ar' ? 'البحث عن طاولة برقم...' : 'Search table by #...'}
+3456: <Sliders className="w-3.5 h-3.5 text-teal-400" /> {i18n.language === 'ru' ? 'Фильтры:' : i18n.language === 'ar' ? 'الفلاتر:' : 'Filters:'}
+3465: <option value="0">{i18n.language === 'ru' ? 'Любая вместимость' : i18n.language === 'ar' ? 'أي سعة' : 'Any capacity'}</option>
+3466: <option value="2">{i18n.language === 'ru' ? 'От 2 человек' : i18n.language === 'ar' ? 'من شخصين' : 'From 2 people'}</option>
+3467: <option value="4">{i18n.language === 'ru' ? 'От 4 человек' : i18n.language === 'ar' ? 'من 4 أشخاص' : 'From 4 people'}</option>
+3468: <option value="6">{i18n.language === 'ru' ? 'От 6 человек' : i18n.language === 'ar' ? 'من 6 أشخاص' : 'From 6 people'}</option>
+3469: <option value="8">{i18n.language === 'ru' ? 'От 8 человек' : i18n.language === 'ar' ? 'من 8 أشخاص' : 'From 8 people'}</option>
+3478: <option value="all">{i18n.language === 'ru' ? 'Все типы столов' : i18n.language === 'ar' ? 'جميع أنواع الطاولات' : 'All table types'}</option>
+3498: {i18n.language === 'ru' ? '2D Схема' : i18n.language === 'ar' ? 'مخطط ثنائي الأبعاد' : '2D Layout'}
+3510: {i18n.language === 'ru' ? '3D Зал' : i18n.language === 'ar' ? 'صالة ثلاثية الأبعاد' : '3D Hall'}
+3539: {i18n.language === 'ru'
+3541: : i18n.language === 'ar'
+3554: {i18n.language === 'ru' ? 'симулятор:' : i18n.language === 'ar' ? 'المحاكي:' : 'simulator:'}
+3580: {i18n.language === 'ru' ? 'Поиск' : i18n.language === 'ar' ? 'بحث' : 'Search'} <strong className="text-amber-400">"{tableSearchQuery}"</strong>:
+3582: <> {i18n.language === 'ru' ? 'найдено' : i18n.language === 'ar' ? 'تم العثور على' : 'found'} <strong className="text-white">{matchedTables.length}</strong> {i18n.language === 'ru' ? (matchedTables.length === 1 ? "столик" : "столика(ов)") : i18n.language === 'ar' ? "طاولة" : "table(s)"}</>
+3584: <> {i18n.language === 'ru' ? 'совпадений в этом зале нет' : i18n.language === 'ar' ? 'لا يوجد تطابق في هذه القاعة' : 'no matches in this hall'}</>
+3591: {i18n.language === 'ru' ? 'Быстрый выбор:' : i18n.language === 'ar' ? 'اختيار سريع:' : 'Quick Select:'}
+3628: {i18n.language === 'ru' ? 'Получаем статус столов...' : i18n.language === 'ar' ? 'جاري جلب حالة الطاولات...' : 'Fetching tables status...'}
+3661: {i18n.language === 'ru' ? 'ВХОД / РЕСЕПШН' : i18n.language === 'ar' ? 'المدخل / الاستقبال' : 'ENTRANCE / RECEPTION'}
+3664: {i18n.language === 'ru' ? 'БАРНАЯ ЗОНА' : i18n.language === 'ar' ? 'منطقة البار' : 'BAR ZONE'}
+3668: {i18n.language === 'ru' ? 'ПАНОРАМНЫЕ ОКНА' : i18n.language === 'ar' ? 'نوافذ بانورامية' : 'PANORAMIC WINDOWS'}
+3676: {i18n.language === 'ru' ? 'КАМИННАЯ ЗОНА' : i18n.language === 'ar' ? 'منطقة المدفأة' : 'FIREPLACE ZONE'}
+3684: {i18n.language === 'ru' ? 'ЖИВОПИСНАЯ РЕКА & НАБЕРЕЖНАЯ' : i18n.language === 'ar' ? 'نهر خلاب وكورنيش' : 'PICTURESQUE RIVER & WATERFRONT'}
+3688: {i18n.language === 'ru' ? 'ОТКРЫТЫЙ ВОЗДУХ' : i18n.language === 'ar' ? 'في الهواء الطلق' : 'OPEN AIR'}
+3842: {t.capacity} {i18n.language === "ru" ? "чел" : i18n.language === "ar" ? "أشخاص" : "pax"}
+3873: title={i18n.language === "ru" ? "Приблизить" : i18n.language === "ar" ? "تكبير" : "Zoom In"}
+3880: title={i18n.language === "ru" ? "Отдалить" : i18n.language === "ar" ? "تصغير" : "Zoom Out"}
+3890: title={i18n.language === "ru" ? "Сбросить" : i18n.language === "ar" ? "إعادة تعيين" : "Reset View"}
+3900: {i18n.language === "ru"
+3902: : i18n.language === "ar"
+3935: {i18n.language === 'ru' ? 'Кликните на стол для выбора' : i18n.language === 'ar' ? 'انقر على طاولة للاختيار' : 'Click on table to select'}
+3947: {i18n.language === 'ru' ? 'Параметры визита' : i18n.language === 'ar' ? 'معايير الزيارة' : 'Visit parameters'}
+3950: {i18n.language === 'ru' ? 'Установите дату и время посещения для обновления доступности.' : i18n.language === 'ar' ? 'حدد التاريخ ووقت الزيارة لتحديث التوفر.' : 'Set the date and time of the visit to update availability.'}
+3971: {i18n.language === 'ru' ? 'Время прибытия' : i18n.language === 'ar' ? 'وقت الوصول' : 'Arrival time'}
+3980: <option value="12:00">12:00 ({i18n.language === 'ru' ? 'Обед' : i18n.language === 'ar' ? 'الغداء' : 'Lunch'})</option>
+3981: <option value="13:30">13:30 ({i18n.language === 'ru' ? 'Обед' : i18n.language === 'ar' ? 'الغداء' : 'Lunch'})</option>
+3982: <option value="15:00">15:00 ({i18n.language === 'ru' ? 'День' : i18n.language === 'ar' ? 'بعد الظهر' : 'Afternoon'})</option>
+3983: <option value="17:00">17:00 ({i18n.language === 'ru' ? 'Ранний ужин' : i18n.language === 'ar' ? 'عشاء مبكر' : 'Early dinner'})</option>
+3984: <option value="18:30">18:30 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : '🔥 Premium / High Demand'})</option>
+3985: <option value="19:00">19:00 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : '🔥 Premium / High Demand'})</option>
+3986: <option value="20:30">20:30 ({i18n.language === 'ru' ? '🔥 Премиум / Высокий спрос' : i18n.language === 'ar' ? '🔥 مميز / طلب مرتفع' : '🔥 Premium / High Demand'})</option>
+3987: <option value="22:00">22:00 ({i18n.language === 'ru' ? 'Ночь' : i18n.language === 'ar' ? 'مساءً' : 'Night'})</option>
+4004: ? (i18n.language === 'ru' ? 'ВЫБРАННЫЙ СТОЛИК' : i18n.language === 'ar' ? 'الطاولة المحددة' : 'SELECTED TABLE')
+4005: : (i18n.language === 'ru' ? 'ВЫБРАННЫЙ ПАКЕТ СТОЛОВ' : i18n.language === 'ar' ? 'مجموعة الطاولات المحددة' : 'SELECTED TABLES PACKAGE')
+4011: : `${i18n.language === 'ru' ? 'Столы:' : 'Tables:'} ${selectedTables.map(t => `#${t.number}`).join(', ')}`
+4017: {i18n.language === 'ru' ? 'Удержание:' : i18n.language === 'ar' ? 'حجز مؤقت:' : 'Hold:'} {holdTimer}s
+4023: {totalSelectedPrice} ₽ {i18n.language === 'ru' ? 'депо' : i18n.language === 'ar' ? 'تأمين' : 'deposit'}
+4028: {totalSelectedCapacity} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : 'guests'}
+4057: {i18n.language === 'ru' ? 'ОБЩАЯ ВМЕСТИМОСТЬ' : i18n.language === 'ar' ? 'إجمالي السعة' : 'TOTAL CAPACITY'}
+4060: {i18n.language === 'ru' ? `до ${totalSelectedCapacity} человек` : i18n.language === 'ar' ? `حتى ${totalSelectedCapacity} أشخاص` : `up to ${totalSelectedCapacity} people`}
+4065: {i18n.language === 'ru' ? 'ЗОНА ЗАЛА' : i18n.language === 'ar' ? 'منطقة القاعة' : 'HALL ZONE'}
+4083: {i18n.language === 'ru' ? 'Недостаточно мест!' : 'Over capacity!'}
+4112: {guestsCount} {i18n.language === 'ru' ? 'чел.' : 'guests'}
+4130: placeholder={i18n.language === 'ru' ? 'Например: день рождения жены, нужен детский стул, тихая зона...' : i18n.language === 'ar' ? 'مثال: عيد ميلاد زوجتي، بحاجة لكرسي أطفال، منطقة هادئة...' : 'For example: wife\'s birthday, need high chair, quiet area...'}
+4142: {i18n.language === 'ru' ? 'Высокий спрос (Премиум-слот)' : i18n.language === 'ar' ? 'طلب مرتفع (فترة مميزة)' : 'High Demand (Premium slot)'}
+4145: {i18n.language === 'ru' ? 'В это время наблюдается максимальная нагрузка. К стандартному тарифу стола добавлена наценка +25%.' : i18n.language === 'ar' ? 'يوجد حد أقصى للطلب في هذا الوقت. تمت إضافة رسوم إضافية بنسبة +25% على السعر القياسي للطاولة.' : 'Peak hours load. A +25% surcharge is added to the standard table rate.'}
+4153: <span className="text-white/40">{i18n.language === 'ru' ? 'Сумма депозита:' : i18n.language === 'ar' ? 'مبلغ التأمين:' : 'Deposit amount:'}</span>
+4154: <span className="font-bold text-white font-mono text-base">{totalSelectedPrice.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽</span>
+4159: {i18n.language === 'ru' ? 'Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).' : i18n.language === 'ar' ? 'الرصيد غير كافٍ. يرجى إعادة شحن رصيدك من القائمة العلوية (+).' : 'Insufficient balance. Please top up your balance from the header (+).'}
+4166: {i18n.language === 'ru' ? 'Выберите один или несколько свободных столиков на схеме слева, чтобы начать оформление заказа.' : i18n.language === 'ar' ? 'اختر أي طاولة شاغرة من المخطط على اليسار لبدء الحجز.' : 'Select one or more available tables on the layout on the left to start booking.'}
+4180: ? (i18n.language === 'ru' ? 'Обработка...' : i18n.language === 'ar' ? 'جاري المعالجة...' : 'Processing...')
+4182: ? (i18n.language === 'ru' ? `Забронировать пакет (${selectedTables.length} стола)` : `Book package (${selectedTables.length} tables)`)
+4183: : (i18n.language === 'ru' ? 'Забронировать этот столик' : i18n.language === 'ar' ? 'حجز هذه الطاولة' : 'Book this table'))}
+4202: {i18n.language === 'ru' ? `О заведении ${selectedRestaurant.name}` : i18n.language === 'ar' ? `حول مطعم ${selectedRestaurant.name}` : `About ${selectedRestaurant.name}`}
+4238: {i18n.language === 'ru' ? 'Выберите велнес-салон или бьюти-центр' : i18n.language === 'ar' ? 'اختر صالون عافية أو مركز تجميل' : 'Select a wellness salon or beauty center'}
+4241: {i18n.language === 'ru' ? 'Подарите себе минуты безупречного ухода. Выберите подходящее заведение или зарегистрируйте собственное!' : i18n.language === 'ar' ? 'امنح نفسك لحظات من العناية المثالية. اختر منشأة مناسبة أو سجل منشأتك الخاصة!' : 'Treat yourself to moments of flawless care. Choose a suitable venue or register your own!'}
+4301: {i18n.language === 'ru' ? 'Открыть услуги' : i18n.language === 'ar' ? 'عرض الخدمات' : 'Open Services'}
+4316: title={i18n.language === 'ru' ? 'Назад к списку салонов' : i18n.language === 'ar' ? 'العودة لقائمة الصالونات' : 'Back to salon list'}
+4325: {i18n.language === 'ru' ? 'Категория:' : i18n.language === 'ar' ? 'الفئة:' : 'Category:'} {selectedSalon.category} • {i18n.language === 'ru' ? 'Адрес:' : i18n.language === 'ar' ? 'العنوان:' : 'Address:'} {selectedSalon.address}
+4337: {cat === 'all' ? (i18n.language === 'ru' ? 'Все категории' : i18n.language === 'ar' ? 'جميع الفئات' : 'All categories') : cat}
+4381: <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {service.duration} {i18n.language === 'ru' ? 'мин' : i18n.language === 'ar' ? 'دقيقة' : 'min'}</span>
+4382: <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {service.staff.length} {i18n.language === 'ru' ? 'специалиста' : i18n.language === 'ar' ? 'أخصائيين' : 'specialists'}</span>
+4390: {i18n.language === 'ru' ? 'Стоимость' : i18n.language === 'ar' ? 'السعر' : 'Price'}
+4392: {service.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽
+4401: {i18n.language === 'ru' ? 'Записаться' : i18n.language === 'ar' ? 'حجز' : 'Book Now'}
+4416: {i18n.language === 'ru' ? 'Детали сеанса' : i18n.language === 'ar' ? 'تفاصيل الجلسة' : 'Session details'}
+4419: {i18n.language === 'ru' ? 'Выберите мастера, дату и желаемое время для сеанса.' : i18n.language === 'ar' ? 'اختر المعالج والتاريخ والوقت المطلوب للجلسة.' : 'Select a specialist, date, and preferred time for the session.'}
+4438: <span className="text-[10px] font-mono text-white/40 block mt-0.5">{selectedService.duration} {i18n.language === 'ru' ? 'мин' : i18n.language === 'ar' ? 'دقيقة' : 'min'} • {selectedService.price} ₽</span>
+4445: {i18n.language === 'ru' ? 'Выберите специалиста' : i18n.language === 'ar' ? 'اختر الأخصائي' : 'Select specialist'}
+4479: {i18n.language === 'ru' ? 'Дата сеанса' : i18n.language === 'ar' ? 'تاريخ الجلسة' : 'Session date'}
+4495: {i18n.language === 'ru' ? 'Доступное время' : i18n.language === 'ar' ? 'الوقت المتاح' : 'Available time'}
+4515: {i18n.language === 'ru' ? 'Недостаточно средств на балансе. Пожалуйста, пополните баланс в шапке профиля (+).' : i18n.language === 'ar' ? 'الرصيد غير كافٍ. يرجى إعادة شحن رصيدك من القائمة العلوية (+).' : 'Insufficient balance. Please top up your balance from the header (+).'}
+4522: {i18n.language === 'ru' ? 'Выберите любую услугу в списке слева, чтобы начать оформление визита.' : i18n.language === 'ar' ? 'اختر أي خدمة من القائمة على اليسار لبدء الحجز.' : 'Select any service from the list on the left to start booking your visit.'}
+4536: ? (i18n.language === 'ru' ? 'Запись...' : i18n.language === 'ar' ? 'جاري التسجيل...' : 'Booking...')
+4537: : (i18n.language === 'ru' ? 'Подтвердить запись' : i18n.language === 'ar' ? 'تأكيد الحجز' : 'Confirm appointment')}
+4580: {i18n.language === 'ru' ? 'Персональный ИИ-Консьерж' : i18n.language === 'ar' ? 'المساعد الشخصي الذكي' : 'Personal AI Concierge'}
+4583: {i18n.language === 'ru'
+4649: {i18n.language === 'ru' ? 'Универсальный QR-чекин' : i18n.language === 'ar' ? 'التحقق العالمي عبر رمز QR' : 'Universal QR Check-in'}
+4652: {i18n.language === 'ru' ? 'Карта гостя OmniReserve' : i18n.language === 'ar' ? 'بطاقة ضيف OmniReserve' : 'OmniReserve Guest Pass'}
+4677: {i18n.language === 'ru' ? 'ИМЯ ГОСТЯ:' : i18n.language === 'ar' ? 'اسم الضيف:' : 'GUEST NAME:'}
+4687: {i18n.language === 'ru' ? 'РОЛЬ В СИСТЕМЕ:' : i18n.language === 'ar' ? 'الدور في النظام:' : 'SYSTEM ROLE:'}
+4694: {i18n.language === 'ru' ? 'Предъявите этот QR-код при входе в ресторан или на ресепшн спа-центра для мгновенной регистрации вашего прибытия.' : i18n.language === 'ar' ? 'يرجى تقديم رمز QR هذا عند دخول المطعم أو في مكتب استقبال مركز السبا للتسجيل الفوري لوصولك.' : 'Present this QR code at the entrance of the restaurant or at the spa reception desk for instant check-in.'}
+4732: {i18n.language === 'ru' ? 'QR-код Бронирования' : i18n.language === 'ar' ? 'رمز QR للحجز' : 'Booking QR Code'}
+4758: {i18n.language === 'ru' ? 'НАЗВАНИЕ / ОБЪЕКТ:' : i18n.language === 'ar' ? 'الاسم / الكائن:' : 'NAME / VENUE:'}
+4762: ? (i18n.language === 'ru' ? `Столик #${selectedQrBooking.tableNumber} (Ресторан)` : i18n.language === 'ar' ? `طاولة #${selectedQrBooking.tableNumber} (المطعم)` : `Table #${selectedQrBooking.tableNumber} (Restaurant)`)
+4768: {i18n.language === 'ru' ? 'ДАТА И ВРЕМЯ:' : i18n.language === 'ar' ? 'التاريخ والوقت:' : 'DATE & TIME:'}
+4771: {selectedQrBooking.date} {i18n.language === 'ru' ? 'в' : i18n.language === 'ar' ? 'في' : 'at'} {selectedQrBooking.time}
+4777: {i18n.language === 'ru' ? 'ЗАЛ И ГОСТИ:' : i18n.language === 'ar' ? 'القاعة والضيوف:' : 'ROOM & GUESTS:'}
+4781: ? (i18n.language === 'ru' ? 'Главный' : i18n.language === 'ar' ? 'الرئيسية' : 'Main')
+4784: : (i18n.language === 'ru' ? 'Терраса' : i18n.language === 'ar' ? 'الشرفة' : 'Terrace')
+4785: }, {selectedQrBooking.guests} {i18n.language === 'ru' ? 'чел' : i18n.language === 'ar' ? 'أشخاص' : 'guests'}
+4791: {i18n.language === 'ru' ? 'СПЕЦИАЛИСТ:' : i18n.language === 'ar' ? 'الأخصائي:' : 'SPECIALIST:'}
+4798: {i18n.language === 'ru' ? 'СТАТУС ЧЕКИНА:' : i18n.language === 'ar' ? 'حالة تسجيل الوصول:' : 'CHECK-IN STATUS:'}
+4801: {i18n.language === 'ru' ? 'Ожидает прибытия' : i18n.language === 'ar' ? 'في انتظار الوصول' : 'Awaiting arrival'}
+4807: {i18n.language === 'ru' ? 'Покажите данный код менеджеру или просканируйте его на терминале при входе для автоматической активации визита.' : i18n.language === 'ar' ? 'يرجى إظهار هذا الرمز للمدير أو مسحه ضوئيًا عند المدخل لتفعيل زيارتك تلقائيًا.' : 'Show this code to the manager or scan it at the terminal upon entrance for automatic visit activation.'}
+4843: {i18n.language === 'ru' ? 'Проверка условий перед подтверждением' : i18n.language === 'ar' ? 'التحقق من الشروط قبل التأكيد' : 'Checking terms before confirmation'}
+4859: {i18n.language === 'ru' ? 'Детали заказа' : i18n.language === 'ar' ? 'تفاصيل الطلب' : 'Order details'}
+4886: {confirmModalData.cost.toLocaleString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')} ₽
+4958: {i18n.language === 'ru' ? 'Настройки профиля' : i18n.language === 'ar' ? 'إعدادات الملف الشخصي' : 'Profile Settings'}
+4961: {i18n.language === 'ru' ? 'управление аккаунтом и темой' : i18n.language === 'ar' ? 'إدارة الحساب والمظهر' : 'manage account and theme'}
+4983: {i18n.language === 'ru' ? 'Ваш аккаунт' : i18n.language === 'ar' ? 'حسابك' : 'Your account'}
+4993: {i18n.language === 'ru' ? 'Имя пользователя' : i18n.language === 'ar' ? 'اسم المستخدم' : 'Username'}
+5004: placeholder={i18n.language === 'ru' ? 'Ваше имя' : i18n.language === 'ar' ? 'اسمك' : 'Your name'}
+5011: {i18n.language === 'ru' ? 'Выберите аватар' : i18n.language === 'ar' ? 'اختر صورتك الرمزية' : 'Select avatar'}
+5043: {i18n.language === 'ru' ? 'Детали профиля' : i18n.language === 'ar' ? 'تفاصيل الحساب' : 'Profile Details'}
+5049: <span className="text-white/40">{i18n.language === 'ru' ? 'Роль:' : i18n.language === 'ar' ? 'الدور:' : 'User Role:'}</span>
+5056: ? (i18n.language === 'ru' ? 'Клиент' : i18n.language === 'ar' ? 'عميل' : 'Client')
+5058: ? (i18n.language === 'ru' ? 'Владелец бизнеса' : i18n.language === 'ar' ? 'مالك عمل' : 'Business Owner')
+5065: <span className="text-white/40">{i18n.language === 'ru' ? 'Баланс счета:' : i18n.language === 'ar' ? 'الرصيد:' : 'Account Balance:'}</span>
+5073: <span className="text-white/40">{i18n.language === 'ru' ? 'Компания:' : i18n.language === 'ar' ? 'الشركة:' : 'Business Name:'}</span>
+5078: <span className="text-white/40">{i18n.language === 'ru' ? 'Категория:' : i18n.language === 'ar' ? 'الفئة:' : 'Category:'}</span>
+5088: <span className="text-white/40 block mb-1.5">{i18n.language === 'ru' ? 'Предпочтения:' : i18n.language === 'ar' ? 'التفضيلات:' : 'Preferences:'}</span>
+5102: <span>{i18n.language === 'ru' ? 'СТАТУС: АКТИВЕН' : i18n.language === 'ar' ? 'الحالة: نشط' : 'STATUS: ACTIVE'}</span>
+5111: {i18n.language === 'ru' ? 'Тема оформления' : i18n.language === 'ar' ? 'المظهر' : 'Visual theme'}
+5114: {i18n.language === 'ru' ? 'Выберите визуальное оформление приложения' : i18n.language === 'ar' ? 'اختر المظهر المرئي للتطبيق' : 'Choose application visual appearance'}
+5132: {i18n.language === 'ru' ? 'Темная' : i18n.language === 'ar' ? 'داكن' : 'Dark'}
+5135: {i18n.language === 'ru' ? 'Энергосберегающая' : i18n.language === 'ar' ? 'موفّر للطاقة' : 'Energy saving'}
+5153: {i18n.language === 'ru' ? 'Светлая' : i18n.language === 'ar' ? 'فاتح' : 'Light'}
+5156: {i18n.language === 'ru' ? 'Высококонтрастная' : i18n.language === 'ar' ? 'تباين عالي' : 'High contrast'}
+5169: {i18n.language === 'ru' ? 'Сохранить настройки' : i18n.language === 'ar' ? 'حفظ الإعدادات' : 'Save Settings'}
+5180: {i18n.language === 'ru' ? 'Выйти из аккаунта' : i18n.language === 'ar' ? 'تسجيل الخروج' : 'Log out'}
+5218: {i18n.language === 'ru' ? 'Регистрация бьюти-бизнеса' : i18n.language === 'ar' ? 'تسجيل عمل تجاري جمالي' : 'Beauty business registration'}
+5221: {i18n.language === 'ru' ? 'Создание нового велнес/салонного центра' : i18n.language === 'ar' ? 'إنشاء مركز عافية/صالون جديد' : 'Create new wellness/salon center'}
+5236: {i18n.language === 'ru' ? 'Название заведения *' : i18n.language === 'ar' ? 'اسم المنشأة *' : 'Venue Name *'}
+5243: placeholder={i18n.language === 'ru' ? 'Например: Aura Spa & Wellness' : i18n.language === 'ar' ? 'مثال: Aura Spa & Wellness' : 'Example: Aura Spa & Wellness'}
+5251: {i18n.language === 'ru' ? 'Категория *' : i18n.language === 'ar' ? 'الفئة *' : 'Category *'}
+5265: {i18n.language === 'ru' ? 'Адрес *' : i18n.language === 'ar' ? 'العنوان *' : 'Address *'}
+5272: placeholder={i18n.language === 'ru' ? 'ул. Ленина, д. 45' : i18n.language === 'ar' ? 'شارع السلام، مبنى 45' : '45 Lenin St.'}
+5280: {i18n.language === 'ru' ? 'Краткое описание' : i18n.language === 'ar' ? 'وصف قصير' : 'Brief description'}
+5285: placeholder={i18n.language === 'ru' ? 'Опишите концепцию, удобства и особенности вашего салона...' : i18n.language === 'ar' ? 'صف المفهوم والمرافق والميزات للصالون الخاص بك...' : 'Describe the concept, amenities, and features of your salon...'}
+5293: {i18n.language === 'ru' ? 'Ссылка на фото (URL)' : i18n.language === 'ar' ? 'رابط الصورة (URL)' : 'Photo Link (URL)'}
+5299: placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
+5306: {i18n.language === 'ru' ? 'Первая услуга салона (для старта)' : i18n.language === 'ar' ? 'أول خدمة للصالون (للبدء)' : 'First salon service (to start)'}
+5311: {i18n.language === 'ru' ? 'Название услуги *' : i18n.language === 'ar' ? 'اسم الخدمة *' : 'Service name *'}
+5318: placeholder={i18n.language === 'ru' ? 'Например: Классический шведский массаж' : i18n.language === 'ar' ? 'مثال: تدليك سويدي كلاسيكي' : 'Example: Classic Swedish Massage'}
+5326: {i18n.language === 'ru' ? 'Стоимость (₽) *' : i18n.language === 'ar' ? 'السعر (₽) *' : 'Price (₽) *'}
+5339: {i18n.language === 'ru' ? 'Длительность (мин) *' : i18n.language === 'ar' ? 'المدة (دقيقة) *' : 'Duration (min) *'}
+5359: {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : 'Cancel'}
+5367: ? (i18n.language === 'ru' ? 'Регистрируем…' : i18n.language === 'ar' ? 'جاري التسجيل...' : 'Registering...')
+5368: : (i18n.language === 'ru' ? 'Зарегистрировать салон' : i18n.language === 'ar' ? 'تسجيل الصالون' : 'Register Salon')}
+5405: {i18n.language === 'ru' ? 'Регистрация ресторана / кафе' : i18n.language === 'ar' ? 'تسجيل مطعم / مقهى' : 'Restaurant / Cafe registration'}
+5408: {i18n.language === 'ru' ? 'Создание нового гастрономического пространства' : i18n.language === 'ar' ? 'إنشاء مساحة طهي جديدة' : 'Create new gastronomic space'}
+5423: {i18n.language === 'ru' ? 'Название заведения *' : i18n.language === 'ar' ? 'اسم المنشأة *' : 'Venue Name *'}
+5430: placeholder={i18n.language === 'ru' ? 'Например: Bistro Gusto' : i18n.language === 'ar' ? 'مثال: Bistro Gusto' : 'Example: Bistro Gusto'}
+5438: {i18n.language === 'ru' ? 'Кухня *' : i18n.language === 'ar' ? 'المطبخ *' : 'Cuisine *'}
+5445: placeholder={i18n.language === 'ru' ? 'Европейская, Азиатская, Итальянская' : i18n.language === 'ar' ? 'أوروبية، آسيوية، إيطالية' : 'European, Asian, Italian'}
+5451: {i18n.language === 'ru' ? 'Количество столов для старта *' : i18n.language === 'ar' ? 'عدد الطاولات للبدء *' : 'Number of tables to start *'}
+5467: {i18n.language === 'ru' ? 'Описание концепции' : i18n.language === 'ar' ? 'وصف المفهوم' : 'Concept description'}
+5472: placeholder={i18n.language === 'ru' ? 'Опишите атмосферу, фирменные блюда и особенности заведения...' : i18n.language === 'ar' ? 'صف الأجواء، الأطباق المميزة وميزات المنشأة...' : 'Describe the atmosphere, signature dishes, and features of the venue...'}
+5480: {i18n.language === 'ru' ? 'Ссылка на фото (URL)' : i18n.language === 'ar' ? 'رابط الصورة (URL)' : 'Photo Link (URL)'}
+5486: placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
+5497: {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : 'Cancel'}
+5505: ? (i18n.language === 'ru' ? 'Создаём…' : i18n.language === 'ar' ? 'جاري الإنشاء...' : 'Creating...')
+5506: : (i18n.language === 'ru' ? 'Создать ресторан' : i18n.language === 'ar' ? 'إنشاء مطعم' : 'Create Restaurant')}
+5545: {i18n.language === 'ru' ? 'Синхронизация события' : i18n.language === 'ar' ? 'مزامنة الحدث' : 'Event Synchronization'}
+5563: {i18n.language === 'ru' ? 'Вы собираетесь добавить следующее событие в ваш основной Google Календарь:' : i18n.language === 'ar' ? 'أنت على وشك إضافة الحدث التالي إلى تقويم Google الرئيسي الخاص بك:' : 'You are about to add the following event to your main Google Calendar:'}
+5569: {i18n.language === 'ru' ? 'Название:' : i18n.language === 'ar' ? 'الاسم:' : 'Name:'}
+5573: ? (i18n.language === 'ru'
+5575: : i18n.language === 'ar'
+5583: {i18n.language === 'ru' ? 'Дата и время:' : i18n.language === 'ar' ? 'التاريخ والوقت:' : 'Date & time:'}
+5586: {pendingSyncBooking.date} {i18n.language === 'ru' ? 'в' : i18n.language === 'ar' ? 'في' : 'at'} {pendingSyncBooking.time}
+5591: {i18n.language === 'ru' ? 'Место:' : i18n.language === 'ar' ? 'الموقع:' : 'Location:'}
+5595: ? (i18n.language === 'ru'
+5597: : i18n.language === 'ar'
+5600: : (i18n.language === 'ru'
+5602: : i18n.language === 'ar'
+5609: {i18n.language === 'ru' ? 'Напоминания:' : i18n.language === 'ar' ? 'التذكيرات:' : 'Reminders:'}
+5612: {i18n.language === 'ru' ? 'Всплывающее (30 мин) & Email (2 ч)' : i18n.language === 'ar' ? 'منبثق (30 دقيقة) وبريد إلكتروني (ساعتان)' : 'Popup (30 min) & Email (2 hours)'}
+5625: {i18n.language === 'ru' ? 'Отмена' : i18n.language === 'ar' ? 'إلغاء' : 'Cancel'}
+5636: {i18n.language === 'ru' ? 'Подтвердить запись' : i18n.language === 'ar' ? 'تأكيد الحجز' : 'Confirm reservation'}
+5665: {i18n.language === 'ru' ? 'Через 2 часа' : i18n.language === 'ar' ? 'خلال ساعتين' : 'In 2 hours'}
+5688: {i18n.language === 'ru' ? 'Адрес назначения' : i18n.language === 'ar' ? 'عنوان الوجهة' : 'Destination Address'}
+5697: <strong>{i18n.language === 'ru' ? 'Как добраться:' : i18n.language === 'ar' ? 'كيفية الوصول:' : 'How to get there:'}</strong> {alert.directions}
+5705: {i18n.language === 'ru' ? 'ID брони:' : i18n.language === 'ar' ? 'معرّف الحجز:' : 'Booking ID:'} <strong className="text-white/60">{alert.bookingId}</strong>
+5713: {i18n.language === 'ru' ? 'Понятно' : i18n.language === 'ar' ? 'مفهوم' : 'Got it'}
+5725: {i18n.language === 'ru'
+5727: : i18n.language === 'ar'
+5739: { id: 'ai-assistant' as const, label: i18n.language === 'ru' ? 'ИИ-Консьерж' : i18n.language === 'ar' ? 'المساعد الذكي' : 'AI Assistant', icon: Sparkles },
+5740: { id: 'dashboard' as const, label: i18n.language === 'ru' ? 'Панель' : i18n.language === 'ar' ? 'لوحة التحكم' : 'Dashboard', icon: Grid },
+5741: { id: 'tabletop' as const, label: i18n.language === 'ru' ? 'Столики' : i18n.language === 'ar' ? 'حجز الطاولات' : 'Tabletop', icon: Utensils },
+5742: { id: 'bookly' as const, label: i18n.language === 'ru' ? 'Услуги' : i18n.language === 'ar' ? 'حجز الخدمات' : 'Bookly', icon: Calendar },
+5743: { id: 'rbac' as const, label: i18n.language === 'ru' ? 'Доступ' : i18n.language === 'ar' ? 'الإدارة' : 'RBAC', icon: Sliders },
+5830: title={i18n.language === 'ru' ? 'Чат с OmniConcierge' : 'Chat with OmniConcierge'}

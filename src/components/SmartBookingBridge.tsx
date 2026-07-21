@@ -178,6 +178,8 @@ export default function SmartBookingBridge({
       return `Столик №${selectedTableObj.number} автоматически выбран для вашей группы из ${guestsCount} чел. Нажмите на любой другой свободный столик для изменения.`;
     } else if (i18n.language === "ar") {
       return `تم اختيار الطاولة رقم ${selectedTableObj.number} تلقائياً لمجموعتك المكونة من ${guestsCount} أشخاص. اضغط على أي طاولة شاغرة أخرى للتغيير.`;
+    } else if (i18n.language === "hy") {
+      return `Սեղան №${selectedTableObj.number}-ը ավտոմատ կերպով ընտրվել է ձեր ${guestsCount} հոգանոց խմբի համար: Փոխելու համար սեղմեք ցանկացած այլ ազատ սեղանի:`;
     }
     return `Table #${selectedTableObj.number} has been chosen for your group of ${guestsCount}. Tap another open table to change.`;
   }, [selectedTableObj, guestsCount, i18n.language]);
@@ -241,11 +243,11 @@ export default function SmartBookingBridge({
               <div className="space-y-1 text-left">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-teal-400 bg-teal-500/10 border border-teal-500/15 px-2 py-0.5 rounded">
-                    {i18n.language === "ru" ? "Умный подбор" : "Smart Selection"}
+                    {i18n.language === "ru" ? "Умный подбор" : i18n.language === "hy" ? "Խելացի ընտրություն" : "Smart Selection"}
                   </span>
                   <span className="text-[11px] text-white/50 font-mono font-bold flex items-center gap-1">
                     <Users className="w-3 h-3 text-amber-400" />
-                    {guestsCount} {i18n.language === "ru" ? "мест" : "guests"} ({i18n.language === "ru" ? `макс. ${selectedTableObj.capacity}` : `max ${selectedTableObj.capacity}`})
+                    {guestsCount} {i18n.language === "ru" ? "мест" : i18n.language === "hy" ? "տեղ" : "guests"} ({i18n.language === "ru" ? `макс. ${selectedTableObj.capacity}` : i18n.language === "hy" ? `առավելագույնը ${selectedTableObj.capacity}` : `max ${selectedTableObj.capacity}`})
                   </span>
                 </div>
                 <p className="text-xs text-white/80 leading-relaxed font-sans max-w-[500px]">
@@ -258,7 +260,7 @@ export default function SmartBookingBridge({
               {/* Optional Quick Swap Info Badge */}
               <div className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-white/5 border border-white/5 rounded-xl text-[10px] text-white/40 font-mono">
                 <HelpCircle className="w-3.5 h-3.5 text-white/30" />
-                <span>{i18n.language === "ru" ? "1 Клик Смена" : "1-Click Swap"}</span>
+                <span>{i18n.language === "ru" ? "1 Клик Смена" : i18n.language === "hy" ? "1-Կտտոցով Փոխում" : "1-Click Swap"}</span>
               </div>
 
               <button
@@ -275,8 +277,8 @@ export default function SmartBookingBridge({
                 )}
                 <span>
                   {tableActionLoading
-                    ? (i18n.language === "ru" ? "Оформление..." : "Processing...")
-                    : (i18n.language === "ru" ? "Подтвердить столик" : "Confirm Reservation")}
+                    ? (i18n.language === "ru" ? "Оформление..." : i18n.language === "hy" ? "Ձևակերպում..." : "Processing...")
+                    : (i18n.language === "ru" ? "Подтвердить столик" : i18n.language === "hy" ? "Հաստատել սեղանը" : "Confirm Reservation")}
                 </span>
                 {!tableActionLoading && <ArrowRight className="w-3.5 h-3.5 shrink-0" />}
               </button>

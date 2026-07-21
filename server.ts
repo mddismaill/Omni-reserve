@@ -1777,6 +1777,48 @@ Answer in a refined, elegant tone, in the user's language (default to Russian).`
     }
   });
 
+  // API - Gemini strategic advisor for business optimization
+  app.post("/api/analytics/ai-advisor", requireAuth, async (req, res) => {
+    const { priceMultiplier, volumeTarget, occupancyGoal, language } = req.body;
+    
+    const isRussian = language === 'ru';
+    const isArmenian = language === 'hy';
+    const isArabic = language === 'ar';
+    
+    let languageInstruction = "English";
+    if (isRussian) languageInstruction = "Russian";
+    else if (isArmenian) languageInstruction = "Armenian";
+    else if (isArabic) languageInstruction = "Arabic";
+
+    const prompt = `
+You are an elite business analyst and strategic growth adviser for OmniReserve - a high-end unified luxury hospitality platform.
+Analyze the following simulated/target operational parameters for our business portfolio:
+1. Pricing adjustment multiplier: ${priceMultiplier > 1 ? `+${Math.round((priceMultiplier - 1) * 100)}% premium pricing` : `${Math.round((priceMultiplier - 1) * 100)}% discount/promo pricing`}
+2. Target daily booking volume (combined table + service): ${volumeTarget} bookings per day.
+3. Hotel rooms/suites target occupancy rate: ${occupancyGoal}%.
+
+Under these target conditions, the projected monthly revenue has been estimated.
+Generate a concise, professional, and actionable business strategy review (2-3 short, highly scannable paragraphs) recommending concrete business actions to hit these goals, balance client retention with yield optimization, and improve staff load management.
+Write your response in ${languageInstruction} language. Avoid flowery corporate buzzwords, and provide specific, high-end hospitality recommendations (e.g., dynamic VIP pricing, off-peak wellness packages, exclusive concierge guest privileges).
+`;
+
+    try {
+      const ai = getGeminiClient();
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          systemInstruction: `You are a brilliant revenue management consultant for elite luxury service platforms (restaurants, salons, stays). Provide data-driven, actionable, premium recommendations.`,
+        }
+      });
+      const advice = response.text || "Could not generate advice.";
+      res.json({ advice });
+    } catch (err: any) {
+      console.error("Error generating strategic advice:", err);
+      res.status(500).json({ error: err.message || "Failed to generate AI strategy." });
+    }
+  });
+
   // API - AI Chat Agent for booking help
   app.post("/api/ai/chat", requireAuth, async (req, res) => {
     const { messages } = req.body;

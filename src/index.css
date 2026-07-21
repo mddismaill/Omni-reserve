@@ -171,5 +171,241 @@ html.light, .light {
   animation: fade-in 0.4s ease-out forwards;
 }
 
+/* ==========================================================================
+   HIGH CONTRAST MODE (WCAG 2.1 AAA COMPLIANT ENGINE)
+   ========================================================================== */
+
+/* Dark High-Contrast mode */
+html.high-contrast, .high-contrast {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Base Layout Backgrounds & Cards */
+.high-contrast .bg-\[\#0F1115\],
+.high-contrast .bg-\[\#090A0D\],
+.high-contrast .bg-black\/40,
+.high-contrast .bg-black\/30,
+.high-contrast .bg-\[\#0d0e12\] {
+  background-color: #000000 !important;
+}
+
+.high-contrast .bg-\[\#16191F\],
+.high-contrast .bg-\[\#1a1d24\],
+.high-contrast .bg-white\/\[0\.01\],
+.high-contrast .bg-white\/\[0\.02\],
+.high-contrast .bg-white\/\[0\.03\],
+.high-contrast .bg-white\/5,
+.high-contrast .bg-white\/10 {
+  background-color: #0a0a0a !important;
+  border: 2px solid #ffffff !important;
+}
+
+/* Light Theme High-Contrast Mode */
+html.high-contrast.light, .high-contrast.light {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.high-contrast.light .bg-\[\#0F1115\],
+.high-contrast.light .bg-\[\#090A0D\],
+.high-contrast.light .bg-black\/40,
+.high-contrast.light .bg-black\/30,
+.high-contrast.light .bg-\[\#0d0e12\],
+.high-contrast.light .bg-gray-50\/50,
+.high-contrast.light .bg-gray-100 {
+  background-color: #ffffff !important;
+}
+
+.high-contrast.light .bg-\[\#16191F\],
+.high-contrast.light .bg-\[\#1a1d24\],
+.high-contrast.light .bg-white\/\[0\.01\],
+.high-contrast.light .bg-white\/\[0\.02\],
+.high-contrast.light .bg-white\/\[0\.03\],
+.high-contrast.light .bg-white\/5,
+.high-contrast.light .bg-white\/10 {
+  background-color: #ffffff !important;
+  border: 2px solid #000000 !important;
+}
+
+/* Text Colors */
+.high-contrast .text-white,
+.high-contrast .text-\[\#E2E8F0\],
+.high-contrast .text-white\/90,
+.high-contrast .text-white\/80,
+.high-contrast .text-white\/70,
+.high-contrast .text-white\/60,
+.high-contrast .text-white\/50,
+.high-contrast .text-white\/40,
+.high-contrast .text-white\/30,
+.high-contrast .text-white\/20,
+.high-contrast .text-gray-900,
+.high-contrast .text-gray-800,
+.high-contrast .text-gray-700,
+.high-contrast .text-gray-600,
+.high-contrast .text-gray-500,
+.high-contrast .text-gray-400 {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.high-contrast.light .text-white,
+.high-contrast.light .text-\[\#E2E8F0\],
+.high-contrast.light .text-white\/90,
+.high-contrast.light .text-white\/80,
+.high-contrast.light .text-white\/70,
+.high-contrast.light .text-white\/60,
+.high-contrast.light .text-white\/50,
+.high-contrast.light .text-white\/40,
+.high-contrast.light .text-white\/30,
+.high-contrast.light .text-white\/20,
+.high-contrast.light .text-gray-900,
+.high-contrast.light .text-gray-800,
+.high-contrast.light .text-gray-700,
+.high-contrast.light .text-gray-600,
+.high-contrast.light .text-gray-500,
+.high-contrast.light .text-gray-400 {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+/* Brand Accents and Status elements for high contrast */
+.high-contrast .text-teal-400,
+.high-contrast .text-teal-500,
+.high-contrast .text-emerald-400,
+.high-contrast .text-emerald-500 {
+  color: #00ffff !important; /* Extremely high contrast cyan/aqua */
+  opacity: 1 !important;
+}
+
+.high-contrast.light .text-teal-400,
+.high-contrast.light .text-teal-500,
+.high-contrast.light .text-emerald-400,
+.high-contrast.light .text-emerald-500 {
+  color: #004d4d !important; /* Stark dark green/teal */
+  opacity: 1 !important;
+}
+
+.high-contrast .text-purple-400,
+.high-contrast .text-purple-500,
+.high-contrast .text-violet-400 {
+  color: #ff00ff !important; /* Bright magenta */
+  opacity: 1 !important;
+}
+
+.high-contrast.light .text-purple-400,
+.high-contrast.light .text-purple-500,
+.high-contrast.light .text-violet-400 {
+  color: #4c0099 !important; /* Deep violet */
+  opacity: 1 !important;
+}
+
+.high-contrast .text-amber-400,
+.high-contrast .text-amber-500,
+.high-contrast .text-orange-400 {
+  color: #ffff00 !important; /* Pure yellow */
+  opacity: 1 !important;
+}
+
+.high-contrast.light .text-amber-400,
+.high-contrast.light .text-amber-500,
+.high-contrast.light .text-orange-400 {
+  color: #b25900 !important; /* Deep amber */
+  opacity: 1 !important;
+}
+
+/* Borders and lines */
+.high-contrast .border-white\/10,
+.high-contrast .border-white\/5,
+.high-contrast .border-white\/20,
+.high-contrast .border-white\/15,
+.high-contrast .border-gray-100,
+.high-contrast .border-gray-200 {
+  border-color: #ffffff !important;
+  border-width: 2px !important;
+}
+
+.high-contrast.light .border-white\/10,
+.high-contrast.light .border-white\/5,
+.high-contrast.light .border-white\/20,
+.high-contrast.light .border-white\/15,
+.high-contrast.light .border-gray-100,
+.high-contrast.light .border-gray-200 {
+  border-color: #000000 !important;
+  border-width: 2px !important;
+}
+
+/* Form inputs & interactive elements */
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast select {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  opacity: 1 !important;
+}
+
+.high-contrast.light input,
+.high-contrast.light textarea,
+.high-contrast.light select {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  opacity: 1 !important;
+}
+
+/* Buttons and interactive actions */
+.high-contrast button {
+  border: 2px solid #ffffff !important;
+}
+.high-contrast.light button {
+  border: 2px solid #000000 !important;
+}
+
+/* Enhanced font visibility */
+.high-contrast p,
+.high-contrast span,
+.high-contrast div,
+.high-contrast button,
+.high-contrast h1,
+.high-contrast h2,
+.high-contrast h3,
+.high-contrast h4,
+.high-contrast h5,
+.high-contrast h6,
+.high-contrast label,
+.high-contrast input,
+.high-contrast textarea {
+  text-shadow: none !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Icons & SVGs should be fully stark */
+.high-contrast svg {
+  stroke: currentColor !important;
+}
+
+.high-contrast .bg-teal-500,
+.high-contrast .bg-emerald-500 {
+  background-color: #00ffff !important;
+  color: #000000 !important;
+}
+.high-contrast.light .bg-teal-500,
+.high-contrast.light .bg-emerald-500 {
+  background-color: #004d4d !important;
+  color: #ffffff !important;
+}
+
+/* Focus indicator for keyboard navigation */
+.high-contrast *:focus {
+  outline: 3px solid #ff00ff !important; /* Bright magenta outline for focus */
+  outline-offset: 2px !important;
+}
+.high-contrast.light *:focus {
+  outline: 3px solid #0000ff !important; /* Pure blue outline for focus */
+  outline-offset: 2px !important;
+}
+
+
 
 

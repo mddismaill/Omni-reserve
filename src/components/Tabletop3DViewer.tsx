@@ -30,6 +30,8 @@ interface Tabletop3DViewerProps {
   partySizeFilter: number;
   tableTypeFilter: string;
   tableSearchQuery?: string;
+  isEditable?: boolean;
+  onUpdateTables?: (updated: Table[]) => void;
 }
 
 type TimeOfDay = "day" | "sunset" | "neon_night";
