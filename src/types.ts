@@ -239,5 +239,59 @@ export interface LegalPolicySettings {
   businessRules: string;
   customerRules: string;
   disclaimer: string;
+  crowdfundingTerms: string;
+  crowdfundingEscrow: string;
+  crowdfundingVenueObligations: string;
+}
+
+export type CampaignStatus = 'Pending' | 'Active' | 'Paused' | 'Refunded' | 'Cancelled' | 'Completed';
+export type CampaignCategory = 'Dining' | 'Spa & Wellness' | 'Hotel Expansion' | 'Featured';
+export type VenueTag = 'Tabletop' | 'Bookly' | 'Stays';
+
+export interface InvestmentTier {
+  name: string;
+  amount: number;
+  bonus: string;
+  reward: string;
+  icon?: string;
+}
+
+export interface BudgetAllocation {
+  category: string;
+  percentage: number;
+  amount: number;
+}
+
+export interface CampaignBacker {
+  id: string;
+  userId: string;
+  userName: string;
+  campaignId: string;
+  tierName: string;
+  amount: number;
+  backedAt: string;
+}
+
+export interface CrowdfundingCampaign {
+  id: string;
+  title: string;
+  venueId: string;
+  venueName: string;
+  venueTag: VenueTag;
+  category: CampaignCategory;
+  description: string;
+  shortPitch: string;
+  images: string[];
+  fundingGoal: number;
+  raisedAmount: number;
+  daysRemaining: number;
+  status: CampaignStatus;
+  budgetAllocation: BudgetAllocation[];
+  riskDisclaimer: string;
+  tiers: InvestmentTier[];
+  backers: number;
+  createdAt: string;
+  ownerEmail: string;
+  escrowDeposited?: number;
 }
 

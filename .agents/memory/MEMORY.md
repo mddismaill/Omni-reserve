@@ -1,0 +1,1 @@
+- [App.tsx import corruption](app-import-corruption.md) — The imported App.tsx contained a duplicated/corrupted footer+bottom-nav fragment that broke TypeScript before any edits. It is safe to remove the duplicate fragment and keep the clean footer/nav section at the end of the file.

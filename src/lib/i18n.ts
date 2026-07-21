@@ -9,6 +9,7 @@ const en = {
       tabletop: "Table Layout (Tabletop)",
       bookly: "Book Services (Bookly)",
       stays: "Book Stays (OmniStay 🏨)",
+      invest: "Invest & Back",
       rbac: "🛡️ Management (RBAC)",
       aiAssistant: "AI Assistant (OmniConcierge ✨)",
     },

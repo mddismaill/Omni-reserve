@@ -26,7 +26,12 @@ import {
   Flag,
   ChevronDown,
   Info,
-  Check
+  Check,
+  Landmark,
+  Coins,
+  TrendingUp,
+  Target,
+  Wallet
 } from 'lucide-react';
 import { 
   User as UserType, 
@@ -35,7 +40,9 @@ import {
   LegalPolicySettings, 
   VenueStatus, 
   InfractionSeverity, 
-  InfractionStatus 
+  InfractionStatus,
+  CrowdfundingCampaign,
+  CampaignStatus
 } from '../types';
 
 interface PlatformControlPanelProps {
@@ -46,6 +53,8 @@ interface PlatformControlPanelProps {
   setViolations: React.Dispatch<React.SetStateAction<ComplianceViolation[]>>;
   legalSettings: LegalPolicySettings;
   setLegalSettings: React.Dispatch<React.SetStateAction<LegalPolicySettings>>;
+  campaigns?: CrowdfundingCampaign[];
+  setCampaigns?: React.Dispatch<React.SetStateAction<CrowdfundingCampaign[]>>;
   onOpenTermsModal: () => void;
   onAddNotification: (title: string, message: string, type: 'reminder' | 'offer' | 'status') => void;
 }
@@ -58,11 +67,13 @@ export default function PlatformControlPanel({
   setViolations,
   legalSettings,
   setLegalSettings,
+  campaigns = [],
+  setCampaigns = () => {},
   onOpenTermsModal,
   onAddNotification
 }: PlatformControlPanelProps) {
-  // Main Tab State: 'controls' (Venue Moderation & Violations) vs 'legal' (Terms & Legal Control Center)
-  const [mainTab, setMainTab] = useState<'controls' | 'legal'>('controls');
+  // Main Tab State: 'controls' (Venue Moderation & Violations) vs 'legal' (Terms & Legal Control Center) vs 'crowdfunding'
+  const [mainTab, setMainTab] = useState<'controls' | 'legal' | 'crowdfunding'>('controls');
 
   // Sub-tab for controls: 'venues' vs 'violations'
   const [controlSubTab, setControlSubTab] = useState<'venues' | 'violations'>('venues');
@@ -100,6 +111,13 @@ export default function PlatformControlPanel({
   const [legalSubTab, setLegalSubTab] = useState<'terms' | 'privacy' | 'business' | 'customer' | 'disclaimer'>('terms');
   const [isLegalSaved, setIsLegalSaved] = useState(false);
 
+  // Crowdfunding Moderation State
+  const [campaignSearch, setCampaignSearch] = useState('');
+  const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>('all');
+  const [selectedCampaignForAction, setSelectedCampaignForAction] = useState<CrowdfundingCampaign | null>(null);
+  const [campaignActionType, setCampaignActionType] = useState<'Approve' | 'Pause' | 'Refund' | 'Cancel' | null>(null);
+  const [campaignActionReason, setCampaignActionReason] = useState('');
+
   // Filtered Venues
   const filteredVenues = venues.filter((v) => {
     const matchesSearch = v.name.toLowerCase().includes(venueSearch.toLowerCase()) || 
@@ -125,6 +143,45 @@ export default function PlatformControlPanel({
   const reviewCount = venues.filter(v => v.status === 'Under Review').length;
   const suspendedCount = venues.filter(v => v.status === 'Suspended' || v.status === 'Banned').length;
   const openViolationsCount = violations.filter(v => v.status === 'Open' || v.status === 'Investigating').length;
+
+  // Filtered Campaigns
+  const filteredCampaigns = campaigns.filter((c) => {
+    const matchesSearch = c.title.toLowerCase().includes(campaignSearch.toLowerCase()) ||
+                          c.venueName.toLowerCase().includes(campaignSearch.toLowerCase()) ||
+                          c.ownerEmail.toLowerCase().includes(campaignSearch.toLowerCase());
+    const matchesStatus = campaignStatusFilter === 'all' || c.status === campaignStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const campaignMetrics = {
+    total: campaigns.length,
+    active: campaigns.filter(c => c.status === 'Active').length,
+    pending: campaigns.filter(c => c.status === 'Pending').length,
+    escrowTotal: campaigns.reduce((sum, c) => sum + (c.escrowDeposited || 0), 0)
+  };
+
+  const handleCampaignAction = () => {
+    if (!selectedCampaignForAction || !campaignActionType) return;
+    const newStatus: CampaignStatus =
+      campaignActionType === 'Approve' ? 'Active' :
+      campaignActionType === 'Pause' ? 'Paused' :
+      campaignActionType === 'Refund' ? 'Refunded' :
+      'Cancelled';
+
+    setCampaigns(prev => prev.map(c =>
+      c.id === selectedCampaignForAction.id ? { ...c, status: newStatus } : c
+    ));
+
+    onAddNotification(
+      `Campaign ${campaignActionType}ed`,
+      `"${selectedCampaignForAction.title}" is now ${newStatus}. ${campaignActionReason ? `Reason: ${campaignActionReason}` : ''}`,
+      'status'
+    );
+
+    setSelectedCampaignForAction(null);
+    setCampaignActionType(null);
+    setCampaignActionReason('');
+  };
 
   // Handle Approve Action
   const handleApproveVenue = (venue: VenueModerationItem) => {
@@ -310,6 +367,18 @@ export default function PlatformControlPanel({
           >
             <Scale className="w-4 h-4" />
             <span>2. Terms & Conditions & Legal Center</span>
+          </button>
+
+          <button
+            onClick={() => setMainTab('crowdfunding')}
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2.5 ${
+              mainTab === 'crowdfunding'
+                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Landmark className="w-4 h-4" />
+            <span>3. Crowdfunding Moderation & Escrow</span>
           </button>
         </div>
       </div>
@@ -950,6 +1019,316 @@ export default function PlatformControlPanel({
           </div>
         </div>
       )}
+
+      {/* ==================== TAB 3: CROWDFUNDING MODERATION & ESCROW ==================== */}
+      {mainTab === 'crowdfunding' && (
+        <div className="space-y-8">
+          {/* Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-[#161920] border border-white/10 rounded-2xl p-5 text-white flex items-center justify-between">
+              <div>
+                <span className="text-xs text-white/50 block font-mono">Total Campaigns</span>
+                <span className="text-2xl font-display font-black text-white mt-1 block">{campaignMetrics.total}</span>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="bg-[#161920] border border-white/10 rounded-2xl p-5 text-white flex items-center justify-between">
+              <div>
+                <span className="text-xs text-white/50 block font-mono">Active Campaigns</span>
+                <span className="text-2xl font-display font-black text-emerald-400 mt-1 block">{campaignMetrics.active}</span>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="bg-[#161920] border border-white/10 rounded-2xl p-5 text-white flex items-center justify-between">
+              <div>
+                <span className="text-xs text-white/50 block font-mono">Pending Review</span>
+                <span className="text-2xl font-display font-black text-amber-400 mt-1 block">{campaignMetrics.pending}</span>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <Clock className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="bg-[#161920] border border-white/10 rounded-2xl p-5 text-white flex items-center justify-between">
+              <div>
+                <span className="text-xs text-white/50 block font-mono">Escrow Held</span>
+                <span className="text-2xl font-display font-black text-teal-400 mt-1 block">${campaignMetrics.escrowTotal.toLocaleString()}</span>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+                <Landmark className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-[#161920] border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input
+                type="text"
+                value={campaignSearch}
+                onChange={(e) => setCampaignSearch(e.target.value)}
+                placeholder="Search campaigns, venues, or owner emails..."
+                className="w-full bg-[#12151B] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <select
+              value={campaignStatusFilter}
+              onChange={(e) => setCampaignStatusFilter(e.target.value)}
+              className="bg-[#12151B] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Active">Active</option>
+              <option value="Paused">Paused</option>
+              <option value="Refunded">Refunded</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+
+          {/* Campaigns Table */}
+          <div className="bg-[#161920] border border-white/10 rounded-2xl overflow-hidden">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+              <h3 className="font-display font-bold text-white flex items-center gap-2">
+                <Landmark className="w-5 h-5 text-indigo-400" />
+                Crowdfunding Moderation Queue
+              </h3>
+              <span className="text-[11px] text-white/50 font-mono">{filteredCampaigns.length} campaigns</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#12151B] text-white/50 font-mono uppercase">
+                  <tr>
+                    <th className="px-4 py-3">Campaign</th>
+                    <th className="px-4 py-3">Venue</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Raised / Goal</th>
+                    <th className="px-4 py-3">Escrow</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filteredCampaigns.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-white/40">
+                        No campaigns match the current filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredCampaigns.map((c) => {
+                      const percentage = Math.min(100, Math.round((c.raisedAmount / c.fundingGoal) * 100));
+                      const statusColor =
+                        c.status === 'Active' ? 'emerald' :
+                        c.status === 'Pending' ? 'amber' :
+                        c.status === 'Paused' ? 'amber' :
+                        'red';
+                      return (
+                        <tr key={c.id} className="hover:bg-white/[0.02] transition">
+                          <td className="px-4 py-3">
+                            <div className="font-bold text-white">{c.title}</div>
+                            <div className="text-[10px] text-white/40">{c.daysRemaining} days remaining • {c.backers} backers</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-white/80">{c.venueName}</div>
+                            <div className="text-[10px] text-white/40">{c.venueTag}</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded-full bg-${statusColor}-500/10 border border-${statusColor}-500/30 text-${statusColor}-300 text-[10px] font-mono font-bold uppercase`}>
+                              {c.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-white font-mono">
+                              ${c.raisedAmount.toLocaleString()} / ${c.fundingGoal.toLocaleString()}
+                            </div>
+                            <div className="text-[10px] text-emerald-400">{percentage}% funded</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-white font-mono">${(c.escrowDeposited || 0).toLocaleString()}</div>
+                            <div className="text-[10px] text-white/40">held in escrow</div>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {c.status === 'Pending' && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedCampaignForAction(c);
+                                    setCampaignActionType('Approve');
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 font-bold text-[10px] transition"
+                                >
+                                  Approve
+                                </button>
+                              )}
+                              {(c.status === 'Active' || c.status === 'Pending') && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedCampaignForAction(c);
+                                    setCampaignActionType('Pause');
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 font-bold text-[10px] transition"
+                                >
+                                  Pause
+                                </button>
+                              )}
+                              {(c.status === 'Active' || c.status === 'Paused' || c.status === 'Pending') && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedCampaignForAction(c);
+                                    setCampaignActionType('Refund');
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 font-bold text-[10px] transition"
+                                >
+                                  Refund
+                                </button>
+                              )}
+                              {(c.status === 'Active' || c.status === 'Paused' || c.status === 'Pending') && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedCampaignForAction(c);
+                                    setCampaignActionType('Cancel');
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 font-bold text-[10px] transition"
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Escrow safeguards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl bg-[#161920] border border-white/10 space-y-2">
+              <div className="flex items-center gap-2 text-indigo-400">
+                <Wallet className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">Segregated Escrow</span>
+              </div>
+              <p className="text-[11px] text-white/60 leading-relaxed">
+                All backer funds are held in wallets separated from venue operating accounts. Daily reconciliation is performed by Platform Controls.
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-[#161920] border border-white/10 space-y-2">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">Milestone Release</span>
+              </div>
+              <p className="text-[11px] text-white/60 leading-relaxed">
+                Funds are released to venues in tranches only after verified project milestones and compliance sign-off.
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-[#161920] border border-white/10 space-y-2">
+              <div className="flex items-center gap-2 text-amber-400">
+                <ShieldCheck className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">Refund Authority</span>
+              </div>
+              <p className="text-[11px] text-white/60 leading-relaxed">
+                Super Admins may refund or cancel campaigns that violate platform policy, misrepresent budgets, or fail compliance checks.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== MODAL: CROWDFUNDING ACTION CONFIRMATION ==================== */}
+      <AnimatePresence>
+        {selectedCampaignForAction && campaignActionType && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#161920] border border-white/10 rounded-3xl p-6 w-full max-w-lg text-white space-y-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-xl ${
+                    campaignActionType === 'Approve' ? 'bg-emerald-500/20 text-emerald-400' :
+                    campaignActionType === 'Pause' ? 'bg-amber-500/20 text-amber-400' :
+                    'bg-red-500/20 text-red-400'
+                  }`}>
+                    {campaignActionType === 'Approve' ? <CheckCircle2 className="w-5 h-5" /> :
+                     campaignActionType === 'Pause' ? <PauseCircle className="w-5 h-5" /> :
+                     <Ban className="w-5 h-5" />}
+                  </div>
+                  <h3 className="font-display font-bold text-base">
+                    {campaignActionType} Campaign
+                  </h3>
+                </div>
+                <button onClick={() => { setSelectedCampaignForAction(null); setCampaignActionType(null); }} className="p-2 text-white/40 hover:text-white">
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <p className="text-white/70">
+                  Campaign: <strong className="text-white">{selectedCampaignForAction.title}</strong>
+                </p>
+                <p className="text-white/70">
+                  Venue: <strong className="text-white">{selectedCampaignForAction.venueName}</strong>
+                </p>
+                <p className="text-white/70">
+                  Escrow held: <strong className="text-white">${(selectedCampaignForAction.escrowDeposited || 0).toLocaleString()}</strong>
+                </p>
+                <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/15 text-amber-300 leading-relaxed">
+                  {campaignActionType === 'Approve' && 'This will publish the campaign and allow public backing.'}
+                  {campaignActionType === 'Pause' && 'This will temporarily stop new contributions while keeping escrow intact.'}
+                  {campaignActionType === 'Refund' && 'This will return all escrowed funds to backers and mark the campaign as Refunded.'}
+                  {campaignActionType === 'Cancel' && 'This will cancel the campaign, return escrowed funds to backers, and close the project.'}
+                </div>
+                <div>
+                  <label className="font-mono text-white/70 block mb-1 font-bold">Reason / Audit Note</label>
+                  <textarea
+                    rows={3}
+                    value={campaignActionReason}
+                    onChange={(e) => setCampaignActionReason(e.target.value)}
+                    placeholder="Detail the reason for this moderation action..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setSelectedCampaignForAction(null); setCampaignActionType(null); }}
+                  className="px-4 py-2 rounded-xl bg-white/5 text-white/70 hover:text-white text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCampaignAction}
+                  className={`px-5 py-2 rounded-xl text-black font-extrabold text-xs transition flex items-center gap-1.5 ${
+                    campaignActionType === 'Approve' ? 'bg-emerald-500 hover:bg-emerald-400' :
+                    campaignActionType === 'Pause' ? 'bg-amber-500 hover:bg-amber-400' :
+                    'bg-red-500 hover:bg-red-400'
+                  }`}
+                >
+                  {campaignActionType === 'Approve' && <CheckCircle2 className="w-4 h-4" />}
+                  {campaignActionType === 'Pause' && <PauseCircle className="w-4 h-4" />}
+                  {(campaignActionType === 'Refund' || campaignActionType === 'Cancel') && <Ban className="w-4 h-4" />}
+                  Confirm {campaignActionType}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* ==================== MODAL: MODERATION REASON INPUT (Suspend/Ban) ==================== */}
       <AnimatePresence>

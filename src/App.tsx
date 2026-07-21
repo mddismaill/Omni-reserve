@@ -91,7 +91,8 @@ import {
 import { RefreshCw, Trash2, Link2, ZoomIn, ZoomOut, ShieldAlert, Scale } from "lucide-react";
 import PlatformControlPanel from "./components/PlatformControlPanel";
 import TermsAndConditionsModal from "./components/TermsAndConditionsModal";
-import { VenueModerationItem, ComplianceViolation, LegalPolicySettings } from "./types";
+import InvestAndBack from "./components/InvestAndBack";
+import { VenueModerationItem, ComplianceViolation, LegalPolicySettings, CrowdfundingCampaign } from "./types";
 
 const INITIAL_VENUES: VenueModerationItem[] = [
   {
@@ -224,13 +225,13 @@ const INITIAL_VIOLATIONS: ComplianceViolation[] = [
 ];
 
 const INITIAL_LEGAL_SETTINGS: LegalPolicySettings = {
-  version: "v2.4 - July 2026",
-  lastUpdated: "2026-07-15",
+  version: "v2.5 - July 2026",
+  lastUpdated: "2026-07-21",
   requireReacceptance: false,
-  termsAndConditions: `OMNIRESERVE SUPERAPP - PLATFORM TERMS OF SERVICE (v2.4)
+  termsAndConditions: `OMNIRESERVE SUPERAPP - PLATFORM TERMS OF SERVICE (v2.5)
 
 1. ACCEPTANCE OF TERMS
-By accessing or using OmniReserve (including Tabletop dining reservations, Bookly appointments, and Stay hotel bookings), you agree to be bound by these unified Terms of Service.
+By accessing or using OmniReserve (including Tabletop dining reservations, Bookly appointments, Stay hotel bookings, and Invest & Back crowdfunding), you agree to be bound by these unified Terms of Service.
 
 2. ACCOUNT REGISTRATION & VERIFICATION
 - Users must provide authentic, non-duplicated profile information.
@@ -241,8 +242,12 @@ By accessing or using OmniReserve (including Tabletop dining reservations, Bookl
 - Cancellations made prior to the free cancellation window (minimum 2 hours) are refunded in full.
 
 4. PLATFORM MODERATION & DISPUTE ARBITRATION
-OmniReserve reserves the right to suspend, audit, or ban any venue or user account violating compliance standards.`,
-  privacyPolicy: `OMNIRESERVE DATA PRIVACY POLICY (v2.4)
+OmniReserve reserves the right to suspend, audit, or ban any venue or user account violating compliance standards.
+
+5. CROWDFUNDING & VENUE BACKING
+- Funds contributed through the Invest & Back module are held in escrow by OmniReserve until the campaign reaches its funding goal or a refund/cancellation event is authorized.
+- Backing is not a guaranteed investment; venues assume full responsibility for reward fulfillment and project completion.`,
+  privacyPolicy: `OMNIRESERVE DATA PRIVACY POLICY (v2.5)
 
 1. DATA COLLECTION & PROTECTION
 OmniReserve collects minimal required personal data (name, email, phone number, and reservation logs) strictly for fulfillment of booking requests and loyalty tracking.
@@ -275,8 +280,179 @@ Failing to show up without cancelling at least 1 hour prior results in full depo
 OmniReserve acts as a technology marketplace connecting guests with independent venues. Food quality, spa service execution, and hotel amenities remain the direct liability of the venue.
 
 3.2 ARBITRATION PROTOCOL
-Disputes are mediated by OmniReserve Platform Controls team prior to formal arbitration.`
+Disputes are mediated by OmniReserve Platform Controls team prior to formal arbitration.`,
+  crowdfundingTerms: `CROWDFUNDING & INVESTOR RISK DISCLAIMER
+
+4.1 BACKING IS NOT A GUARANTEED INVESTMENT
+Contributing to a venue crowdfunding campaign through Invest & Back is a voluntary pledge for rewards, not a financial security, equity stake, or guaranteed return. Backers accept the risk that the venue may be unable to complete the project or deliver rewards as described.
+
+4.2 ESCROW & FUND RELEASE POLICY
+All funds are collected into an OmniReserve managed escrow account. Pledged funds are released to the venue only after the campaign reaches its stated funding goal and passes a compliance review. If a campaign fails, is cancelled, or is refunded by the Super Admin, pledged funds are returned to the backer's OmniReserve deposit balance.
+
+4.3 REWARD FULFILLMENT OBLIGATIONS
+Venues must honor all tier rewards to eligible backers once the campaign completes and funds are released. Failure to deliver rewards may result in compliance strikes, suspension from the platform, and mandatory refund processing.`,
+  crowdfundingEscrow: `ESCROW SAFEGUARDS & FINANCIAL COMPLIANCE
+
+5.1 SEGREGATED ESCROW ACCOUNTS
+Crowdfunding proceeds are held in segregated escrow wallets separate from OmniReserve operational funds and venue operating accounts. Daily reconciliation is performed by the Platform Controls team.
+
+5.2 REFUND & CANCELLATION AUTHORITY
+OmniReserve Super Admins reserve the right to pause, refund, or cancel any campaign that violates platform policies, misrepresents its budget, or fails to meet legal compliance requirements. Refunds are credited to the original backer's deposit balance.
+
+5.3 ANTI-MONEY LAUNDERING & KYC
+Venues launching crowdfunding campaigns must pass enhanced identity verification and business documentation review before funds are released. Large tier contributions may trigger additional KYC checks.`,
+  crowdfundingVenueObligations: `VENUE FULFILLMENT OBLIGATIONS FOR BACKERS
+
+6.1 PROJECT COMPLETION TIMELINE
+Venues must publish and adhere to a milestone timeline for the funded expansion. Delays longer than 30 days beyond the communicated timeline must be disclosed to backers through the platform.
+
+6.2 REWARD DELIVERY & REDEMPTION
+Tier rewards (e.g., dining bonuses, VIP tables, concierge access, cashback on deposits) must be tracked in the backer's OmniReserve account and redeemable through the normal booking flow. Venues cannot impose additional charges or redemption restrictions not disclosed in the original campaign.
+
+6.3 DISPUTE RESOLUTION FOR REWARDS
+Disputes over reward delivery are mediated by the Platform Controls team under the same Compliance Violations framework used for booking disputes. Backers may escalate unresolved disputes to formal arbitration after 30 days.`
 };
+
+const INITIAL_CAMPAIGNS: CrowdfundingCampaign[] = [
+  {
+    id: 'campaign-1',
+    title: 'Grand Terrace — Summer Rooftop Expansion',
+    venueId: 'rest-2',
+    venueName: 'Skyline Lounge & Terrace',
+    venueTag: 'Tabletop',
+    category: 'Dining',
+    description: 'Transform our rooftop terrace into a premium summer dining destination with climate-controlled pergolas, an open-air sushi bar, and panoramic city views. Backers will enjoy early access and bonus dining deposits.',
+    shortPitch: 'Help us build the most coveted rooftop table experience in the city.',
+    images: [
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1525610553991-2bede4a236e7?auto=format&fit=crop&w=1200&q=80'
+    ],
+    fundingGoal: 125000,
+    raisedAmount: 67800,
+    daysRemaining: 18,
+    status: 'Active',
+    budgetAllocation: [
+      { category: 'Pergolas & Shade', percentage: 35, amount: 43750 },
+      { category: 'Outdoor Kitchen', percentage: 30, amount: 37500 },
+      { category: 'Furniture & Lighting', percentage: 20, amount: 25000 },
+      { category: 'Permits & Safety', percentage: 15, amount: 18750 }
+    ],
+    riskDisclaimer: 'Rooftop construction is subject to weather, permitting delays, and city zoning approvals. If the project is cancelled, pledged funds will be refunded to your OmniReserve balance.',
+    tiers: [
+      { name: 'Bronze', amount: 100, bonus: '15% bonus on dining deposit', reward: 'Early access to rooftop bookings before public launch.' },
+      { name: 'Gold', amount: 500, bonus: '25% bonus deposit', reward: 'Named VIP Table/Seat for the summer season + Priority Tabletop reservation privilege.' },
+      { name: 'Platinum Partner', amount: 2500, bonus: 'VIP event invites + Personal concierge', reward: 'Lifetime 10% cash-back on all deposits at Grand Terrace.' }
+    ],
+    backers: 124,
+    createdAt: '2026-07-01',
+    ownerEmail: 'elena.skyline@omni.ru',
+    escrowDeposited: 67800
+  },
+  {
+    id: 'campaign-2',
+    title: 'Luxe Spa — Cryo Chamber Launch',
+    venueId: 'salon-1',
+    venueName: 'Luxe Spa & Wellness',
+    venueTag: 'Bookly',
+    category: 'Spa & Wellness',
+    description: 'Install a state-of-the-art cryotherapy chamber and recovery lounge to expand our wellness offerings. Backers unlock priority appointments and complimentary wellness credits.',
+    shortPitch: 'Be first to experience recovery at sub-zero temperatures.',
+    images: [
+      'https://images.unsplash.com/photo-1540555700478-65d2f2ad8f35?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600334089648-b0d9d3025ebf?auto=format&fit=crop&w=1200&q=80'
+    ],
+    fundingGoal: 85000,
+    raisedAmount: 42100,
+    daysRemaining: 24,
+    status: 'Active',
+    budgetAllocation: [
+      { category: 'Cryo Chamber Equipment', percentage: 50, amount: 42500 },
+      { category: 'Recovery Lounge Build', percentage: 25, amount: 21250 },
+      { category: 'Staff Training', percentage: 15, amount: 12750 },
+      { category: 'Safety & Certification', percentage: 10, amount: 8500 }
+    ],
+    riskDisclaimer: 'Medical equipment procurement may experience delivery delays. Luxe Spa will provide alternative wellness credits if the cryo chamber launch is postponed.',
+    tiers: [
+      { name: 'Bronze', amount: 100, bonus: '15% bonus on service deposit', reward: 'Early access to cryo chamber bookings.' },
+      { name: 'Gold', amount: 500, bonus: '25% bonus deposit', reward: 'Named VIP recovery seat + priority Bookly appointment privilege.' },
+      { name: 'Platinum Partner', amount: 2500, bonus: 'VIP wellness events + personal concierge', reward: 'Lifetime 10% cash-back on deposits at Luxe Spa.' }
+    ],
+    backers: 87,
+    createdAt: '2026-07-05',
+    ownerEmail: 'spa.owner@omni.ru',
+    escrowDeposited: 42100
+  },
+  {
+    id: 'campaign-3',
+    title: 'Atrium Oasis — Suite Tower Expansion',
+    venueId: 'hotel-1',
+    venueName: 'The Grand Atrium Oasis',
+    venueTag: 'Stays',
+    category: 'Hotel Expansion',
+    description: 'Expand our boutique hotel with twelve luxury suite rooms featuring in-room spa tubs, private balconies, and smart concierge tablets. Backers receive complimentary nights and upgrade privileges.',
+    shortPitch: 'Invest in the next chapter of luxury stays.',
+    images: [
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80'
+    ],
+    fundingGoal: 320000,
+    raisedAmount: 185000,
+    daysRemaining: 31,
+    status: 'Active',
+    budgetAllocation: [
+      { category: 'Room Construction', percentage: 45, amount: 144000 },
+      { category: 'Spa Fixtures & Tech', percentage: 25, amount: 80000 },
+      { category: 'Interior Design', percentage: 20, amount: 64000 },
+      { category: 'Permits & Inspections', percentage: 10, amount: 32000 }
+    ],
+    riskDisclaimer: 'Hotel construction is subject to permitting, contractor schedules, and material availability. Backers will be notified of milestone delays and may request refunds if the project is cancelled.',
+    tiers: [
+      { name: 'Bronze', amount: 100, bonus: '15% bonus on stay deposit', reward: 'Early access to new suite bookings.' },
+      { name: 'Gold', amount: 500, bonus: '25% bonus deposit', reward: 'Complimentary suite upgrade on your next stay + priority late checkout.' },
+      { name: 'Platinum Partner', amount: 2500, bonus: 'VIP opening invite + personal concierge', reward: 'Lifetime 10% cash-back on all OmniStay deposits at Atrium Oasis.' }
+    ],
+    backers: 215,
+    createdAt: '2026-06-28',
+    ownerEmail: 'hotel.owner@omni.ru',
+    escrowDeposited: 185000
+  },
+  {
+    id: 'campaign-4',
+    title: 'Omni Gourmet — Chef Table Experience',
+    venueId: 'rest-1',
+    venueName: 'Omni Gourmet Dining',
+    venueTag: 'Tabletop',
+    category: 'Featured',
+    description: 'Create an exclusive chef counter with twelve seats, an omakase tasting menu, and live-fire kitchen theater. Backers become founding members of the Chef Circle.',
+    shortPitch: 'Join the founding circle of our most intimate dining experience.',
+    images: [
+      'https://images.unsplash.com/photo-1550966871-3ed3c47e2ce2?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1200&q=80'
+    ],
+    fundingGoal: 95000,
+    raisedAmount: 95000,
+    daysRemaining: 5,
+    status: 'Completed',
+    budgetAllocation: [
+      { category: 'Kitchen Build-Out', percentage: 40, amount: 38000 },
+      { category: 'Chef Counter & Seating', percentage: 30, amount: 28500 },
+      { category: 'Tableware & Glassware', percentage: 20, amount: 19000 },
+      { category: 'Marketing & Launch', percentage: 10, amount: 9500 }
+    ],
+    riskDisclaimer: 'The Chef Table Experience is fully funded. Funds will be released in tranches tied to construction milestones.',
+    tiers: [
+      { name: 'Bronze', amount: 100, bonus: '15% bonus on dining deposit', reward: 'Early reservation window for the first month.' },
+      { name: 'Gold', amount: 500, bonus: '25% bonus deposit', reward: 'Named chef counter seat + priority booking for special events.' },
+      { name: 'Platinum Partner', amount: 2500, bonus: 'VIP opening dinners + personal concierge', reward: 'Lifetime 10% cash-back on deposits at Omni Gourmet.' }
+    ],
+    backers: 156,
+    createdAt: '2026-06-15',
+    ownerEmail: 'alex.owner@omni.ru',
+    escrowDeposited: 95000
+  }
+];
 
 export default function App() {
   // Centralized Supabase session — single source of truth for auth checks.
@@ -302,14 +478,15 @@ export default function App() {
   const [businessDescription, setBusinessDescription] = useState("");
 
   // App core state
-  const [activeModule, setActiveModule] = useState<'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant' | 'stays' | 'analytics' | 'platform'>('ai-assistant');
+  const [activeModule, setActiveModule] = useState<'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant' | 'stays' | 'analytics' | 'platform' | 'invest'>('ai-assistant');
   const [adminPasscode, setAdminPasscode] = useState("");
   const [adminGateError, setAdminGateError] = useState("");
   const [venues, setVenues] = useState<VenueModerationItem[]>(INITIAL_VENUES);
   const [violations, setViolations] = useState<ComplianceViolation[]>(INITIAL_VIOLATIONS);
   const [legalSettings, setLegalSettings] = useState<LegalPolicySettings>(INITIAL_LEGAL_SETTINGS);
+  const [campaigns, setCampaigns] = useState<CrowdfundingCampaign[]>(INITIAL_CAMPAIGNS);
   const [showTermsModal, setShowTermsModal] = useState(false);
-  const [userAcceptedVersion, setUserAcceptedVersion] = useState<string>("v2.4 - July 2026");
+  const [userAcceptedVersion, setUserAcceptedVersion] = useState<string>("v2.5 - July 2026");
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   
@@ -2633,6 +2810,8 @@ export default function App() {
                     setViolations={setViolations}
                     legalSettings={legalSettings}
                     setLegalSettings={setLegalSettings}
+                    campaigns={campaigns}
+                    setCampaigns={setCampaigns}
                     onOpenTermsModal={() => setShowTermsModal(true)}
                     onAddNotification={(title, message) => {
                       toast.success(`${title}: ${message}`);
@@ -5074,6 +5253,16 @@ export default function App() {
                 />
               )}
 
+              {/* G. INVEST & BACK — CROWDFUNDING VENUE MODULE */}
+              {activeModule === 'invest' && (
+                <InvestAndBack
+                  user={user}
+                  campaigns={campaigns}
+                  setCampaigns={setCampaigns}
+                  setUser={setUser}
+                />
+              )}
+
             </main>
 
             {/* Personal Universal QR Pass Modal */}
@@ -6337,40 +6526,6 @@ export default function App() {
               )}
             </AnimatePresence>
 
-            {/* Sticky subtle footer with bottom padding to account for sticky bottom dock */}
-            <footer className="bg-[#0F1115] border-t border-white/5 py-8 text-center text-xs text-white/40 mt-12 pb-28" id="main-footer">
-              <div className="max-w-7xl mx-auto px-4">
-                <p>
-                  {i18n.language === 'ru' ? '© 2026 OmniReserve Booking Superapp. Объединенная            </div>
-
-            {/* Floating OmniConcierge AI Chatbot (Moved slightly higher to avoid overlapping bottom bar) */}/motion.div>
-                ))}
-              </AnimatePresence>
-            </div>             {isActive && (
-                        <motion.div
-                          layoutId="activeTabGlow"
-                          className="absolute -top-[13px] w-12 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full shadow-[0_0_10px_#2dd4bf]"
-                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                        />
-                      )}
-                      
-                      <div className={`p-1.5 rounded-xl transition-transform duration-300 ${
-                        isActive ? "scale-110 text-teal-400 bg-teal-500/10" : "group-hover:scale-105"
-                      }`}>
-                        <Icon className={`w-5 h-5 ${isActive ? "stroke-[2.5px]" : "stroke-[1.8px]"}`} />
-                      </div>
-                      
-                      <span className={`text-[10px] font-medium tracking-tight transition-colors ${
-                        isActive ? "font-bold text-white" : "font-semibold text-white/50"
-                      }`}>
-                        {item.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Floating Upcoming Booking Alerts Toast Center */}
             <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-4 max-w-sm w-full pointer-events-none">
               <AnimatePresence>
@@ -6465,6 +6620,7 @@ export default function App() {
                   { id: 'tabletop' as const, label: i18n.language === 'ru' ? 'Столики' : i18n.language === 'ar' ? 'حجز الطاولات' : i18n.language === 'hy' ? 'Սեղաններ' : 'Tabletop', icon: Utensils },
                   { id: 'bookly' as const, label: i18n.language === 'ru' ? 'Услуги' : i18n.language === 'ar' ? 'حجز الخدمات' : i18n.language === 'hy' ? 'Ծառայություններ' : 'Bookly', icon: Calendar },
                   { id: 'stays' as const, label: i18n.language === 'ru' ? 'Отели' : i18n.language === 'ar' ? 'الفنادق' : i18n.language === 'hy' ? 'Հյուրանոցներ' : 'Stays', icon: HotelIcon },
+                  { id: 'invest' as const, label: i18n.language === 'ru' ? 'Инвестиции' : i18n.language === 'ar' ? 'استثمر' : i18n.language === 'hy' ? 'Ներդրում' : 'Invest & Back', icon: Coins },
                   { id: 'rbac' as const, label: i18n.language === 'ru' ? 'Доступ' : i18n.language === 'ar' ? 'الإدارة' : i18n.language === 'hy' ? 'Հասանելիություն' : 'RBAC', icon: Sliders },
                 ].filter(item => item.id !== 'rbac' || (user && user.role !== 'client')).map((item) => {
                   const isActive = activeModule === item.id;

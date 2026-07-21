@@ -13,7 +13,8 @@ import {
   Lock,
   Sparkles,
   ChevronRight,
-  Scale
+  Scale,
+  TrendingUp
 } from 'lucide-react';
 import { LegalPolicySettings } from '../types';
 
@@ -34,7 +35,7 @@ export default function TermsAndConditionsModal({
   forced = false,
   userAcceptedVersion
 }: TermsAndConditionsModalProps) {
-  const [activeTab, setActiveTab] = useState<'business' | 'customer' | 'disclaimer' | 'full' | 'privacy'>('business');
+  const [activeTab, setActiveTab] = useState<'business' | 'customer' | 'disclaimer' | 'full' | 'privacy' | 'crowdfunding'>('business');
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -126,6 +127,7 @@ export default function TermsAndConditionsModal({
               { id: 'business' as const, label: 'Business Venue Rules', icon: Building2 },
               { id: 'customer' as const, label: 'Customer Rules', icon: UserCheck },
               { id: 'disclaimer' as const, label: 'Platform Disclaimer', icon: ShieldCheck },
+              { id: 'crowdfunding' as const, label: 'Invest & Back', icon: TrendingUp },
               { id: 'full' as const, label: 'Terms of Service', icon: FileText },
               { id: 'privacy' as const, label: 'Privacy Policy', icon: Lock },
             ].map((tab) => {
@@ -301,6 +303,66 @@ export default function TermsAndConditionsModal({
 
                 <div className="p-4 rounded-xl bg-[#1A1E27] border border-white/10 text-xs whitespace-pre-wrap font-mono text-white/70 leading-relaxed">
                   {legalSettings.disclaimer}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'crowdfunding' && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/15">
+                  <h3 className="font-display font-bold text-base text-white mb-1 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-indigo-400" />
+                    Section 4: Crowdfunding & Venue Backing (Invest & Back)
+                  </h3>
+                  <p className="text-xs text-white/60">
+                    Rules governing how users back venue expansion campaigns, how funds are held in escrow, and how venues must fulfill rewards.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                    <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider block">Investor Risk Disclaimer</span>
+                    <h4 className="font-bold text-white text-sm">Backing is Not a Guaranteed Investment</h4>
+                    <p className="text-xs text-white/70">
+                      Contributions are voluntary pledges for rewards, not financial securities, equity stakes, or guaranteed returns. Backers accept the risk that a venue may be unable to complete the project or deliver rewards as described.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                    <span className="text-xs font-mono font-bold text-teal-400 uppercase tracking-wider block">Escrow Policy</span>
+                    <h4 className="font-bold text-white text-sm">Segregated Escrow & Milestone Release</h4>
+                    <p className="text-xs text-white/70">
+                      All funds are collected into an OmniReserve managed escrow account. Pledged funds are released to the venue only after the campaign reaches its funding goal and passes a compliance review.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                    <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider block">Venue Obligations</span>
+                    <h4 className="font-bold text-white text-sm">Reward Fulfillment & Redemption</h4>
+                    <p className="text-xs text-white/70">
+                      Venues must honor all tier rewards to eligible backers once the campaign completes and funds are released. Rewards must be tracked in the backer's account and redeemable through the normal booking flow.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                    <span className="text-xs font-mono font-bold text-red-400 uppercase tracking-wider block">Refund & Cancellation</span>
+                    <h4 className="font-bold text-white text-sm">Platform Refund Authority</h4>
+                    <p className="text-xs text-white/70">
+                      OmniReserve Super Admins may pause, refund, or cancel any campaign that violates platform policies, misrepresents its budget, or fails to meet legal compliance. Refunds are credited to the original backer's deposit balance.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#1A1E27] border border-white/10 text-xs whitespace-pre-wrap font-mono text-white/70 leading-relaxed">
+                  {legalSettings.crowdfundingTerms}
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#1A1E27] border border-white/10 text-xs whitespace-pre-wrap font-mono text-white/70 leading-relaxed">
+                  {legalSettings.crowdfundingEscrow}
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#1A1E27] border border-white/10 text-xs whitespace-pre-wrap font-mono text-white/70 leading-relaxed">
+                  {legalSettings.crowdfundingVenueObligations}
                 </div>
               </div>
             )}

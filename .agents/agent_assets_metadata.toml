@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "PVm64zF2O1A9GsA6JhXm3"
+uri = "file://screenshots/app-home.jpg"
+type = "image"
+title = "OmniReserve app running with Invest & Back module"

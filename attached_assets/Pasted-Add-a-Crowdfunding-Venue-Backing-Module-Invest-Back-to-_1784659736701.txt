@@ -1,0 +1,28 @@
+Add a Crowdfunding & Venue Backing Module (Invest & Back) to the OmniReserve project, integrated into the platform ecosystem alongside the Super Admin and Legal controls.
+
+Implement the following features and UI components:
+
+1. New Navigation Tab: "Invest & Back" (Crowdfunding Platform):
+   - Campaign Showcase Grid: Display active crowdfunding campaigns from venues (e.g., "Grand Terrace — Summer Rooftop Expansion", "Luxe Spa — Cryo Chamber Launch").
+   - Campaign Cards displaying: Target funding goal ($), current raised amount, visually styled percentage progress bar (%), remaining campaign days, and venue tag (Tabletop / Bookly / Stays).
+   - Filter options: "All Projects", "Dining", "Spa & Wellness", "Hotel Expansion", "Featured".
+
+2. Interactive Backing / Tier Selection Modal:
+   - Detailed project pitch, photo gallery, budget allocation breakdown, and risk disclaimers.
+   - Investment Tiers (Rewards):
+     * Tier 1 (Bronze): e.g., $100 — 15% bonus on dining deposit + Early access to bookings.
+     * Tier 2 (Gold): e.g., $500 — 25% bonus deposit + Named VIP Table/Seat + Priority Tabletop reservation privilege.
+     * Tier 3 (Platinum Partner): e.g., $2,500 — VIP event invites + Personal concierge + Lifetime 10% cash-back on deposits.
+   - "Back This Campaign" button integrating directly with the user's Deposit Balance.
+
+3. Super Admin & Legal Oversight for Crowdfunding:
+   - "Crowdfunding Moderation" section in the Platform Control Panel:
+     * Review pending venue funding applications before they go public.
+     * Ability for Super Admin to "Approve", "Pause", or "Refund/Cancel" campaigns.
+     * Escrow safeguards and financial compliance tracking.
+   - Terms & Conditions additions:
+     * Add specific sections in the Terms & Conditions Modal defining Investor Risk Disclaimers, Escrow policies, and Venue fulfillment obligations for backer rewards.
+
+4. Premium UX & Design:
+   - Match the existing dark luxury theme (slate/teal/emerald progress indicators, modern modals, clean badges).
+   - Fully dynamic React state management so campaign contributions immediately update raised amounts, deposit balances, and status badges.
