@@ -195,3 +195,49 @@ export interface Notification {
   linkToModule?: 'dashboard' | 'tabletop' | 'bookly';
 }
 
+export type VenueStatus = 'Active' | 'Under Review' | 'Suspended' | 'Banned';
+
+export interface VenueModerationItem {
+  id: string;
+  name: string;
+  category: string;
+  module: 'tabletop' | 'bookly' | 'stay';
+  ownerName: string;
+  ownerEmail: string;
+  status: VenueStatus;
+  statusReason?: string;
+  rating: number;
+  totalBookings: number;
+  complianceScore: number;
+  lastAuditDate: string;
+  verifiedBadge?: boolean;
+}
+
+export type InfractionSeverity = 'Low' | 'Medium' | 'High' | 'Critical';
+export type InfractionStatus = 'Open' | 'Investigating' | 'Resolved' | 'Action Taken';
+
+export interface ComplianceViolation {
+  id: string;
+  ticketNumber: string;
+  venueId: string;
+  venueName: string;
+  reportedBy: string;
+  type: 'Unilateral Cancellation' | 'Price Manipulation' | 'No-Show Fraud' | 'Quality Complaint' | 'Policy Infraction';
+  severity: InfractionSeverity;
+  description: string;
+  status: InfractionStatus;
+  createdAt: string;
+  resolutionNote?: string;
+}
+
+export interface LegalPolicySettings {
+  version: string;
+  lastUpdated: string;
+  requireReacceptance: boolean;
+  termsAndConditions: string;
+  privacyPolicy: string;
+  businessRules: string;
+  customerRules: string;
+  disclaimer: string;
+}
+

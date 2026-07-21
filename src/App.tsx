@@ -78,6 +78,7 @@ import RestaurantReviews from "./components/RestaurantReviews";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import QRScanner from "./components/QRScanner";
 import WeatherWidget, { WeatherId, weatherPresets } from "./components/WeatherWidget";
+import FullMonthCalendar from "./components/FullMonthCalendar";
 import { 
   initCalendarAuth, 
   googleCalendarSignIn, 
@@ -87,7 +88,195 @@ import {
   deleteGoogleCalendarEvent, 
   CalendarEvent 
 } from "./lib/googleCalendar";
-import { RefreshCw, Trash2, Link2, ZoomIn, ZoomOut } from "lucide-react";
+import { RefreshCw, Trash2, Link2, ZoomIn, ZoomOut, ShieldAlert, Scale } from "lucide-react";
+import PlatformControlPanel from "./components/PlatformControlPanel";
+import TermsAndConditionsModal from "./components/TermsAndConditionsModal";
+import { VenueModerationItem, ComplianceViolation, LegalPolicySettings } from "./types";
+
+const INITIAL_VENUES: VenueModerationItem[] = [
+  {
+    id: "rest-1",
+    name: "Omni Gourmet Dining",
+    category: "Gourmet Restaurant",
+    module: "tabletop",
+    ownerName: "Александр Великий",
+    ownerEmail: "alex.owner@omni.ru",
+    status: "Active",
+    rating: 4.9,
+    totalBookings: 1420,
+    complianceScore: 99,
+    lastAuditDate: "2026-07-01",
+    verifiedBadge: true
+  },
+  {
+    id: "rest-2",
+    name: "Skyline Lounge & Terrace",
+    category: "Pan-Asian Lounge",
+    module: "tabletop",
+    ownerName: "Елена Небо",
+    ownerEmail: "elena.skyline@omni.ru",
+    status: "Active",
+    rating: 4.8,
+    totalBookings: 890,
+    complianceScore: 96,
+    lastAuditDate: "2026-06-28",
+    verifiedBadge: true
+  },
+  {
+    id: "salon-1",
+    name: "Lotus Spa Salon",
+    category: "Spa & Wellness",
+    module: "bookly",
+    ownerName: "Виктор Владелец",
+    ownerEmail: "victor@lotusspa.ru",
+    status: "Active",
+    rating: 4.9,
+    totalBookings: 610,
+    complianceScore: 98,
+    lastAuditDate: "2026-07-05",
+    verifiedBadge: true
+  },
+  {
+    id: "salon-2",
+    name: "Gold Gym Active",
+    category: "Fitness & Active",
+    module: "bookly",
+    ownerName: "Игорь Тренер",
+    ownerEmail: "igor@goldgym.ru",
+    status: "Under Review",
+    statusReason: "Customer complaints regarding schedule overlap",
+    rating: 4.5,
+    totalBookings: 340,
+    complianceScore: 82,
+    lastAuditDate: "2026-07-10",
+    verifiedBadge: false
+  },
+  {
+    id: "salon-3",
+    name: "Dent Clinic Pro",
+    category: "Beauty & Medical",
+    module: "bookly",
+    ownerName: "Анна Мед",
+    ownerEmail: "anna@dentclinic.ru",
+    status: "Suspended",
+    statusReason: "Violation of Section 3.2: Unilateral Booking Cancellation within 1h",
+    rating: 4.1,
+    totalBookings: 180,
+    complianceScore: 68,
+    lastAuditDate: "2026-07-08",
+    verifiedBadge: false
+  },
+  {
+    id: "hotel-1",
+    name: "The Grand Atrium Oasis",
+    category: "Luxury Spa Resort",
+    module: "stay",
+    ownerName: "Мария Оазис",
+    ownerEmail: "maria@grandoasis.com",
+    status: "Active",
+    rating: 4.95,
+    totalBookings: 520,
+    complianceScore: 100,
+    lastAuditDate: "2026-07-12",
+    verifiedBadge: true
+  }
+];
+
+const INITIAL_VIOLATIONS: ComplianceViolation[] = [
+  {
+    id: "vio-101",
+    ticketNumber: "VIO-2026-101",
+    venueId: "salon-3",
+    venueName: "Dent Clinic Pro",
+    reportedBy: "Customer (Dmitry K.)",
+    type: "Unilateral Cancellation",
+    severity: "High",
+    description: "Venue cancelled confirmed service 45 minutes prior without providing alternative slot or instant deposit refund.",
+    status: "Action Taken",
+    createdAt: "2026-07-08",
+    resolutionNote: "Venue suspended for 7 days. Penalty fee of 15% applied."
+  },
+  {
+    id: "vio-102",
+    ticketNumber: "VIO-2026-102",
+    venueId: "salon-2",
+    venueName: "Gold Gym Active",
+    reportedBy: "System Audit Bot",
+    type: "Price Manipulation",
+    severity: "Medium",
+    description: "In-app price listed as 2500 ₽, on-premise checkout requested 3200 ₽ citing unannounced equipment surcharge.",
+    status: "Investigating",
+    createdAt: "2026-07-10"
+  },
+  {
+    id: "vio-103",
+    ticketNumber: "VIO-2026-103",
+    venueId: "rest-2",
+    venueName: "Skyline Lounge & Terrace",
+    reportedBy: "Customer (Elena V.)",
+    type: "Quality Complaint",
+    severity: "Low",
+    description: "Table reserved at window was reassigned to center dining area without prior guest notification.",
+    status: "Resolved",
+    createdAt: "2026-07-04",
+    resolutionNote: "Venue management provided 500 ₽ deposit voucher to guest."
+  }
+];
+
+const INITIAL_LEGAL_SETTINGS: LegalPolicySettings = {
+  version: "v2.4 - July 2026",
+  lastUpdated: "2026-07-15",
+  requireReacceptance: false,
+  termsAndConditions: `OMNIRESERVE SUPERAPP - PLATFORM TERMS OF SERVICE (v2.4)
+
+1. ACCEPTANCE OF TERMS
+By accessing or using OmniReserve (including Tabletop dining reservations, Bookly appointments, and Stay hotel bookings), you agree to be bound by these unified Terms of Service.
+
+2. ACCOUNT REGISTRATION & VERIFICATION
+- Users must provide authentic, non-duplicated profile information.
+- Venue operators must maintain active business credentials and valid tax identification.
+
+3. BOOKING DEPOSITS & WALLET SETTLEMENTS
+- Deposits held in OmniReserve user balances are protected until digital QR check-in or booking completion.
+- Cancellations made prior to the free cancellation window (minimum 2 hours) are refunded in full.
+
+4. PLATFORM MODERATION & DISPUTE ARBITRATION
+OmniReserve reserves the right to suspend, audit, or ban any venue or user account violating compliance standards.`,
+  privacyPolicy: `OMNIRESERVE DATA PRIVACY POLICY (v2.4)
+
+1. DATA COLLECTION & PROTECTION
+OmniReserve collects minimal required personal data (name, email, phone number, and reservation logs) strictly for fulfillment of booking requests and loyalty tracking.
+
+2. THIRD-PARTY DATA ISOLATION
+We do not sell, rent, or trade personal guest data to external marketing agencies. Venue operators receive guest contact details exclusively for reservation fulfillment.
+
+3. ENCRYPTION & COMPLIANCE
+All payment transaction details and database records are encrypted in transit and at rest in compliance with regional data privacy standards.`,
+  businessRules: `BUSINESS OPERATOR & VENUE GOVERNANCE RULES
+
+1.1 REAL-TIME INVENTORY GUARANTEE
+Partner venues must keep real-time slot synchronization active. Artificially closing availability while accepting off-app reservations is prohibited.
+
+1.2 ANTI-CANCELLATION PENALTIES
+Unilateral cancellations within 2 hours of arrival without proven force majeure incur a 15% platform penalty fee and a compliance strike.
+
+1.3 TRANSPARENT PRICING COMMITMENT
+On-premise charges must match in-app prices exactly. Surcharging customers above agreed rates triggers immediate suspension.`,
+  customerRules: `CUSTOMER RESERVATION & NO-SHOW RULES
+
+2.1 ARRIVAL GRACE PERIOD
+Tabletop table reservations are held for exactly 15 minutes past the scheduled time before being released.
+
+2.2 NO-SHOW PENALTY & STRIKES
+Failing to show up without cancelling at least 1 hour prior results in full deposit forfeiture. Accounts accumulating 3 no-show strikes incur temporary reservation locks.`,
+  disclaimer: `PLATFORM LIABILITY DISCLAIMER
+
+3.1 THIRD-PARTY SERVICE QUALITY
+OmniReserve acts as a technology marketplace connecting guests with independent venues. Food quality, spa service execution, and hotel amenities remain the direct liability of the venue.
+
+3.2 ARBITRATION PROTOCOL
+Disputes are mediated by OmniReserve Platform Controls team prior to formal arbitration.`
+};
 
 export default function App() {
   // Centralized Supabase session — single source of truth for auth checks.
@@ -113,7 +302,14 @@ export default function App() {
   const [businessDescription, setBusinessDescription] = useState("");
 
   // App core state
-  const [activeModule, setActiveModule] = useState<'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant' | 'stays' | 'analytics'>('ai-assistant');
+  const [activeModule, setActiveModule] = useState<'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant' | 'stays' | 'analytics' | 'platform'>('ai-assistant');
+  const [adminPasscode, setAdminPasscode] = useState("");
+  const [adminGateError, setAdminGateError] = useState("");
+  const [venues, setVenues] = useState<VenueModerationItem[]>(INITIAL_VENUES);
+  const [violations, setViolations] = useState<ComplianceViolation[]>(INITIAL_VIOLATIONS);
+  const [legalSettings, setLegalSettings] = useState<LegalPolicySettings>(INITIAL_LEGAL_SETTINGS);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [userAcceptedVersion, setUserAcceptedVersion] = useState<string>("v2.4 - July 2026");
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   
@@ -206,6 +402,7 @@ export default function App() {
   const [tabletopTime, setTabletopTime] = useState("19:00");
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [selectedTables, setSelectedTables] = useState<Table[]>([]);
+  const [hoveredSvgTable, setHoveredSvgTable] = useState<Table | null>(null);
 
   // Automatically clear selectedTables if selectedTable becomes null
   useEffect(() => {
@@ -642,6 +839,46 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Listen for /superadmin route in URL pathname or hash
+  useEffect(() => {
+    const handleRouteCheck = () => {
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      if (path === '/superadmin' || path.startsWith('/superadmin') || hash === '#superadmin' || hash === '#/superadmin') {
+        setActiveModule('platform');
+      }
+    };
+
+    handleRouteCheck();
+    window.addEventListener('popstate', handleRouteCheck);
+    window.addEventListener('hashchange', handleRouteCheck);
+    return () => {
+      window.removeEventListener('popstate', handleRouteCheck);
+      window.removeEventListener('hashchange', handleRouteCheck);
+    };
+  }, []);
+
+  const navigateToModule = (mod: 'dashboard' | 'tabletop' | 'bookly' | 'rbac' | 'ai-assistant' | 'stays' | 'analytics' | 'platform') => {
+    setActiveModule(mod);
+    if (mod === 'platform') {
+      if (window.location.pathname !== '/superadmin' && window.location.hash !== '#superadmin') {
+        try {
+          window.history.pushState({}, '', '/superadmin');
+        } catch (e) {
+          window.location.hash = '#superadmin';
+        }
+      }
+    } else {
+      if (window.location.pathname === '/superadmin') {
+        try {
+          window.history.pushState({}, '', '/');
+        } catch (e) {
+          window.location.hash = '';
+        }
+      }
+    }
+  };
+
   // Calendar history view state
   const [bookingHistoryView, setBookingHistoryView] = useState<'list' | 'calendar'>('list');
   const [dateFilter, setDateFilter] = useState<'all' | 'week' | 'month' | 'next_month'>('all');
@@ -699,16 +936,6 @@ export default function App() {
       return true;
     });
   }, [bookings, dateFilter]);
-  const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
-    // Default to July 2026 since mock data has dates in July 2026, or current month if it is already July 2026
-    const now = new Date();
-    if (now.getFullYear() === 2026 && now.getMonth() === 6) {
-      return now;
-    }
-    return new Date(2026, 6, 1);
-  });
-  const [selectedCalendarDay, setSelectedCalendarDay] = useState<string | null>(null);
-
   // Real-time booking alerts state (2 hours before)
   const [upcomingAlerts, setUpcomingAlerts] = useState<{
     id: string;
@@ -1381,64 +1608,6 @@ export default function App() {
     if (!isTableSearchActive || !cleanTableSearchQuery) return [];
     return availableTables.filter(t => t.room === selectedRoom && t.number.toString().includes(cleanTableSearchQuery));
   }, [isTableSearchActive, cleanTableSearchQuery, availableTables, selectedRoom]);
-
-  // Helper to generate the monthly calendar grid
-  const getCalendarDays = () => {
-    const year = calendarMonth.getFullYear();
-    const month = calendarMonth.getMonth();
-
-    // First day of the month
-    const firstDayOfMonth = new Date(year, month, 1);
-    // Day of the week of the first day (0 = Sunday, 1 = Monday, etc.)
-    const firstDayOfWeek = firstDayOfMonth.getDay();
-    // Adjust so that Monday is 0, Sunday is 6
-    const startOffset = (firstDayOfWeek + 6) % 7;
-
-    // Number of days in the current month
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    // Number of days in the previous month
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-    const days = [];
-
-    // Previous month's padding days
-    for (let i = startOffset - 1; i >= 0; i--) {
-      const d = daysInPrevMonth - i;
-      const prevDate = new Date(year, month - 1, d);
-      days.push({
-        dayNumber: d,
-        date: prevDate,
-        isCurrentMonth: false,
-        dateString: `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}-${String(prevDate.getDate()).padStart(2, "0")}`
-      });
-    }
-
-    // Current month's days
-    for (let d = 1; d <= daysInMonth; d++) {
-      const currDate = new Date(year, month, d);
-      days.push({
-        dayNumber: d,
-        date: currDate,
-        isCurrentMonth: true,
-        dateString: `${currDate.getFullYear()}-${String(currDate.getMonth() + 1).padStart(2, "0")}-${String(currDate.getDate()).padStart(2, "0")}`
-      });
-    }
-
-    // Next month's padding days to fill 6 rows (42 cells) or 5 rows (35 cells)
-    const totalCells = days.length <= 35 ? 35 : 42;
-    const remainingCells = totalCells - days.length;
-    for (let d = 1; d <= remainingCells; d++) {
-      const nextDate = new Date(year, month + 1, d);
-      days.push({
-        dayNumber: d,
-        date: nextDate,
-        isCurrentMonth: false,
-        dateString: `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}-${String(nextDate.getDate()).padStart(2, "0")}`
-      });
-    }
-
-    return days;
-  };
 
   // Handle User login
   const handleLogin = (e?: React.FormEvent) => {
@@ -2314,6 +2483,22 @@ export default function App() {
                       <span className="hidden md:inline">{i18n.language === 'ru' ? 'Сканировать QR' : 'Scan QR'}</span>
                     </button>
 
+                    {/* Platform Owner Controls Button */}
+                    {user && user.role === 'platform_admin' && (
+                      <button 
+                        onClick={() => navigateToModule('platform')}
+                        className={`p-2 rounded-xl border transition flex items-center gap-1.5 cursor-pointer text-xs font-bold px-3 ${
+                          activeModule === 'platform'
+                            ? 'bg-amber-500 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                            : 'bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20'
+                        }`}
+                        title="Platform Owner Controls & Governance"
+                      >
+                        <ShieldAlert className="w-4 h-4 shrink-0 text-amber-400" />
+                        <span className="hidden md:inline">Platform Controls</span>
+                      </button>
+                    )}
+
                     {/* Profile Dropdown */}
                     <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                       <div 
@@ -2436,6 +2621,135 @@ export default function App() {
                 )}
               </AnimatePresence>
 
+
+              {/* PLATFORM OWNER CONTROLS & GOVERNANCE */}
+              {activeModule === 'platform' && (
+                user && user.role === 'platform_admin' ? (
+                  <PlatformControlPanel
+                    user={user}
+                    venues={venues}
+                    setVenues={setVenues}
+                    violations={violations}
+                    setViolations={setViolations}
+                    legalSettings={legalSettings}
+                    setLegalSettings={setLegalSettings}
+                    onOpenTermsModal={() => setShowTermsModal(true)}
+                    onAddNotification={(title, message) => {
+                      toast.success(`${title}: ${message}`);
+                    }}
+                  />
+                ) : (
+                  <div className="max-w-xl mx-auto py-16 px-4">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-[#12141A] border border-amber-500/30 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-left"
+                    >
+                      <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                      
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                          <ShieldAlert className="w-7 h-7" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase block">
+                            RESTRICTED ROUTE • /superadmin
+                          </span>
+                          <h2 className="text-xl font-display font-extrabold text-white">
+                            {i18n.language === 'ru' ? 'Вход для Администраторов OmniReserve' : 'OmniReserve Admin Portal Access'}
+                          </h2>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-white/70 leading-relaxed mb-6">
+                        {i18n.language === 'ru' 
+                          ? 'Модуль управления платформой предназначен исключительно для главных администраторов OmniReserve. Здесь осуществляется модерация заведений, разрешение жалоб, настройка комиссий и юридических оферт.'
+                          : 'The Platform Controls module is strictly reserved for OmniReserve platform operators. Access allows venue verification, complaint arbitration, commission tier management, and TOS policy updates.'}
+                      </p>
+
+                      <form 
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (adminPasscode.trim() === "2026" || adminPasscode.trim().toLowerCase() === "admin") {
+                            setUser({
+                              id: 'admin-owner',
+                              name: 'OmniReserve Superadmin',
+                              email: 'owner@omnireserve.io',
+                              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+                              role: 'platform_admin',
+                              balance: 100000
+                            });
+                            setAdminPasscode("");
+                            setAdminGateError("");
+                            toast.success(i18n.language === 'ru' ? 'Авторизован как Суперадминистратор OmniReserve' : 'Authorized as OmniReserve Platform Admin');
+                          } else {
+                            setAdminGateError(i18n.language === 'ru' ? 'Неверный пароль администратора (по умолчанию: 2026)' : 'Invalid admin passcode (default: 2026)');
+                          }
+                        }}
+                        className="space-y-4"
+                      >
+                        <div>
+                          <label className="block text-xs font-semibold text-white/60 mb-1.5">
+                            {i18n.language === 'ru' ? 'Пароль администратора:' : 'Admin Passcode:'}
+                          </label>
+                          <input 
+                            type="password"
+                            value={adminPasscode}
+                            onChange={(e) => {
+                              setAdminPasscode(e.target.value);
+                              setAdminGateError("");
+                            }}
+                            placeholder={i18n.language === 'ru' ? 'Введите пароль (2026)' : 'Enter passcode (2026)'}
+                            className="w-full px-4 py-3 rounded-xl bg-[#090A0D] border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-amber-500 font-mono"
+                          />
+                          {adminGateError && (
+                            <p className="text-xs text-rose-400 mt-1.5 font-medium">{adminGateError}</p>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                          <button
+                            type="submit"
+                            className="flex-1 py-3 px-4 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs rounded-xl transition shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-2"
+                          >
+                            <ShieldAlert className="w-4 h-4" />
+                            <span>{i18n.language === 'ru' ? 'Войти как Суперадминистратор' : 'Authenticate as Admin'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUser({
+                                id: 'admin-owner',
+                                name: 'OmniReserve Superadmin',
+                                email: 'owner@omnireserve.io',
+                                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+                                role: 'platform_admin',
+                                balance: 100000
+                              });
+                              setAdminGateError("");
+                              toast.success(i18n.language === 'ru' ? 'Переключено на аккаунт Суперадминистратора' : 'Switched to Platform Admin Profile');
+                            }}
+                            className="py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-xs rounded-xl transition cursor-pointer"
+                          >
+                            {i18n.language === 'ru' ? 'Демо-вход (1-клик)' : 'Quick Demo Unlock'}
+                          </button>
+                        </div>
+                      </form>
+
+                      <div className="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-white/40">
+                        <span>Route: <code className="text-amber-400/80">/superadmin</code></span>
+                        <button
+                          onClick={() => navigateToModule('ai-assistant')}
+                          className="hover:text-white transition cursor-pointer underline underline-offset-2"
+                        >
+                          {i18n.language === 'ru' ? '← На главную' : '← Return to App'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  </div>
+                )
+              )}
 
               {/* ANALYTICS & REVENUE DASHBOARD */}
               {activeModule === 'analytics' && (
@@ -3261,231 +3575,24 @@ export default function App() {
                         </div>
                       )
                     ) : (
-                      /* Calendar view container */
-                      <div className="p-4 sm:p-6 space-y-6 bg-[#16191F]">
-                        {/* Month navigation and details */}
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-4">
-                          <div className="flex items-center gap-2">
-                            <button 
-                              onClick={() => {
-                                const prev = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
-                                setCalendarMonth(prev);
-                                setSelectedCalendarDay(null);
-                              }}
-                              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white text-white/60 transition cursor-pointer"
-                              title={t('dashboard.prevMonthTooltip')}
-                            >
-                              <ChevronLeft className="w-4 h-4" />
-                            </button>
-                            <span className="font-display font-bold text-sm text-white capitalize min-w-[120px] text-center">
-                              {calendarMonth.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', { month: 'long', year: 'numeric' })}
-                            </span>
-                            <button 
-                              onClick={() => {
-                                const next = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
-                                setCalendarMonth(next);
-                                setSelectedCalendarDay(null);
-                              }}
-                              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white text-white/60 transition cursor-pointer"
-                              title={t('dashboard.nextMonthTooltip')}
-                            >
-                              <ChevronRight className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <span className="text-[10px] font-mono text-white/40 text-left sm:text-right">
-                            {t('dashboard.calendarCellHint')}
-                          </span>
-                        </div>
-
-                        {/* Weekday Labels */}
-                        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] sm:text-xs font-bold text-white/40 uppercase tracking-wider">
-                          {(i18n.language === 'ru' ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] : i18n.language === 'ar' ? ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'] : i18n.language === 'hy' ? ['Երկ', 'Երք', 'Չոր', 'Հնգ', 'Ուրբ', 'Շաբ', 'Կիր'] : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']).map(day => (
-                            <div key={day} className="py-2">{day}</div>
-                          ))}
-                        </div>
-
-                        {/* Days Grid */}
-                        <div className="grid grid-cols-7 gap-1 sm:gap-2">
-                          {getCalendarDays().map((cell, idx) => {
-                            const cellBookings = bookings.filter(b => b.date === cell.dateString);
-                            const hasBookings = cellBookings.length > 0;
-                            const isSelected = selectedCalendarDay === cell.dateString;
-                            const isToday = cell.dateString === new Date().toISOString().split('T')[0];
-
-                            // Check types of bookings on this day for color code styling
-                            const hasTable = cellBookings.some(b => b.type === 'table');
-                            const hasService = cellBookings.some(b => b.type === 'service');
-
-                            return (
-                              <button
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedCalendarDay(isSelected ? null : cell.dateString);
-                                }}
-                                className={`min-h-[70px] sm:min-h-[90px] p-2 rounded-xl border text-left flex flex-col justify-between transition relative overflow-hidden group cursor-pointer ${
-                                  !cell.isCurrentMonth 
-                                    ? 'bg-[#0F1115]/30 border-white/[0.02] text-white/10' 
-                                    : isSelected
-                                      ? 'bg-teal-500/10 border-teal-500 text-white shadow-lg shadow-teal-500/5'
-                                      : hasBookings
-                                        ? 'bg-white/[0.02] border-white/10 hover:border-white/20 text-white'
-                                        : 'bg-white/[0.01] border-white/5 hover:border-white/10 text-white/70'
-                                } ${isToday ? 'ring-1 ring-teal-400/30' : ''}`}
-                              >
-                                {/* Date Number */}
-                                <div className="flex items-center justify-between w-full">
-                                  <span className={`text-[11px] font-mono font-bold ${
-                                    isToday 
-                                      ? 'bg-teal-500 text-black w-5 h-5 rounded-full flex items-center justify-center font-extrabold shadow-sm' 
-                                      : !cell.isCurrentMonth
-                                        ? 'text-white/20'
-                                        : 'text-white/80'
-                                  }`}>
-                                    {cell.dayNumber}
-                                  </span>
-
-                                  {/* Dots or Mini Indicators for Mobile / Compact View */}
-                                  <div className="flex gap-1">
-                                    {hasTable && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />}
-                                    {hasService && <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />}
-                                  </div>
-                                </div>
-
-                                {/* Booking Labels inside cells (Desktop/Wide screens) */}
-                                <div className="hidden sm:flex flex-col gap-1 mt-1.5 w-full overflow-hidden">
-                                  {cellBookings.slice(0, 2).map((b) => {
-                                    const bTable = b.type === 'table';
-                                    return (
-                                      <div 
-                                        key={b.id} 
-                                        className={`text-[9px] font-medium px-1.5 py-0.5 rounded-md truncate border text-left ${
-                                          bTable 
-                                            ? 'bg-orange-500/10 text-orange-300 border-orange-500/20' 
-                                            : 'bg-teal-500/10 text-teal-300 border-teal-500/20'
-                                        }`}
-                                        title={bTable ? t('tabletop.tableNumber', { n: b.tableNumber }) : b.serviceName}
-                                      >
-                                        <span className="mr-0.5">{bTable ? '🍽️' : '🌸'}</span>
-                                        {bTable ? t('tabletop.tableNumber', { n: b.tableNumber }) : b.serviceName}
-                                      </div>
-                                    );
-                                  })}
-                                  {cellBookings.length > 2 && (
-                                    <div className="text-[8px] text-white/40 font-mono pl-1">
-                                      {t('dashboard.moreBookingsCount', { count: cellBookings.length - 2 })}
-                                    </div>
-                                  )}
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Selected day details panel */}
-                        <AnimatePresence mode="wait">
-                          {selectedCalendarDay && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
-                              className="mt-6 p-4 rounded-2xl bg-[#0F1115] border border-white/5 space-y-4"
-                            >
-                              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                                <h4 className="font-display font-bold text-xs text-white uppercase tracking-wider flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-teal-400" />
-                                  <span>{t('dashboard.calendarDayDetailsTitle', { date: new Date(selectedCalendarDay).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' }) })}</span>
-                                </h4>
-                                <button 
-                                  onClick={() => setSelectedCalendarDay(null)}
-                                  className="text-white/40 hover:text-white"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </div>
-
-                              {bookings.filter(b => b.date === selectedCalendarDay).length === 0 ? (
-                                <p className="text-center py-6 text-xs text-white/40">{t('dashboard.noBookingsOnDay')}</p>
-                              ) : (
-                                <div className="space-y-3">
-                                  {bookings.filter(b => b.date === selectedCalendarDay).map((booking) => {
-                                    const isTable = booking.type === "table";
-                                    return (
-                                      <div 
-                                        key={booking.id} 
-                                        className="p-4 rounded-xl border border-white/5 bg-white/[0.01] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-left"
-                                      >
-                                        <div className="flex items-start gap-3">
-                                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-base shrink-0 border ${
-                                            isTable 
-                                              ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' 
-                                              : 'bg-teal-500/10 text-teal-400 border-teal-500/20'
-                                          }`}>
-                                            {isTable ? "🍽️" : "🌸"}
-                                          </div>
-                                          <div>
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                              <span className="font-semibold text-xs text-white">
-                                                {isTable ? `Столик #${booking.tableNumber} в ${(booking as any).restaurantName || 'Grand Atelier'}` : booking.serviceName}
-                                              </span>
-                                              <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
-                                                isTable 
-                                                  ? 'bg-orange-500/15 text-orange-400 border border-orange-500/20' 
-                                                  : 'bg-teal-500/15 text-teal-400 border border-teal-500/20'
-                                              }`}>
-                                                {isTable ? "Tabletop" : "Bookly"}
-                                              </span>
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-x-3 mt-1 text-[11px] text-white/40">
-                                              <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {booking.time}</span>
-                                              {isTable ? (
-                                                <>
-                                                  <span>{t('dashboard.roomLabel', { room: booking.room === 'main' ? t('dashboard.roomMain') : booking.room === 'vip' ? t('dashboard.roomVip') : t('dashboard.roomTerrace') })}</span>
-                                                  <span>{t('dashboard.guestsCount', { count: booking.guests })}</span>
-                                                </>
-                                              ) : (
-                                                <>
-                                                  <span>{t('dashboard.specialistName', { name: booking.staffName })}</span>
-                                                  <TagCategory category={booking.category} />
-                                                </>
-                                              )}
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5 font-mono">
-                                          <div className="text-left sm:text-right">
-                                            <span className="text-[9px] text-white/30 block">{t('dashboard.costLabel')}</span>
-                                            <span className="text-xs font-bold text-white">{booking.price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'hy' ? 'hy-AM' : 'en-US')} ₽</span>
-                                          </div>
-
-                                          <button 
-                                            onClick={() => {
-                                              if (confirm(t('dashboard.cancelBookingConfirm'))) {
-                                                setUser({ ...user, balance: user.balance + booking.price });
-                                                setBookings(bookings.filter(b => b.id !== booking.id));
-                                                setBookingSuccessMsg(t('dashboard.cancelBookingSuccess'));
-                                                // If that was the last booking on this day, collapse panel
-                                                const remainingOnDay = bookings.filter(b => b.id !== booking.id && b.date === selectedCalendarDay);
-                                                if (remainingOnDay.length === 0) {
-                                                  setSelectedCalendarDay(null);
-                                                }
-                                              }
-                                            }}
-                                            className="p-1.5 border border-white/10 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400 rounded-lg text-white/40 transition cursor-pointer"
-                                            title={t('dashboard.cancelBookingTooltip')}
-                                          >
-                                            <X className="w-3.5 h-3.5" />
-                                          </button>
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
+                      <FullMonthCalendar
+                        bookings={bookings}
+                        theme={theme}
+                        user={user}
+                        setUser={setUser}
+                        setBookings={setBookings}
+                        isGoogleCalendarConnected={isGoogleCalendarConnected}
+                        syncedBookingIds={syncedBookingIds}
+                        autoSyncToCalendar={autoSyncToCalendar}
+                        isCalendarLoading={isCalendarLoading}
+                        handleUnsyncBooking={handleUnsyncBooking}
+                        triggerSyncBooking={triggerSyncBooking}
+                        triggerUpcomingBookingAlert={triggerUpcomingBookingAlert}
+                        trigger30MinBrowserNotification={trigger30MinBrowserNotification}
+                        copiedBookingId={copiedBookingId}
+                        handleShare={handleShare}
+                        setBookingSuccessMsg={setBookingSuccessMsg}
+                      />
                     )}
                   </div>
 
@@ -3674,21 +3781,21 @@ export default function App() {
                             <div className="flex rounded-xl bg-white/5 p-1 border border-white/5">
                               <button 
                                 type="button"
-                                onClick={() => { setSelectedRoom('main'); setSelectedTable(null); }}
+                                onClick={() => { setSelectedRoom('main'); setSelectedTable(null); setHoveredSvgTable(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${selectedRoom === 'main' ? 'bg-white/10 text-white shadow-xs' : 'text-white/40 hover:text-white'}`}
                               >
                                 {selectedRestaurant.rooms.main}
                               </button>
                               <button 
                                 type="button"
-                                onClick={() => { setSelectedRoom('vip'); setSelectedTable(null); }}
+                                onClick={() => { setSelectedRoom('vip'); setSelectedTable(null); setHoveredSvgTable(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${selectedRoom === 'vip' ? 'bg-white/10 text-white shadow-xs' : 'text-white/40 hover:text-white'}`}
                               >
                                 {selectedRestaurant.rooms.vip}
                               </button>
                               <button 
                                 type="button"
-                                onClick={() => { setSelectedRoom('terrace'); setSelectedTable(null); }}
+                                onClick={() => { setSelectedRoom('terrace'); setSelectedTable(null); setHoveredSvgTable(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${selectedRoom === 'terrace' ? 'bg-white/10 text-white shadow-xs' : 'text-white/40 hover:text-white'}`}
                               >
                                 {selectedRestaurant.rooms.terrace}
@@ -3993,11 +4100,44 @@ export default function App() {
                                         });
                                       }
 
+                                      // Status label & ARIA label calculation for accessibility and screen readers
+                                      let statusLabel = i18n.language === 'ru' ? 'Свободен' : i18n.language === 'ar' ? 'متاح' : i18n.language === 'hy' ? 'Ազատ է' : 'Available';
+                                      if (isBooked) {
+                                        statusLabel = i18n.language === 'ru' ? 'Забронирован' : i18n.language === 'ar' ? 'محجوز' : i18n.language === 'hy' ? 'Ամրագրված է' : 'Reserved';
+                                      } else if (isSelected) {
+                                        statusLabel = i18n.language === 'ru' ? 'Выбран' : i18n.language === 'ar' ? 'محدد' : i18n.language === 'hy' ? 'Ընտրված է' : 'Selected';
+                                      }
+
+                                      const tableAriaLabel = i18n.language === 'ru'
+                                        ? `Столик номер ${t.number}, Вместимость ${t.capacity} человек, Статус: ${statusLabel}`
+                                        : i18n.language === 'ar'
+                                          ? `طاولة رقم ${t.number}، السعة ${t.capacity} أشخاص، الحالة: ${statusLabel}`
+                                          : i18n.language === 'hy'
+                                            ? `Սեղան համար ${t.number}, Տարողություն ${t.capacity} անձ, Կարգավիճակ՝ ${statusLabel}`
+                                            : `Table number ${t.number}, Capacity ${t.capacity} guests, Status: ${statusLabel}`;
+
                                       return (
                                         <g 
                                           key={t.id} 
-                                          className={`${isBooked ? 'cursor-not-allowed' : 'cursor-pointer'} transition group`}
+                                          role="button"
+                                          tabIndex={0}
+                                          aria-label={tableAriaLabel}
+                                          aria-disabled={isBooked}
+                                          aria-pressed={isSelected}
+                                          className={`${isBooked ? 'cursor-not-allowed' : 'cursor-pointer'} transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400`}
                                           opacity={isTableSearchActive && cleanTableSearchQuery ? (isMatch ? 1 : 0.25) : 1}
+                                          onMouseEnter={() => setHoveredSvgTable(t)}
+                                          onMouseLeave={() => setHoveredSvgTable(null)}
+                                          onFocus={() => setHoveredSvgTable(t)}
+                                          onBlur={() => setHoveredSvgTable(null)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                              e.preventDefault();
+                                              if (!isBooked) {
+                                                handleTableSelectToggle(t);
+                                              }
+                                            }
+                                          }}
                                           onClick={(e) => {
                                             if (hasMoved) {
                                               e.preventDefault();
@@ -4034,7 +4174,14 @@ export default function App() {
                                               stroke={strokeColor}
                                               strokeWidth={isMatch ? "5" : isSelected ? "4" : "3"}
                                               className={`transition-all duration-300 filter ${isMatch ? 'animate-pulse' : ''}`}
-                                              whileHover={isBooked ? {} : { scale: 1.06, filter: "brightness(1.15)" }}
+                                              whileHover={{ 
+                                                scale: 1.08, 
+                                                filter: isBooked 
+                                                  ? "brightness(1.15) drop-shadow(0 0 8px rgba(239, 68, 68, 0.5))" 
+                                                  : isSelected 
+                                                    ? "brightness(1.2) drop-shadow(0 0 10px rgba(45, 212, 191, 0.7))" 
+                                                    : "brightness(1.25) drop-shadow(0 0 8px rgba(255, 255, 255, 0.4))" 
+                                              }}
                                               whileTap={isBooked ? {} : { scale: 0.94 }}
                                               transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                               style={{ 
@@ -4089,6 +4236,70 @@ export default function App() {
                                       );
                                     })}
                                 </g>
+
+                                   {/* Floating SVG Tooltip showing capacity & status on hover */}
+                                   {hoveredSvgTable && (() => {
+                                     const t = hoveredSvgTable;
+                                     if (t.room !== selectedRoom) return null;
+
+                                     const isBooked = bookings.some(b => b.type === 'table' && b.tableId === t.id && b.date === tabletopDate && b.time === tabletopTime);
+                                     const isSelected = selectedTables.some(item => item.id === t.id) || selectedTable?.id === t.id;
+
+                                     const cx = t.x + t.width / 2;
+                                     const cy = t.y + t.height / 2;
+                                     const tooltipWidth = 190;
+                                     const tooltipHeight = 72;
+                                     const tooltipX = cx - tooltipWidth / 2;
+                                     const tooltipY = Math.max(5, cy - (t.height / 2) - tooltipHeight - 14);
+
+                                     let statusText = i18n.language === 'ru' ? 'Свободен' : i18n.language === 'ar' ? 'متاح' : i18n.language === 'hy' ? 'Ազատ է' : 'Available';
+                                     let statusBadgeBg = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                                     let statusDot = 'bg-emerald-400';
+
+                                     if (isBooked) {
+                                       statusText = i18n.language === 'ru' ? 'Забронирован' : i18n.language === 'ar' ? 'محجوز' : i18n.language === 'hy' ? 'Ամրագրված է' : 'Reserved';
+                                       statusBadgeBg = 'bg-red-500/20 text-red-400 border-red-500/30';
+                                       statusDot = 'bg-red-400';
+                                     } else if (isSelected) {
+                                       statusText = i18n.language === 'ru' ? 'Выбран' : i18n.language === 'ar' ? 'محدد' : i18n.language === 'hy' ? 'Ընտրված է' : 'Selected';
+                                       statusBadgeBg = 'bg-teal-500/20 text-teal-300 border-teal-500/30';
+                                       statusDot = 'bg-teal-400';
+                                     }
+
+                                     const capacityLabel = i18n.language === 'ru' 
+                                       ? `Вместимость: ${t.capacity} чел.` 
+                                       : i18n.language === 'ar' 
+                                         ? `السعة: ${t.capacity} أشخاص` 
+                                         : i18n.language === 'hy' 
+                                           ? `Տարողություն՝ ${t.capacity} անձ` 
+                                           : `Capacity: ${t.capacity} guests`;
+
+                                     return (
+                                       <g transform={`translate(${tooltipX}, ${tooltipY})`} className="pointer-events-none z-50">
+                                         <foreignObject width={tooltipWidth} height={tooltipHeight + 15} className="overflow-visible">
+                                           <div className="flex flex-col items-center">
+                                             <div className="w-full bg-[#161920]/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl text-left flex flex-col gap-1 text-white ring-1 ring-white/10">
+                                               <div className="flex items-center justify-between border-b border-white/10 pb-1">
+                                                 <span className="font-display font-black text-xs text-white">
+                                                   {i18n.language === 'ru' ? `Столик #${t.number}` : i18n.language === 'ar' ? `طاولة #${t.number}` : i18n.language === 'hy' ? `Սեղան #${t.number}` : `Table #${t.number}`}
+                                                 </span>
+                                                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border flex items-center gap-1 ${statusBadgeBg}`}>
+                                                   <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} />
+                                                   {statusText}
+                                                 </span>
+                                               </div>
+                                               <div className="flex items-center justify-between text-[10px] text-white/80 font-mono pt-0.5">
+                                                 <span>👥 {capacityLabel}</span>
+                                                 <span className="capitalize text-teal-300 font-bold">{t.type}</span>
+                                               </div>
+                                             </div>
+                                             {/* Tooltip pointer arrow */}
+                                             <div className="w-2.5 h-2.5 bg-[#161920] border-r border-b border-white/20 rotate-45 -mt-1.5" />
+                                           </div>
+                                         </foreignObject>
+                                       </g>
+                                     );
+                                   })()}
 
                                 {/* SVG Gradient patterns definitions */}
                                 <defs>
@@ -5916,7 +6127,7 @@ export default function App() {
                       </div>
                       <button 
                         onClick={() => setShowRegisterRestaurantModal(false)}
-                        className="p-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/60 hover:text-white transition"
+                        className="p-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/60 hover:text-white transition cursor-pointer"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -5974,7 +6185,7 @@ export default function App() {
                         <textarea 
                           value={newRestaurantForm.description}
                           onChange={e => setNewRestaurantForm({...newRestaurantForm, description: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'Опишите атмосферу, фирменные блюда и особенности заведения...' : i18n.language === 'ar' ? 'صف الأجواء، الأطباق المميزة وميزات المنشأة...' : i18n.language === 'hy' ? 'Նկարագրեք հաստատության մթնոլորտը, ֆիրմային ուտեստներն ու առանձնահատկությունները...' : 'Describe the atmosphere, signature dishes, and features of the venue...'}
+                          placeholder={i18n.language === 'ru' ? 'Опишите атмосферу, фирменные блюда и особенности заведения...' : i18n.language === 'ar' ? 'صف الأجواء، الأطباق المميزة وميزات المنشأة...' : i18n.language === 'hy' ? 'Նկարագրեք մթնոլորտը...' : 'Describe atmosphere...'}
                           rows={3}
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500 resize-none"
                         />
@@ -5988,7 +6199,7 @@ export default function App() {
                           type="text" 
                           value={newRestaurantForm.image}
                           onChange={e => setNewRestaurantForm({...newRestaurantForm, image: e.target.value})}
-                          placeholder={i18n.language === 'ru' ? 'https://images.unsplash.com/... (Оставьте пустым для автогенерации)' : i18n.language === 'ar' ? 'https://images.unsplash.com/... (اتركه فارغاً للتوليد التلقائي)' : i18n.language === 'hy' ? 'https://images.unsplash.com/... (Թողնել դատարկ ավտոմատ գեներացման համար)' : 'https://images.unsplash.com/... (Leave empty for auto-generation)'}
+                          placeholder="https://images.unsplash.com/..."
                           className="w-full px-4 py-2 bg-[#0F1115] border border-white/10 text-white rounded-xl text-xs focus:outline-none focus:border-teal-500"
                         />
                       </div>
@@ -6022,34 +6233,23 @@ export default function App() {
               {showSyncConfirmModal && pendingSyncBooking && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                   <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={() => {
-                      setShowSyncConfirmModal(false);
-                      setPendingSyncBooking(null);
-                    }}
-                    className="absolute inset-0 bg-black/90 backdrop-blur-md"
-                  />
-
-                  <motion.div
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    className="bg-[#16191F] border border-white/10 rounded-3xl p-6 max-w-lg w-full relative z-[101] shadow-2xl overflow-hidden text-left"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-[#16191F] border border-white/10 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5 text-left"
                   >
-                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-                    <div className="flex justify-between items-center mb-6 relative">
+                    <div className="flex justify-between items-center pb-3 border-b border-white/5">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
+                        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
                           <CalendarDays className="w-5 h-5" />
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-base text-white">
-                            {i18n.language === 'ru' ? 'Синхронизация события' : i18n.language === 'ar' ? 'مزامنة الحدث' : i18n.language === 'hy' ? 'Իրադարձության սինխրոնացում' : 'Event Synchronization'}
+                            {i18n.language === 'ru' ? 'Синхронизация с Google Календарём' : i18n.language === 'ar' ? 'مزامنة مع تقويم Google' : i18n.language === 'hy' ? 'Սինխրոնացում Google Օրացույցի հետ' : 'Google Calendar Sync'}
                           </h4>
-                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Google Calendar Confirmation</span>
+                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider block">
+                            OAuth 2.0 Integration
+                          </span>
                         </div>
                       </div>
                       <button 
@@ -6136,6 +6336,40 @@ export default function App() {
                 </div>
               )}
             </AnimatePresence>
+
+            {/* Sticky subtle footer with bottom padding to account for sticky bottom dock */}
+            <footer className="bg-[#0F1115] border-t border-white/5 py-8 text-center text-xs text-white/40 mt-12 pb-28" id="main-footer">
+              <div className="max-w-7xl mx-auto px-4">
+                <p>
+                  {i18n.language === 'ru' ? '© 2026 OmniReserve Booking Superapp. Объединенная            </div>
+
+            {/* Floating OmniConcierge AI Chatbot (Moved slightly higher to avoid overlapping bottom bar) */}/motion.div>
+                ))}
+              </AnimatePresence>
+            </div>             {isActive && (
+                        <motion.div
+                          layoutId="activeTabGlow"
+                          className="absolute -top-[13px] w-12 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full shadow-[0_0_10px_#2dd4bf]"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                      
+                      <div className={`p-1.5 rounded-xl transition-transform duration-300 ${
+                        isActive ? "scale-110 text-teal-400 bg-teal-500/10" : "group-hover:scale-105"
+                      }`}>
+                        <Icon className={`w-5 h-5 ${isActive ? "stroke-[2.5px]" : "stroke-[1.8px]"}`} />
+                      </div>
+                      
+                      <span className={`text-[10px] font-medium tracking-tight transition-colors ${
+                        isActive ? "font-bold text-white" : "font-semibold text-white/50"
+                      }`}>
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Floating Upcoming Booking Alerts Toast Center */}
             <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-4 max-w-sm w-full pointer-events-none">
