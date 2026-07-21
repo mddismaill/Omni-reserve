@@ -1,7 +1,7 @@
 // Typed wrappers around supabase.functions.invoke for all migrated backend endpoints.
 // Each function returns typed data or throws an Error with a message safe to display.
 
-import { supabase } from "../integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "../integrations/supabase/client";
 import i18n from "./i18n";
 import type {
   Restaurant,
@@ -20,15 +20,77 @@ interface InvokeResult<T> {
 }
 
 /**
+ * Maps Supabase edge-function names to local Express endpoints when Supabase is
+ * not configured. This lets the app run with the built-in in-memory server
+ * without requiring real Supabase credentials.
+ */
+function localEndpoint(fnName: string, method?: string): string | null {
+  if (method === "GET" && fnName.startsWith("tables?")) return `/api/${fnName}`;
+  switch (fnName) {
+    case "restaurants":
+    case "salons":
+    case "services":
+      return `/api/${fnName}`;
+    case "book-table":
+      return "/api/tables/book";
+    case "book-service":
+      return "/api/services/book";
+    default:
+      return null;
+  }
+}
+
+async function invokeLocalOrThrow<T>(
+  fnName: string,
+  options: { method?: "GET" | "POST"; body?: unknown } = {},
+  fallbackError = "Request failed"
+): Promise<T> {
+  const endpoint = localEndpoint(fnName, options.method);
+  if (!endpoint) {
+    throw new Error(fallbackError);
+  }
+
+  const attempt = async () => {
+    const response = await fetch(endpoint, {
+      method: options.method ?? "GET",
+      headers: { "Content-Type": "application/json" },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+    if (!response.ok) {
+      const text = await response.text().catch(() => "Request failed");
+      throw new Error(text || fallbackError);
+    }
+    return (await response.json()) as T;
+  };
+
+  try {
+    return await attempt();
+  } catch (err) {
+    // Retry once after a short delay. The dev server can be a few ms behind
+    // the browser during the first load, so a single retry removes transient
+    // startup failures without hiding real errors.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return await attempt();
+  }
+}
+
+/**
  * Runs supabase.functions.invoke and normalizes errors into thrown Error objects.
  * Uses the server-provided error message when present, otherwise falls back
  * to the raw invoke error, otherwise a generic message.
+ *
+ * When Supabase is not configured, falls back to the local Express endpoints
+ * served by server.ts so the app can run with demo data.
  */
 async function invokeOrThrow<T>(
   fnName: string,
   options: { method?: "GET" | "POST"; body?: unknown } = {},
   fallbackError = "Request failed"
 ): Promise<T> {
+  if (!isSupabaseConfigured) {
+    return invokeLocalOrThrow<T>(fnName, options, fallbackError);
+  }
+
   const { data, error } = (await supabase.functions.invoke(fnName, {
     method: options.method ?? "GET",
     body: options.body as never,

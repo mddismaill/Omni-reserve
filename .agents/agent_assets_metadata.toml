@@ -6,3 +6,15 @@ id = "PVm64zF2O1A9GsA6JhXm3"
 uri = "file://screenshots/app-home.jpg"
 type = "image"
 title = "OmniReserve app running with Invest & Back module"
+
+[[outputs]]
+id = "RUBD4Z3DUoUlYlQV0Vlv7"
+uri = "file://screenshots/app-clean.jpg"
+type = "image"
+title = "OmniReserve app running cleanly"
+
+[[outputs]]
+id = "TuRtSd2lkSQAR7e560ZcY"
+uri = "file://screenshots/app-final.jpg"
+type = "image"
+title = "OmniReserve app running without console errors"
