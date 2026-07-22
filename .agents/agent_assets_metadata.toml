@@ -30,3 +30,9 @@ id = "G3vUHl59eBHzB9OEwNdnr"
 uri = "file://screenshots/app-task4-final.jpg"
 type = "image"
 title = "OmniReserve app running after dependency vulnerability fixes"
+
+[[outputs]]
+id = "Y09cl-67OAFqsk5gmEZs8"
+uri = "file://screenshots/app-task5-final.jpg"
+type = "image"
+title = "OmniReserve app running after vulnerability fixes"
