@@ -23,5 +23,16 @@ export default defineConfig(() => {
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
       allowedHosts: true as const,
     },
+    build: {
+      target: 'es2022',
+    },
+    esbuild: {
+      target: 'es2022',
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'es2022',
+      },
+    },
   };
 });
